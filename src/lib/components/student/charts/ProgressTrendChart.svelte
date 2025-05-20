@@ -1,7 +1,7 @@
 <script>
 	import { createEventDispatcher, onMount } from 'svelte';
 	import Chart from 'chart.js/auto';
-	import Card from './components/Card.svelte';
+	import { Card } from '$lib';
 	import { chatContextStore, selectedClassStore } from '$lib/stores/globalFilters.js';
 	import { FilterIcon } from '$lib/svgComponents';
 
@@ -37,7 +37,7 @@
 		Mathematics: '#4CAF50',
 		English: '#9C27B0',
 		Hindi: '#2196F3',
-		'Science': '#FFEB3B',
+		Science: '#FFEB3B',
 		'Social Science': '#F44336'
 	};
 
@@ -197,8 +197,6 @@
 				<!-- <span>{$selectedClassStore.fullClassName}</span> -->
 				<span>Date: {dateRange}</span>
 				<span>Subject: {subjectFilter}</span>
-				
-				
 			</div>
 		</div>
 		<button class="flex gap-2 items-center text-link font-medium" on:click={setContextInChatBox}>

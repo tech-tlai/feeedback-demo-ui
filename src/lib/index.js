@@ -1,11 +1,8 @@
 // place files you want to import through the `$lib` alias in this folder.
 // Follow the same order as in the file structure ( Alphabetical order of the file names)
+
 // lib
-import ProgressTrendChart from '$lib/ProgressTrendChart.svelte';
-import PercentileTrendChart from '$lib/PercentileTrendChart.svelte';
 
-
-export {ProgressTrendChart,PercentileTrendChart}
 
 //lib/components
 import Card from '$lib/components/Card.svelte';
@@ -114,10 +111,11 @@ import AllSubjectsPercentileTrend from '$lib/components/student/charts/AllSubjec
 import BadgesUnlocked from '$lib/components/student/charts/BadgesUnlocked.svelte';
 import CurrentGoals from '$lib/components/student/charts/CurrentGoals.svelte';
 import GoalsCard from '$lib/components/student/charts/GoalsCard.svelte';
+import PercentileTrendChart from '$lib/components/student/charts/PercentileTrendChart.svelte';
 import PerfHistoryCard from '$lib/components/student/charts/PerfHistoryCard.svelte';
 import PerformanceTable from '$lib/components/student/charts/PerformanceTable.svelte';
+import ProgressTrendChart from '$lib/components/student/charts/ProgressTrendChart.svelte';
 import StudentPerfAnalysis from '$lib/components/student/charts/StudentPerfAnalysis.svelte';
-
 import Quote from '$lib/components/student/charts/Quote.svelte';
 
 export {
@@ -126,8 +124,10 @@ export {
   BadgesUnlocked, 
   CurrentGoals, 
   GoalsCard, 
+  PercentileTrendChart,
   PerfHistoryCard,
   PerformanceTable,
+  ProgressTrendChart,
   Quote,
   StudentPerfAnalysis
 }

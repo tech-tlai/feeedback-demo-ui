@@ -1,7 +1,7 @@
 <script>
 	import { createEventDispatcher, onMount } from 'svelte';
 	import Chart from 'chart.js/auto';
-	import Card from './components/Card.svelte';
+	import {Card} from '$lib';
 	import { chatContextStore, selectedClassStore } from '$lib/stores/globalFilters.js';
 	import { FilterIcon } from '$lib/svgComponents';
 
