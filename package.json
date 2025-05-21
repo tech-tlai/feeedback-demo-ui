@@ -31,6 +31,10 @@
 		"vite-plugin-iso-import": "^1.1.0"
 	},
 	"dependencies": {
-		"d3": "^7.9.0"
+		"@vercel/nft": "^0.29.3",
+		"amplify-adapter": "^1.1.0",
+		"chart.js": "^4.4.9",
+		"d3": "^7.9.0",
+		"prepend-file": "^2.0.1"
 	}
 }
