@@ -33,7 +33,7 @@ export {
 // ========================================================================
 
 //lib/components/charts
-import DrilldownChart from '$lib/components/charts/DrillDownChart.svelte';
+import DrilldownChart from '$lib/components/charts/DrilldownChart.svelte';
 import Histogram from '$lib/components/charts/Histogram.svelte';
 import PackedBubbleChart from '$lib/components/charts/PackedBubbleChart.svelte';
 
