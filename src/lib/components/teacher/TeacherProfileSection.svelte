@@ -5,6 +5,7 @@
 	import { OtherClassSummary } from '$lib';
 	import ChatInterface from '$lib/components/profileSection/ChatInterface.svelte';
 	import AllClassesSummary from '$lib/components/teacher/AllClassesSummary.svelte';
+	import { fetchApi } from '$lib/apiUtils.js';
 	export let profileData = {
 		name: 'Sabdeep Sharma',
 		role: 'TEACHER',
@@ -18,28 +19,21 @@
 	export let classes = [];
 
 	const chatHistory = [
-    "How did Class 10 perform in the end-term exam?",
-    "What are the weak areas in Mathematics for Class 7?",
-    "Which students from Class 5 showed the most improvement in English?",
-    // "How does the latest English test performance compare to the previous one for Class 10?",
-    "What can be done to improve vocabulary for Class 3A?",
-    // "Which topics need more reinforcement for Class 6 in Social Science?",
-    // "How does Class 8’s overall performance compare to the school average?",
-    // "Which students from Class 4 are struggling the most with reading comprehension?",
-    // "What percentage of Class 2A scored above 80% in General Science?",
-    // "Which types of questions had the lowest accuracy in Class 11’s recent exam?"
-]
+		{ uuid: 1, text: 'How did Class 10 perform in the end-term exam?' },
+		{ uuid: 2, text: 'What are the weak areas in Mathematics for Class 7?' },
+		{ uuid: 3, text: 'Which students from Class 5 showed the most improvement in English?' },
+		{ uuid: 4, text: 'What can be done to improve vocabulary for Class 3A?' }
+		// Add more as needed, incrementing the id
+	];
 
 	const pinnedChats = 12;
 	const suggestedQueries = [
 		{
+			id: 1,
 			title: 'Subject specific insights',
-			query: 'How did I perform in Mathematics?'
+			query: 'How does class 5 perform in Mathematics?'
 		},
-		{
-			title: 'Analyze weak areas',
-			query: 'Where am I losing marks in Geography?'
-		}
+		{ id: 2, title: 'Analyze weak areas', query: 'Weaknesses of class 3 students in English.' }
 	];
 
 	// Helper function to determine score color
@@ -48,6 +42,62 @@
 		if (status === 'warning') return 'bg-orange-light text-orange-dark';
 		return 'bg-gray-light text-gray-dark';
 	}
+
+	let selectedChat = null;
+	let chatDetails = null;
+	let loadingChatDetails = false;
+	let chatError = null;
+
+	async function handleChatSelection(e) {
+		const chat = e.detail;
+		selectedChat = chat;
+		chatDetails = null;
+		chatError = null;
+		if (!chat || (!chat.id && !chat.uuid)) return;
+		loadingChatDetails = true;
+		try {
+			const data = await fetchApi(`/apis/teacher/chat/details/${chat.id || chat.uuid}`);
+			chatDetails = { queryTitle: data.title, response: data.details };
+		} catch (err) {
+			chatError = err.message;
+		} finally {
+			loadingChatDetails = false;
+		}
+	}
+
+	async function handleFetchFromSuggestion(e) {
+		const suggestion = e.detail;
+		console.log('suggestion', suggestion);
+		chatDetails = null;
+		chatError = null;
+		loadingChatDetails = true;
+		try {
+			const data = await fetchApi(`/apis/teacher/chat/suggestions/${suggestion.id}`);
+			chatDetails = { queryTitle: data.query, response: data.response };
+		} catch (err) {
+			chatError = err.message;
+		} finally {
+			loadingChatDetails = false;
+		}
+	}
+
+	async function handleChatInput(e) {
+		const inputText = e.detail;
+		chatDetails = null;
+		chatError = null;
+		loadingChatDetails = true;
+		try {
+			const data = await fetchApi('/apis/teacher/chat', {
+				method: 'POST',
+				body: { title: inputText }
+			});
+			chatDetails = { queryTitle: data.title, response: data.response };
+		} catch (err) {
+			chatError = err.message;
+		} finally {
+			loadingChatDetails = false;
+		}
+	}
 </script>
 
 <div class="w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-5">
@@ -55,7 +105,12 @@
 	<div class="lg:col-span-3 space-y-4">
 		<ProfileCard {...profileData} />
 
-		<ChatHistory history={chatHistory} pinnedCount={pinnedChats} />
+		<ChatHistory
+			history={chatHistory}
+			pinnedCount={pinnedChats}
+			on:chatSelected={handleChatSelection}
+			selected={selectedChat}
+		/>
 	</div>
 
 	<!-- Main Content Area -->
@@ -65,7 +120,12 @@
 			<!--  -->
 			<AllClassesSummary />
 			<div class=" flex-grow">
-				<ChatInterface {suggestedQueries} />
+				<ChatInterface
+					aiResponse={chatDetails}
+					{suggestedQueries}
+					on:fetchFromSuggestion={handleFetchFromSuggestion}
+					on:chatInput={handleChatInput}
+				/>
 			</div>
 		</div>
 	</div>

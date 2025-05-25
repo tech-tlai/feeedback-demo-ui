@@ -12,9 +12,9 @@
     <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
       <!-- Student Dashboard Card -->
       <div class="bg-white rounded-xl shadow-lg overflow-hidden transition-transform duration-700 hover:scale-105 hover:shadow-xl">
-        <div class="h-48 bg-gradient-to-r from-purple-400 to-indigo-500 relative overflow-hidden">
+        <div class="h-64 bg-gradient-to-r from-purple-400 to-indigo-500 relative overflow-hidden">
           <img 
-            src="/placeholder.svg?height=200&width=400&query=students+studying+in+classroom+illustration" 
+            src="/students-thumbnail.png" 
             alt="Student Dashboard" 
             class="w-full h-full object-cover"
           />
@@ -51,9 +51,9 @@
 
       <!-- Teacher Dashboard Card -->
       <div class="bg-white rounded-xl shadow-lg overflow-hidden transition-transform duration-700 hover:scale-105 hover:shadow-xl">
-        <div class="h-48 bg-gradient-to-r from-blue-400 to-cyan-500 relative overflow-hidden">
+        <div class="h-64 bg-gradient-to-r from-blue-400 to-cyan-500 relative overflow-hidden">
           <img 
-            src="/placeholder.svg?height=200&width=400&query=teacher+at+classroom+illustration" 
+            src="/school-thumbnail.png" 
             alt="Teacher Dashboard" 
             class="w-full h-full object-cover"
           />
