@@ -45,3 +45,36 @@ export async function fetchSuggestionResponse(id) {
         throw new Error(error.message);
     }
 }
+
+export async function fetchChatInputResponse(title) {
+    try {
+        const response = await fetch('/apis/student/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title })
+        });
+        if (!response.ok) {
+            throw new Error('Failed to fetch chat input response');
+        }
+        return await response.json();
+    } catch (error) {
+        throw new Error(error.message);
+    }
+}
+
+export async function fetchApi(endpoint, { method = 'GET', body = null } = {}) {
+    try {
+        const options = { method, headers: {} };
+        if (body) {
+            options.headers['Content-Type'] = 'application/json';
+            options.body = JSON.stringify(body);
+        }
+        const response = await fetch(endpoint, options);
+        if (!response.ok) {
+            throw new Error('API request failed');
+        }
+        return await response.json();
+    } catch (error) {
+        throw new Error(error.message);
+    }
+}

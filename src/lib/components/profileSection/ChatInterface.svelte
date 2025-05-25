@@ -4,7 +4,7 @@
 	import { createEventDispatcher, onDestroy, onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
 
-	export let aiResponse = '';
+	export let aiResponse = {};
 	export let suggestedQueries = [];
 
 	const dispatch = createEventDispatcher();
@@ -26,12 +26,29 @@
 
 	let showHeader = false;
 
+	let chatTitle = '';
+	let aiText = '';
+
+	$: {
+		if (typeof aiResponse === 'object' && aiResponse !== null) {
+			chatTitle = aiResponse.queryTitle || '';
+			aiText = aiResponse.response || '';
+		} else {
+			chatTitle = '';
+			aiText = aiResponse || '';
+		}
+	}
+
 	export function startStreaming(response) {
+		let text = '';
+		if (typeof response === 'object' && response !== null) {
+			text = response.response || '';
+		}
 		const batchSize = 3;
 		clearInterval(intervalId);
 		chunks = [];
 		showHeader = false;
-		const sentences = splitIntoSentences(response.trim());
+		const sentences = splitIntoSentences(text.trim());
 		let index = 0;
 
 		intervalId = setInterval(() => {
@@ -47,7 +64,7 @@
 	}
 
 	function triggerChat() {
-		if (aiResponse) {
+		if (aiResponse && Object?.keys(aiResponse).length > 0) {
 			startStreaming(aiResponse);
 		}
 	}
@@ -73,9 +90,7 @@
 
 	function handleFormSubmit(event) {
 		event.preventDefault();
-		setTimeout(() => {
-			startStreaming();
-		}, 1000);
+		dispatch('chatInput', inputText);
 		inputText = '';
 	}
 
@@ -97,7 +112,7 @@
 	function removeContext() {
 		$chatContextStore = null;
 	}
-
+	
 	function setInputFromSuggestion(suggestion) {
 		// inputText = suggestion.query;
 		// chatBoxRef.focus();
@@ -121,14 +136,15 @@
 	onDestroy(() => clearInterval(intervalId));
 </script>
 
-<div class="bg-white rounded-lg shadow p-6 h-full flex flex-col justify-end">
-	<h3 class="text-black text-center font-semibold mb-4">
+<div class="bg-white rounded-lg shadow p-6 h-full flex flex-col justify-between">
+	<h3 class="text-black text-center font-semibold">
+		&nbsp;
 		{#if showHeader}
-			<span in:fade={{ duration: 250 }}> Geograpy performance </span>
+			<span in:fade={{ duration: 250 }}> {chatTitle} </span>
 		{/if}
 	</h3>
 	<div
-		class="overflow-y-auto text-gray-dark pr-2 max-h-[clamp(200px,40vh,400px)] p-4 leading-8 whitespace-pre-wrap flex-grow flex flex-col justify-end"
+		class="overflow-y-auto text-gray-dark pr-2 max-h-[clamp(200px,40vh,400px)] p-4 leading-8 whitespace-pre-wrap flex-grow flex flex-col "
 	>
 		<!-- {displayedText} version 1 -->
 

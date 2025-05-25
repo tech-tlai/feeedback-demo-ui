@@ -5,7 +5,7 @@
 	import ChatInterface from '$lib/components/profileSection/ChatInterface.svelte';
 	import ExamSchedule from '$lib/components/profileSection/ExamSchedule.svelte';
 	import Achievements from '$lib/components/profileSection/Achievements.svelte';
-	import { fetchChatDetails, fetchSuggestionResponse } from '$lib/apiUtils.js';
+	import { fetchApi } from '$lib/apiUtils.js';
 
 	// Sample data
 	export let profileData = {
@@ -50,12 +50,11 @@
 	];
 
 	const chatHistory = [
-		{ uuid: 1, text: 'How duuid I perform in previous 4 English tests?' },
-		{ uuid: 2, text: 'Analyse my weaknesses in Hindi grammar.' },
-		{ uuid: 3, text: 'Overall performance in Mathematics tests' },
-		{ uuid: 4, text: 'What feedback do you have on my problem..' },
-		{ uuid: 5, text: 'How did I perform in previous 4 English tests?' }
-	];
+    { "uuid": 1, "text": "How did Class 5 perform overall in the recent Mathematics assessment?" },
+    { "uuid": 2, "text": "What are the common challenges Class 3 students face in multiplication?" },
+    { "uuid": 3, "text": "Which specific topics in Geometry need more attention for Class 5?" },
+    { "uuid": 4, "text": "Are there any patterns in the errors made by Class 3 in their basic arithmetic problems?" }
+]
 
 	const pinnedChats = 12;
 
@@ -101,9 +100,8 @@
 		if (!chat || (!chat.id && !chat.uuid)) return;
 		loadingChatDetails = true;
 		try {
-			const data = await fetchChatDetails(chat.id || chat.uuid);
-			chatDetails = data.details;
-			console.log('chatDetails', chatDetails);
+		const data = await fetchApi(`/apis/student/chat/details/${chat.id || chat.uuid}`);
+			chatDetails = { queryTitle: data.title, response: data.details };
 		} catch (err) {
 			chatError = err.message;
 		} finally {
@@ -117,9 +115,23 @@
 		chatError = null;
 		loadingChatDetails = true;
 		try {
-			const data = await fetchSuggestionResponse(suggestion.id);
-			chatDetails = data.response;
-			console.log('data',data)
+			const data = await fetchApi(`/apis/student/chat/suggestions/${suggestion.id}`);
+			chatDetails = { queryTitle: data.query, response: data.response };
+		} catch (err) {
+			chatError = err.message;
+		} finally {
+			loadingChatDetails = false;
+		}
+	}
+
+	async function handleChatInput(e) {
+		const inputText = e.detail;
+		chatDetails = null;
+		chatError = null;
+		loadingChatDetails = true;
+		try {
+			const data = await fetchApi('/apis/student/chat', { method: 'POST', body: { title: inputText } });
+			chatDetails = { queryTitle: data.title, response: data.response };
 		} catch (err) {
 			chatError = err.message;
 		} finally {
@@ -148,7 +160,13 @@
 					<h2 class="text-base font-medium text-gray-700 mb-4">RECENT RESULT - MID TERM '24</h2>
 					<StatisticsSection stats={statsData} />
 				</div>
-				<ChatInterface aiResponse={chatDetails} {suggestedQueries} bind:this={chatInterface} on:fetchFromSuggestion={handleFetchFromSuggestion}/>
+				<ChatInterface
+					aiResponse={chatDetails}
+					{suggestedQueries}
+					bind:this={chatInterface}
+					on:fetchFromSuggestion={handleFetchFromSuggestion}
+					on:chatInput={handleChatInput}
+				/>
 			</div>
 		</div>
 
