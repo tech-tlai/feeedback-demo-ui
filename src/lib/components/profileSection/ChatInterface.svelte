@@ -1,114 +1,17 @@
 <script>
 	import ExpandIcon from '$lib/svgComponents/ExpandIcon.svelte';
 	import { chatContextStore } from '$lib/stores/globalFilters.js';
-	import { onDestroy, onMount } from 'svelte';
+	import { createEventDispatcher, onDestroy, onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
-	import { aiResponse } from '$lib/data';
 
-	export let fullResponse =
-		"Rahul Sharma is facing challenges in English, particularly in comprehension and grammar accuracy. His performance indicates a need for focused reinforcement in foundational concepts, as inconsistencies in sentence structure and vocabulary usage are affecting his overall scores. Encouraging more structured reading activities and targeted exercises can help build his confidence and improve retention. A gradual, consistent approach to practice will be beneficial in enhancing his understanding and performance over time. With the right support, steady progress is achievable.";
+	export let aiResponse = '';
+	export let suggestedQueries = [];
+
+	const dispatch = createEventDispatcher();
 
 	let displayedText = '';
 	let intervalId;
-
-	// robotic word by word effect
-	// export function startStreaming() {
-	// 	displayedText = '';
-	// 	clearInterval(intervalId); // clear previous
-	// 	let index = 0;
-	// 	const responseSplitIntoWords = fullResponse.split(' ');
-	// 	intervalId = setInterval(() => {
-	// 		if (index < responseSplitIntoWords.length) {
-	// 			displayedText += responseSplitIntoWords[index]+ ' ';
-	// 			index++;
-	// 		} else {
-	// 			clearInterval(intervalId);
-	// 		}
-	// 	}, 100);
-	// }
-
-	// reveal by chunks
 	let chunks = [];
-
-	export function startStreaming() {
-		const batchSize = 3; // show 2 words per chunk
-		chunks = [];
-		clearInterval(intervalId);
-
-		let index = 0;
-		const words = fullResponse.split(' ');
-		intervalId = setInterval(() => {
-			if (index < words.length) {
-				const nextChunk = words.slice(index, index + batchSize).join(' ');
-				chunks = [...chunks, ' ', nextChunk];
-				index += batchSize;
-			} else {
-				clearInterval(intervalId);
-			}
-		}, 180);
-	}
-
-	// version 3
-	// export let aiResponse = [];
-
-	// let revealedBlocks = [];
-
-	// export function startStreaming() {
-	// 	revealedBlocks = [];
-	// 	clearInterval(intervalId);
-
-	// 	let index = 0;
-	// 	intervalId = setInterval(() => {
-	// 		if (index < aiResponse.length) {
-	// 			revealedBlocks = [...revealedBlocks, aiResponse[index]];
-	// 			index++;
-	// 		} else {
-	// 			clearInterval(intervalId);
-	// 		}
-	// 	}, 600); // reveal a block every 600ms
-	// }
-
-	//version 4 - hybrid approach
-	// import { tick } from 'svelte';
-
-	// let displayedBlocks = [];
-
-	// const WORDS_PER_CHUNK = 3;
-	// const WORD_DELAY = 100; // ms per chunk
-	// const BLOCK_DELAY = 500; // ms delay between blocks
-
-	// async function startStreaming() {
-	// 	for (const block of aiResponse) {
-	// 		if (block.type === 'table') {
-	// 			displayedBlocks = [...displayedBlocks, { ...block, reveal: true }];
-	// 			await new Promise((resolve) => setTimeout(resolve, BLOCK_DELAY));
-	// 		} else {
-	// 			const words = block.content.split(' ');
-	// 			let revealedText = '';
-
-	// 			for (let i = 0; i < words.length; i += WORDS_PER_CHUNK) {
-	// 				const chunk = words.slice(i, i + WORDS_PER_CHUNK).join(' ');
-	// 				revealedText += (revealedText ? ' ' : '') + chunk;
-
-	// 				displayedBlocks = [...displayedBlocks, { ...block, content: revealedText, reveal: true }];
-	// 				await tick();
-	// 				await new Promise((resolve) => setTimeout(resolve, WORD_DELAY));
-
-	// 				// Remove the duplicate blocks in between chunks
-	// 				displayedBlocks = displayedBlocks.filter((b, index, arr) => {
-	// 					if (b.type !== block.type) return true;
-	// 					const lastIndex = arr.map((bb) => bb.type).lastIndexOf(block.type);
-	// 					return index === lastIndex;
-	// 				});
-	// 			}
-	// 			await new Promise((resolve) => setTimeout(resolve, BLOCK_DELAY));
-	// 		}
-	// 	}
-	// }
-
-	onDestroy(() => clearInterval(intervalId));
-
-	export let suggestedQueries = [];
 
 	let inputText = '';
 	let maxChatBoxHeight = 200; // Set a maximum height for the chat box
@@ -116,22 +19,38 @@
 	let chatBoxRef = null; // Reference to the chat box element
 
 	let chatContext;
-	onMount(() => {
-		const unsubscribe = chatContextStore.subscribe((value) => {
-			chatContext = value;
-			if (chatContext) {
-				focusChatBox();
+
+	function splitIntoSentences(text) {
+		return text.match(/[^\.!\?]+[\.!\?]+/g) || [];
+	}
+
+	let showHeader = false;
+
+	export function startStreaming(response) {
+		const batchSize = 3;
+		clearInterval(intervalId);
+		chunks = [];
+		showHeader = false;
+		const sentences = splitIntoSentences(response.trim());
+		let index = 0;
+
+		intervalId = setInterval(() => {
+			if (index < sentences.length) {
+				const nextChunk = sentences[index].trim() + '';
+				chunks = [...chunks, nextChunk];
+				index++;
+			} else {
+				clearInterval(intervalId);
+				showHeader = true;
 			}
-		});
+		}, 400);
+	}
 
-		return () => {
-			unsubscribe();
-		};
-	});
-
-	// onDestroy(() => {
-	// 	unsubscribe();
-	// });
+	function triggerChat() {
+		if (aiResponse) {
+			startStreaming(aiResponse);
+		}
+	}
 
 	export function focusChatBox() {
 		if (chatBoxRef) {
@@ -160,8 +79,6 @@
 		inputText = '';
 	}
 
-	// let listofcharts=[{id:1, name:'Strength Analysis'}, {id:2, name:'Weakness Analysis'}, {id:3, name:'Topic Analysis'}, {id:4, name:'Class Performance'}, {id:5, name:'Class Performance'}, {id:6, name:'Class Performance'}]
-
 	// auto-resize function
 	function autoResize(event) {
 		if (event.key === 'Enter' && !event.shiftKey) {
@@ -180,87 +97,66 @@
 	function removeContext() {
 		$chatContextStore = null;
 	}
+
+	function setInputFromSuggestion(suggestion) {
+		// inputText = suggestion.query;
+		// chatBoxRef.focus();
+		dispatch('fetchFromSuggestion', suggestion);
+	}
+
+	$: triggerChat(aiResponse);
+	onMount(() => {
+		const unsubscribe = chatContextStore.subscribe((value) => {
+			chatContext = value;
+			if (chatContext) {
+				focusChatBox();
+			}
+		});
+
+		return () => {
+			unsubscribe();
+		};
+	});
+
+	onDestroy(() => clearInterval(intervalId));
 </script>
 
 <div class="bg-white rounded-lg shadow p-6 h-full flex flex-col justify-end">
+	<h3 class="text-black text-center font-semibold mb-4">
+		{#if showHeader}
+			<span in:fade={{ duration: 250 }}> Geograpy performance </span>
+		{/if}
+	</h3>
 	<div
-		class="overflow-y-auto text-gray-dark pr-2 max-h-[clamp(200px,45vh,400px)] p-4 leading-8 whitespace-pre-wrap flex-grow flex flex-col justify-end"
+		class="overflow-y-auto text-gray-dark pr-2 max-h-[clamp(200px,40vh,400px)] p-4 leading-8 whitespace-pre-wrap flex-grow flex flex-col justify-end"
 	>
 		<!-- {displayedText} version 1 -->
 
 		<!-- verions 2 -->
-		<div class="max-h-full ">
-			{#each chunks as word, i (i)}
-				<span in:fade={{ duration: 200 }}>{word}</span>
+
+		<div class="max-h-full">
+			<!-- {#each chunks as chunk, i (i)}
+				<span in:fade={{ duration: 200 }} class="inline-block mr-1">{chunk}</span>
+			{/each} -->
+
+			{#each chunks as sentence, i (i)}
+				<span in:fade={{ duration: 250 }} class="mb-2 mr-1">{sentence}</span>
 			{/each}
 		</div>
-
-		<!-- verions 3 -->
-		<!-- {#each revealedBlocks as block, i (i)}
-		<div in:fade={{ duration: 300 }}>
-			{#if block.type === 'paragraph'}
-				<p class="leading-relaxed">{block.content}</p>
-
-			{:else if block.type === 'code'}
-				<pre class="bg-gray-900 text-green-200 p-3 rounded overflow-auto text-sm"><code>{block.content}</code></pre>
-
-			{:else if block.type === 'table'}
-				<table class="w-full text-sm border border-gray-300 rounded overflow-hidden">
-					{#each block.content as row, ri}
-						<tr class={ri === 0 ? 'bg-gray-200 font-semibold' : ''}>
-							{#each row as cell}
-								<td class="border px-2 py-1">{cell}</td>
-							{/each}
-						</tr>
-					{/each}
-				</table>
-
-			{:else if block.type === 'list'}
-				<ul class="list-disc pl-5 space-y-1">
-					{#each block.content as item}
-						<li>{item}</li>
-					{/each}
-				</ul>
-			{/if}
-		</div>
-	{/each} -->
-
-		<!-- version 4 -->
-		<!-- {#each displayedBlocks as block (block.content)}
-			{#if block.type === 'paragraph'}
-				<p transition:fade class="text-gray-800 leading-relaxed">{block.content}</p>
-			{:else if block.type === 'list'}
-				<ul class="list-disc pl-6 space-y-1">
-					{#each block.content.split('\n') as item (item)}
-						<li transition:fade>{item}</li>
-					{/each}
-				</ul>
-			{:else if block.type === 'code'}
-				<pre transition:fade class="bg-gray-100 p-3 rounded text-sm overflow-auto"><code
-						>{block.content}</code
-					></pre>
-			{:else if block.type === 'table'}
-				<table transition:fade class="w-full border border-collapse text-sm">
-					{#each block.content as row, i}
-						<tr class={i === 0 ? 'bg-gray-200' : ''}>
-							{#each row as cell}
-								<td class="border px-2 py-1">{cell}</td>
-							{/each}
-						</tr>
-					{/each}
-				</table>
-			{/if}
-		{/each} -->
 	</div>
+
 	<div>
 		<h2 class="text-2xl font-bold text-center text-black mb-6">What can I help you with today?</h2>
 		{#if inputText?.length === 0}
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
 				{#each suggestedQueries as query}
-					<div class="border rounded-lg p-4 hover:bg-gray-50 cursor-pointer">
+					<button
+						class="border rounded-lg p-4 hover:bg-gray-50 cursor-pointer"
+						on:click={() => setInputFromSuggestion(query)}
+					>
 						<h3 class="font-medium text-gray-800">{query.title}</h3>
 						<p class="text-gray-500 text-sm mt-1">{query.query}</p>
-					</div>
+					</button>
 				{/each}
 			</div>
 		{/if}

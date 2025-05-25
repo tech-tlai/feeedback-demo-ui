@@ -18,16 +18,11 @@
 	export let classes = [];
 
 	const chatHistory = [
-    "How did Class 10 perform in the end-term exam?",
-    "What are the weak areas in Mathematics for Class 7?",
-    "Which students from Class 5 showed the most improvement in English?",
-    // "How does the latest English test performance compare to the previous one for Class 10?",
-    "What can be done to improve vocabulary for Class 3A?",
-    // "Which topics need more reinforcement for Class 6 in Social Science?",
-    // "How does Class 8’s overall performance compare to the school average?",
-    // "Which students from Class 4 are struggling the most with reading comprehension?",
-    // "What percentage of Class 2A scored above 80% in General Science?",
-    // "Which types of questions had the lowest accuracy in Class 11’s recent exam?"
+    { uuid: 1, text: "How did Class 10 perform in the end-term exam?" },
+    { uuid: 2, text: "What are the weak areas in Mathematics for Class 7?" },
+    { uuid: 3, text: "Which students from Class 5 showed the most improvement in English?" },
+    { uuid: 4, text: "What can be done to improve vocabulary for Class 3A?" }
+    // Add more as needed, incrementing the id
 ]
 
 	const pinnedChats = 12;
