@@ -124,40 +124,7 @@
               <div class="bg-white rounded-2xl p-6 shadow-2xl">
                 <DummyBarChart/>
               </div>
-               <!-- <div class="flex items-center justify-between mb-6">
-                  <h3 class="text-lg font-bold text-black">Live Analytics</h3>
-                  <div class="flex gap-2">
-                    <div class="w-3 h-3 bg-graph-green rounded-full animate-pulse"></div>
-                    <div class="w-3 h-3 bg-graph-blue rounded-full animate-pulse"></div>
-                    <div class="w-3 h-3 bg-graph-purple rounded-full animate-pulse"></div>
-                  </div>
-                </div>
-                <div class="space-y-4">
-                  <div class="flex justify-between items-center">
-                    <span class="text-gray-dark">Class Performance</span>
-                    <span class="font-bold text-green-dark">+12.5%</span>
-                  </div>
-                  <div class="w-full bg-gray-light rounded-full h-3">
-                    <div
-                      class="bg-gradient-to-r from-graph-green to-graph-blue h-3 rounded-full"
-                      style="width: 85%"
-                    ></div>
-                  </div>
-                  <div class="grid grid-cols-3 gap-4 mt-6">
-                    <div class="text-center">
-                      <div class="text-2xl font-bold text-graph-green">94%</div>
-                      <div class="text-xs text-gray-dark">Pass Rate</div>
-                    </div>
-                    <div class="text-center">
-                      <div class="text-2xl font-bold text-graph-blue">78</div>
-                      <div class="text-xs text-gray-dark">Avg Score</div>
-                    </div>
-                    <div class="text-center">
-                      <div class="text-2xl font-bold text-graph-purple">156</div>
-                      <div class="text-xs text-gray-dark">Students</div>
-                    </div>
-                  </div>
-                </div> -->
+               
             </div>
           </div>
         </div>

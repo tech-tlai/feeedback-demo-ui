@@ -1,5 +1,6 @@
 <script>
 	// Import your existing components
+	import {onMount} from 'svelte'
 	import ProfileCard from '$lib/components/profileSection/Profile.svelte';
 	import ChatHistory from '$lib/components/profileSection/ChatHistory.svelte';
 	import { OtherClassSummary } from '$lib';
@@ -18,13 +19,7 @@
 	// Sample class data for the horizontal scrollable area
 	export let classes = [];
 
-	const chatHistory = [
-		{ uuid: 1, text: 'How did Class 10 perform in the end-term exam?' },
-		{ uuid: 2, text: 'What are the weak areas in Mathematics for Class 7?' },
-		{ uuid: 3, text: 'Which students from Class 5 showed the most improvement in English?' },
-		{ uuid: 4, text: 'What can be done to improve vocabulary for Class 3A?' }
-		// Add more as needed, incrementing the id
-	];
+	let chatHistory = [];
 
 	const pinnedChats = 12;
 	const suggestedQueries = [
@@ -67,19 +62,36 @@
 
 	async function handleFetchFromSuggestion(e) {
 		const suggestion = e.detail;
-		console.log('suggestion', suggestion);
 		chatDetails = null;
 		chatError = null;
 		loadingChatDetails = true;
 		try {
-			const data = await fetchApi(`/apis/teacher/chat/suggestions/${suggestion.id}`);
-			chatDetails = { queryTitle: data.query, response: data.response };
+			const data = await fetchApi(`/apis/teacher/chat`, {
+				method: 'POST',
+				body: { title: suggestion.query }
+			});
+			// Add new chat to chatHistory and select it
+			const newChat = { uuid: data.id, text: data.title };
+			chatHistory = [...chatHistory, newChat];
+			selectedChat = newChat;
+			// Fetch details for the new chat
+			const detailsData = await fetchApi(`/apis/teacher/chat/details/${data.id}?title=${data.title}`);
+			chatDetails = { queryTitle: detailsData.title, response: detailsData.details };
 		} catch (err) {
 			chatError = err.message;
 		} finally {
 			loadingChatDetails = false;
 		}
 	}
+
+	onMount(async () => {
+		try {
+			const data = await fetchApi('/apis/teacher/chat');
+			chatHistory = data;
+		} catch (err) {
+			console.error('Failed to fetch chat history:', err);
+		}
+	});
 
 	async function handleChatInput(e) {
 		const inputText = e.detail;
@@ -92,6 +104,10 @@
 				body: { title: inputText }
 			});
 			chatDetails = { queryTitle: data.title, response: data.response };
+			// Add new chat to chatHistory and select it
+			const newChat = { uuid: data.id, text: data.title };
+			chatHistory = [...chatHistory, newChat];
+			selectedChat = newChat;
 		} catch (err) {
 			chatError = err.message;
 		} finally {
