@@ -56,7 +56,7 @@
 		if (!chat || (!chat.id && !chat.uuid)) return;
 		loadingChatDetails = true;
 		try {
-			const data = await fetchApi(`/apis/teacher/chat/details/${chat.id || chat.uuid}`);
+			const data = await fetchApi(`/apis/teacher/chat/details/${chat.id || chat.uuid}?title=${chat.text}`);
 			chatDetails = { queryTitle: data.title, response: data.details };
 		} catch (err) {
 			chatError = err.message;

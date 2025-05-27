@@ -6,6 +6,7 @@
 	import ExamSchedule from '$lib/components/profileSection/ExamSchedule.svelte';
 	import Achievements from '$lib/components/profileSection/Achievements.svelte';
 	import { fetchApi } from '$lib/apiUtils.js';
+	import { onMount } from 'svelte';
 
 	// Sample data
 	export let profileData = {
@@ -49,12 +50,7 @@
 		}
 	];
 
-	const chatHistory = [
-    { "uuid": 1, "text": "How did Class 5 perform overall in the recent Mathematics assessment?" },
-    { "uuid": 2, "text": "What are the common challenges Class 3 students face in multiplication?" },
-    { "uuid": 3, "text": "Which specific topics in Geometry need more attention for Class 5?" },
-    { "uuid": 4, "text": "Are there any patterns in the errors made by Class 3 in their basic arithmetic problems?" }
-]
+	let chatHistory = [];
 
 	const pinnedChats = 12;
 
@@ -94,13 +90,14 @@
 
 	async function handleChatSelection(e) {
 		const chat = e.detail;
+		console.log('chat',chat)
 		selectedChat = chat;
 		chatDetails = null;
 		chatError = null;
 		if (!chat || (!chat.id && !chat.uuid)) return;
 		loadingChatDetails = true;
 		try {
-		const data = await fetchApi(`/apis/student/chat/details/${chat.id || chat.uuid}`);
+		const data = await fetchApi(`/apis/student/chat/details/${chat.id || chat.uuid}?title=${chat.text}`);
 			chatDetails = { queryTitle: data.title, response: data.details };
 		} catch (err) {
 			chatError = err.message;
@@ -115,13 +112,27 @@
 		chatError = null;
 		loadingChatDetails = true;
 		try {
-			const data = await fetchApi(`/apis/student/chat/suggestions/${suggestion.id}`);
-			chatDetails = { queryTitle: data.query, response: data.response };
+			const data = await fetchApi('/apis/student/chat', { method: 'POST', body: { title: suggestion.query } });
+			setChatDetailsAndAddToHistory(data);
 		} catch (err) {
 			chatError = err.message;
 		} finally {
 			loadingChatDetails = false;
 		}
+	}
+
+	function addNewChatToHistory(data) {
+		const newChat = { uuid: data.id, text: data.title };
+		chatHistory = [
+			...chatHistory,
+			newChat
+		];
+		selectedChat = newChat;
+	}
+
+	function setChatDetailsAndAddToHistory(data) {
+		chatDetails = { queryTitle: data.title, response: data.response };
+		addNewChatToHistory(data);
 	}
 
 	async function handleChatInput(e) {
@@ -131,13 +142,22 @@
 		loadingChatDetails = true;
 		try {
 			const data = await fetchApi('/apis/student/chat', { method: 'POST', body: { title: inputText } });
-			chatDetails = { queryTitle: data.title, response: data.response };
+			setChatDetailsAndAddToHistory(data);
 		} catch (err) {
 			chatError = err.message;
 		} finally {
 			loadingChatDetails = false;
 		}
 	}
+
+	onMount(async () => {
+		try {
+			const data = await fetchApi('/apis/student/chat');
+			chatHistory = data
+		} catch (err) {
+			console.error('Failed to fetch chat history:', err);
+		}
+	});
 </script>
 
 <main class="min-h-screen">
