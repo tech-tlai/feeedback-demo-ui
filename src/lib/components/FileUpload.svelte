@@ -5,19 +5,19 @@ export let helperText='Upload file'
 
 let fileInput;
 let selectedFile;
+let selectedFiles = [];
 const dispatch = createEventDispatcher();
 
 function handleFileSelect(e){
 	fileInput.click();
 }
-function onFileSelected(e){
-    	const file = e.target.files[0];
-		if (file) {
-			selectedFile = file;
-			console.log('selectedFile', selectedFile);
-			dispatch('fileSelected', file);
-		}
-
+function onFileSelected(e) {
+    const files = Array.from(e.target.files);
+    if (files.length) {
+        selectedFiles = files;
+        selectedFile = files[0]; // for backward compatibility in UI
+        dispatch('fileSelected', files);
+    }
 }
 </script>
 
@@ -43,17 +43,24 @@ function onFileSelected(e){
 			<line x1="12" y1="3" x2="12" y2="15"></line>
 		</svg>
 	</div>
-	{#if selectedFile}
+	{#if selectedFiles.length > 0}
+		<ul class="text-center font-medium text-accent-blue">
+			{#each selectedFiles as file}
+				<li>{file.name} uploaded</li>
+			{/each}
+		</ul>
+	{:else if selectedFile}
 		<p class="text-center font-medium text-accent-blue">{selectedFile.name} uploaded</p>
 	{:else}
 		<p class="text-center font-medium">{helperText}</p>
 	{/if}
-	<p class="text-center text-sm text-gray-500 mt-1">Supported format: XLS</p>
+	<p class="text-center text-sm text-gray-500 mt-1">Supported format: XLS, CSV</p>
 	<input
 		type="file"
 		bind:this={fileInput}
 		on:change={onFileSelected}
-		accept=".xls, .xlsx"
+		accept=".xls, .xlsx, .csv"
 		class="hidden"
+		multiple
 	/>
 </div>

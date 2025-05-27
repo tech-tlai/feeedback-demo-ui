@@ -1,6 +1,7 @@
 <script>
 	import { goto } from '$app/navigation';
-	import { FileUpload } from '$lib';
+	import { FileUpload ,SearchableComboBox} from '$lib';
+	
 	export let title = 'Card title';
 	export let description =
 		'card description - lorem ipsum';
@@ -11,29 +12,43 @@
 	export let buttonText = 'View';
 	export let gradient = 'from-blue-400 to-cyan-500';
 	export let icon = 'teacher'; // for future extensibility
-    export let fileUploadHelperText='Upload file'
+    // export let fileUploadHelperText='Upload file'
 
-	let uploadedFile = null;
-	let uploadError = '';
+	// let uploadedFile = null;
+	// let uploadError = '';
 
-	function handleFileSelected(e) {
-		uploadedFile = e.detail;
-		uploadError = '';
-	}
+	// function handleFileSelected(e) {
+	// 	uploadedFile = e.detail;
+	// 	uploadError = '';
+	// }
 
 	function handleButtonClick() {
-		if (!uploadedFile) {
-			uploadError = 'Please upload a file before proceeding.';
+		if (!selectedEntityId) {
+			alert('Please select an entity before proceeding.');
 			return;
 		}
-		goto(href)
+		goto(href);
+	}
+
+	// Accept a list of entities as a prop
+	export let entityList = [];
+	// Optionally, accept a label and placeholder for the combobox
+	export let comboLabel = '';
+	export let comboPlaceholder = '';
+	let selectedEntityId = '';
+	let selectedEntityName = '';
+
+	function handleComboBoxChange(e) {
+		selectedEntityId = e.detail.selectedItemId;
+		selectedEntityName = e.detail.selectedItemName;
+		// You can dispatch or use the selected entity as needed
 	}
 </script>
 
 <div
-	class="bg-white rounded-xl shadow-lg overflow-hidden transition-transform duration-300 hover:scale-[100.5%] hover:shadow-xl"
+	class="bg-white rounded-xl shadow-lg  transition-transform duration-300 hover:scale-[100.5%] hover:shadow-xl"
 >
-	<div class="h-64 bg-gradient-to-r {gradient} relative overflow-hidden">
+	<div class="h-64 bg-gradient-to-r {gradient} relative overflow-hidden rounded-t-xl">
 		<img src={image} alt={title} class="w-full h-full object-cover" />
 		<div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent flex items-end">
 			<div class="p-4 text-white">
@@ -59,11 +74,21 @@
 			{description}
 		</p>
 		<div class="mb-4">
+			<SearchableComboBox
+				options={entityList}
+				label={comboLabel}
+				placeholder={comboPlaceholder}
+				selectedItemId={selectedEntityId}
+				selectedItemName={selectedEntityName}
+				on:handleDispatchComboBoxData={handleComboBoxChange}
+			/>
+		</div>
+		<!-- <div class="mb-4">
 			<FileUpload on:fileSelected={handleFileSelected} helperText={fileUploadHelperText}/>
 			{#if uploadError}
 				<p class="text-red-600 text-sm mt-2">{uploadError}</p>
 			{/if}
-		</div>
+		</div> -->
 		<div class="flex items-center justify-end">
 			<!-- <div class="flex items-center gap-2 {highlightColor}">
 				<span class="text-sm font-medium">{highlight}</span>
@@ -71,8 +96,9 @@
 			</div> -->
 			<button
 				type="button"
-				class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+				class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-dark disabled:cursor-not-allowed"
 				on:click={handleButtonClick}
+				disabled={!selectedEntityId}
 			>
 				{buttonText}
 			</button>

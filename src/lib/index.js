@@ -13,8 +13,10 @@ import FileUpload from '$lib/components/FileUpload.svelte';
 import FilterDropdown from '$lib/components/FilterDropdown.svelte';
 import LegacyDatatable from '$lib/components/LegacyDatatable.svelte';
 import LegacyTabs from '$lib/components/LegacyTabs.svelte';
+import MultiFileUpload from '$lib/components/MultiFileUpload.svelte';
 import ProgressIndicator from '$lib/components/ProgressIndicator.svelte';
 import SearchBar from '$lib/components/SearchBar.svelte';
+import SearchableComboBox from "$lib/components/SearchableComboBox.svelte"
 import SectionTitle from '$lib/components/SectionTitle.svelte';
 import StrengthWeaknessNotfn from '$lib/components/StrengthWeaknessNotfn.svelte';
 import Tabs from '$lib/components/Tabs.svelte';
@@ -27,8 +29,10 @@ export {
     FilterDropdown,
     LegacyDatatable,
     LegacyTabs,
+    MultiFileUpload,
     ProgressIndicator,
     SearchBar,
+    SearchableComboBox,
     SectionTitle,
     StrengthWeaknessNotfn,
     Tabs

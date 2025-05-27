@@ -112,13 +112,27 @@
 		chatError = null;
 		loadingChatDetails = true;
 		try {
-			const data = await fetchApi(`/apis/student/chat/suggestions/${suggestion.id}`);
-			chatDetails = { queryTitle: data.query, response: data.response };
+			const data = await fetchApi('/apis/student/chat', { method: 'POST', body: { title: suggestion.query } });
+			setChatDetailsAndAddToHistory(data);
 		} catch (err) {
 			chatError = err.message;
 		} finally {
 			loadingChatDetails = false;
 		}
+	}
+
+	function addNewChatToHistory(data) {
+		const newChat = { uuid: data.id, text: data.title };
+		chatHistory = [
+			...chatHistory,
+			newChat
+		];
+		selectedChat = newChat;
+	}
+
+	function setChatDetailsAndAddToHistory(data) {
+		chatDetails = { queryTitle: data.title, response: data.response };
+		addNewChatToHistory(data);
 	}
 
 	async function handleChatInput(e) {
@@ -128,14 +142,7 @@
 		loadingChatDetails = true;
 		try {
 			const data = await fetchApi('/apis/student/chat', { method: 'POST', body: { title: inputText } });
-			chatDetails = { queryTitle: data.title, response: data.response };
-			// Add to chatHistory
-			const newChat = { uuid: data.id, text: data.title };
-			chatHistory = [
-				...chatHistory,
-				newChat
-			];
-			selectedChat = newChat;
+			setChatDetailsAndAddToHistory(data);
 		} catch (err) {
 			chatError = err.message;
 		} finally {
