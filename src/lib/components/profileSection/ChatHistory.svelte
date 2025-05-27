@@ -1,10 +1,13 @@
 <script>
 	import Tabs from '$lib/components/Tabs.svelte';
 	import { createEventDispatcher } from 'svelte';
+	import { fade } from 'svelte/transition';
 
 	export let history = [];
 	export let pinnedCount = 0;
 	const dispatch = createEventDispatcher();
+
+	$: console.log('history',history)
 
 	let selectedTab = 0;
 	export let selected;
@@ -17,6 +20,8 @@
 	function handleChatSelect(chat) {
 		dispatch('chatSelected', chat);
 	}
+
+	$: history = history && history.length ? [...history].sort((a, b) => b.uuid - a.uuid) : history;
 </script>
 
 <div class="bg-white rounded-lg shadow p-4">
@@ -32,9 +37,10 @@
 		{#if selectedTab === 0}
 			{#each history as chat}
 				<button
-					class="p-3 text-left rounded-lg text-black text-sm  hover:bg-gray-50 cursor-pointer {selected && ((selected.id || selected.uuid) === (chat.id || chat.uuid)) ? 'bg-gray-100 hover:bg-gray-100' : ''}"
+					class="w-full p-3 text-left rounded-lg text-black text-sm  hover:bg-gray-50 cursor-pointer {selected && ((selected.id || selected.uuid) === (chat.id || chat.uuid)) ? 'bg-gray-100 hover:bg-gray-100' : ''}"
 					class:bg-gray-100={selected && ((selected.id || selected.uuid) === (chat.id || chat.uuid))}
 					on:click={() => handleChatSelect(chat)}
+					in:fade={{ duration: 250 }}
 				>
 					{chat.text}
 				</button>

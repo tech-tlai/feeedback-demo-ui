@@ -1,4 +1,5 @@
 // SvelteKit POST endpoint for /apis/student/chats
+import { studentChatDetails } from '$lib/data.js';
 
 /**
  * Mock chat POST handler for demonstration.
@@ -14,11 +15,14 @@ export async function POST({ request }) {
                 headers: { 'Content-Type': 'application/json' }
             });
         }
-        // Mock response
-        const id = Math.floor(Math.random() * 10000) + 100;
-        const response = `This is a mock AI response for: ${title}`;
+        // Find the next id based on studentChatDetails
+        const ids = Object.keys(studentChatDetails).map(Number);
+        const nextId = ids.length > 0 ? Math.max(...ids) + 1 : 1;
+        const details = `This is a mock AI response for: ${title} -- Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque euismod, nisi vel consectetur.`;
+        // Append to studentChatDetails (in-memory, will not persist after restart)
+        studentChatDetails[nextId] = { id: nextId, title, details };
         return new Response(
-            JSON.stringify({ id, title, response }),
+            JSON.stringify({ id: nextId, title, response: details }),
             {
                 status: 200,
                 headers: { 'Content-Type': 'application/json' }
@@ -31,3 +35,20 @@ export async function POST({ request }) {
         });
     }
 }
+
+/**
+ * GET handler to return all chats.
+ * Returns [{ uuid, text }].
+ */
+export async function GET() {
+    // Return all chats in the required format
+    const chats = Object.values(studentChatDetails).map(chat => ({
+        uuid: chat.id,
+        text: chat.title
+    }));
+    return new Response(JSON.stringify(chats), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
+    });
+}
+
