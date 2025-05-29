@@ -1,6 +1,7 @@
 <script>
 	import { Datatable, SearchBar, LegacyDatatable } from '$lib';
 	import { onMount } from 'svelte';
+	import { fetchApi } from '$lib/apiUtils.js';
 
 	let searchValue = '';
 	let goalsData = [];
@@ -10,11 +11,10 @@
 
 	onMount(async () => {
 		try {
-			const response = await fetch(`/apis/student/goals/current-goals/${STUDENT_ID}`);
-			if (!response.ok) {
-				throw new Error('Failed to fetch goals');
-			}
-			goalsData = await response.json();
+			goalsData = await fetchApi(`/apis/student/goals/current-goals/${STUDENT_ID}`, {
+				action: 'fetch',
+				entity: 'current goals'
+			});
 		} catch (err) {
 			error = err.message;
 		} finally {
@@ -40,7 +40,7 @@
 		<h4 class="text-sm font-bold text-black">Current Goals</h4>
 
 		{#if isLoading}
-			<p>Loading...</p>
+			<p>Loading Current Goals...</p>
 		{:else if error}
 			<p class="text-red-500">Error: {error}</p>
 		{:else}

@@ -3,6 +3,7 @@
 	import { onMount } from 'svelte';
 	import ErrorComponent from '$lib/components/ErrorComponent.svelte';
 	import SkelClassSummary from '$lib/components/loadingSkeletons/SkelClassSummary.svelte';
+	import { fetchApi } from '$lib/apiUtils.js';
 
 	let perfHistory = [];
 	let isLoading = true;
@@ -10,11 +11,10 @@
 	const STUDENT_ID = 1;
 	onMount(async () => {
 		try {
-			const response = await fetch(`/apis/student/performance-history/${STUDENT_ID}`);
-			if (!response.ok) {
-				throw new Error('Failed to fetch performance history');
-			}
-			perfHistory = await response.json();
+			perfHistory = await fetchApi(`/apis/student/performance-history/${STUDENT_ID}`, {
+				action: 'fetch',
+				entity: 'performance history'
+			});
 		} catch (err) {
 			error = err.message;
 		} finally {
@@ -33,11 +33,15 @@
 </div>
 
 {#if isLoading}
-	<SkelClassSummary />
+	<div class="grid grid-cols-[repeat(auto-fit,minmax(min(250px,100%),260px))] gap-5">
+		{#each Array(5) as _, i}
+			<SkelClassSummary key={i} />
+		{/each}
+	</div>
 {:else if error}
 	<ErrorComponent message={error} />
 {:else}
-	<div class="grid grid-cols-[repeat(auto-fit,minmax(min(250px,100%),275px))] gap-5">
+	<div class="grid grid-cols-[repeat(auto-fit,minmax(min(250px,100%),260px))] gap-5">
 		{#each perfHistory as classData}
 			<PerfHistoryCard
 				className={classData.className}

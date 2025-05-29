@@ -1,6 +1,7 @@
 <script>
 	import { PerformanceAnalysis } from '$lib';
 	import { onMount } from 'svelte';
+	import { fetchApi } from '$lib/apiUtils.js';
 
 	let isLoading = false;
 	let error = null;
@@ -14,9 +15,10 @@
 		isLoading = true;
 		error = null;
 		try {
-			const response = await fetch(`/apis/student/perf-analysis/${id}`);
-			if (!response.ok) throw new Error('Failed to fetch performance analysis');
-			const data = await response.json();
+			const data = await fetchApi(`/apis/student/perf-analysis/${id}`, {
+				action: 'fetch',
+				entity: 'performance analysis'
+			});
 			const { achievement, roomForImprovement, suggestions } = data;
 			perfData = {
 				achievement: achievement.feedback,
@@ -39,9 +41,9 @@
 </script>
 
 {#if isLoading}
-	<div class="p-4 text-center">Loading...</div>
+	<div class="p-4 text-center bg-white rounded-lg shadow-sm h-64 flex justify-center items-center">Loading Performance Analysis...</div>
 {:else if error}
-	<div class="p-4 text-center text-red-500">{error}</div>
+	<div class="p-4 text-center text-red-500 bg-white rounded-lg shadow-sm h-64 flex justify-center items-center">{error}</div>
 {:else if perfData}
 	<PerformanceAnalysis
 		roomForImprovement={perfData.roomForImprovement}
