@@ -33,7 +33,7 @@
 	<div class="flex">
 		{#each tabs as tab, index}
 			<button
-				class="px-4 py-3 text-base relative {selectedIndex === index
+				class="px-4 py-3 text-sm relative {selectedIndex === index
 					? 'text-black font-semibold'
 					: 'text-gray-dark font-medium'}"
 				on:click={() => selectTab(index, tab)}

@@ -23,7 +23,6 @@
 		goto('/dashboard-portal');
 	}
 
-	
 	let files = [];
 
 	function handleFileChange(event) {
@@ -83,11 +82,13 @@
 						Contact
 					</button> -->
 				</nav>
-				<button
-					class=" bg-black/80 text-white border-0 px-6 py-2 rounded-lg font-medium text-base transition-all"
-				>
-					Start Analysis
-				</button>
+				<a href="#upload">
+					<button
+						class=" bg-black/80 text-white border-0 px-6 py-2 rounded-lg font-medium text-base transition-all"
+					>
+						Start Analysis
+					</button>
+				</a>
 			</div>
 		</div>
 	</header>
