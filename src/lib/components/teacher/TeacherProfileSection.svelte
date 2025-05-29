@@ -1,6 +1,6 @@
 <script>
 	// Import your existing components
-	import {onMount} from 'svelte'
+	import { onMount } from 'svelte';
 	import ProfileCard from '$lib/components/profileSection/Profile.svelte';
 	import ChatHistory from '$lib/components/profileSection/ChatHistory.svelte';
 	import { OtherClassSummary } from '$lib';
@@ -20,8 +20,9 @@
 	export let classes = [];
 
 	let chatHistory = [];
+	let pinnedChats = [];
+	let selectedTab = 0;
 
-	const pinnedChats = 12;
 	const suggestedQueries = [
 		{
 			id: 1,
@@ -31,17 +32,11 @@
 		{ id: 2, title: 'Analyze weak areas', query: 'Weaknesses of class 3 students in English.' }
 	];
 
-	// Helper function to determine score color
-	function getScoreColor(status) {
-		if (status === 'success') return 'bg-green-light text-green-dark';
-		if (status === 'warning') return 'bg-orange-light text-orange-dark';
-		return 'bg-gray-light text-gray-dark';
-	}
-
 	let selectedChat = null;
 	let chatDetails = null;
 	let loadingChatDetails = false;
 	let chatError = null;
+	let chatInterface = null;
 
 	async function handleChatSelection(e) {
 		const chat = e.detail;
@@ -70,13 +65,7 @@
 				method: 'POST',
 				body: { title: suggestion.query }
 			});
-			// Add new chat to chatHistory and select it
-			const newChat = { uuid: data.id, text: data.title };
-			chatHistory = [...chatHistory, newChat];
-			selectedChat = newChat;
-			// Fetch details for the new chat
-			const detailsData = await fetchApi(`/apis/teacher/chat/details/${data.id}?title=${data.title}`);
-			chatDetails = { queryTitle: detailsData.title, response: detailsData.details };
+			setChatDetailsAndAddToHistory(data);
 		} catch (err) {
 			chatError = err.message;
 		} finally {
@@ -84,14 +73,16 @@
 		}
 	}
 
-	onMount(async () => {
-		try {
-			const data = await fetchApi('/apis/teacher/chat');
-			chatHistory = data;
-		} catch (err) {
-			console.error('Failed to fetch chat history:', err);
-		}
-	});
+	function addNewChatToHistory(data) {
+		const newChat = { uuid: data.id, text: data.title };
+		chatHistory = [...chatHistory, newChat];
+		selectedChat = newChat;
+	}
+
+	function setChatDetailsAndAddToHistory(data) {
+		chatDetails = { queryTitle: data.title, response: data.response };
+		addNewChatToHistory(data);
+	}
 
 	async function handleChatInput(e) {
 		const inputText = e.detail;
@@ -103,17 +94,48 @@
 				method: 'POST',
 				body: { title: inputText }
 			});
-			chatDetails = { queryTitle: data.title, response: data.response };
-			// Add new chat to chatHistory and select it
-			const newChat = { uuid: data.id, text: data.title };
-			chatHistory = [...chatHistory, newChat];
-			selectedChat = newChat;
+			setChatDetailsAndAddToHistory(data);
 		} catch (err) {
 			chatError = err.message;
 		} finally {
 			loadingChatDetails = false;
 		}
 	}
+
+	function handlePinChat(chat) {
+		if (!pinnedChats.some((c) => (c.id || c.uuid) === (chat.id || chat.uuid))) {
+			pinnedChats = [...pinnedChats, chat];
+			selectedTab = 1;
+		}
+	}
+
+	function handleUnpinChat(chat) {
+		pinnedChats = pinnedChats.filter((c) => (c.id || c.uuid) !== (chat.id || chat.uuid));
+	}
+
+	function handleChatMenuAction(e) {
+		const { chat, action } = e.detail;
+		switch (action) {
+			case 'pin':
+				handlePinChat(chat);
+				break;
+			case 'unpin':
+				handleUnpinChat(chat);
+				break;
+			// Add more actions as needed
+			default:
+				console.log('Unknown chat menu action:', action, chat);
+		}
+	}
+
+	onMount(async () => {
+		try {
+			const data = await fetchApi('/apis/teacher/chat');
+			chatHistory = data;
+		} catch (err) {
+			console.error('Failed to fetch chat history:', err);
+		}
+	});
 </script>
 
 <div class="w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-5">
@@ -123,9 +145,11 @@
 
 		<ChatHistory
 			history={chatHistory}
-			pinnedCount={pinnedChats}
 			on:chatSelected={handleChatSelection}
 			selected={selectedChat}
+			on:chatMenuAction={handleChatMenuAction}
+			{pinnedChats}
+			bind:selectedTab
 		/>
 	</div>
 
@@ -133,12 +157,12 @@
 	<div class="lg:col-span-9 space-y-5 h-full">
 		<div class="flex flex-col gap-4 h-full">
 			<!-- Horizontal Scrollable Class Cards -->
-			<!--  -->
 			<AllClassesSummary />
 			<div class=" flex-grow">
 				<ChatInterface
 					aiResponse={chatDetails}
 					{suggestedQueries}
+					bind:this={chatInterface}
 					on:fetchFromSuggestion={handleFetchFromSuggestion}
 					on:chatInput={handleChatInput}
 				/>

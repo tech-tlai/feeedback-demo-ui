@@ -6,7 +6,9 @@
 
 //lib/components
 import Card from '$lib/components/Card.svelte';
+import ChatItem from '$lib/components/ChatItem.svelte';
 import CommonDashCard from '$lib/components/CommonDashCard.svelte';
+import ContextMenu from '$lib/components/ContextMenu.svelte';
 import Button from '$lib/components/Button.svelte';
 import Datatable from '$lib/components/Datatable.svelte';
 import FileUpload from '$lib/components/FileUpload.svelte';
@@ -22,7 +24,9 @@ import StrengthWeaknessNotfn from '$lib/components/StrengthWeaknessNotfn.svelte'
 import Tabs from '$lib/components/Tabs.svelte';
 export {
     Card,
+    ChatItem,
     CommonDashCard,
+    ContextMenu,
     Button,
     Datatable,
     FileUpload,

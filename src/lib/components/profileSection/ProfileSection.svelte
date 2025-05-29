@@ -52,8 +52,6 @@
 
 	let chatHistory = [];
 
-	const pinnedChats = 12;
-
 	const suggestedQueries = [
 		{ id: 1, title: 'Subject specific insights', query: 'How did I perform in Mathematics?' },
 		{ id: 2, title: 'Analyze weak areas', query: 'Where am I losing marks in Geography?' }
@@ -82,6 +80,10 @@
 	let loadingChatDetails = false;
 	let chatError = null;
 
+	let pinnedChats = [];
+
+	let selectedTab = 0;
+
 	function handleClick() {
 		if (chatInterface) {
 			chatInterface.focusChatBox(); // Call the focusChatBox method from ChatInterface
@@ -90,14 +92,16 @@
 
 	async function handleChatSelection(e) {
 		const chat = e.detail;
-		console.log('chat',chat)
+		console.log('chat', chat);
 		selectedChat = chat;
 		chatDetails = null;
 		chatError = null;
 		if (!chat || (!chat.id && !chat.uuid)) return;
 		loadingChatDetails = true;
 		try {
-		const data = await fetchApi(`/apis/student/chat/details/${chat.id || chat.uuid}?title=${chat.text}`);
+			const data = await fetchApi(
+				`/apis/student/chat/details/${chat.id || chat.uuid}?title=${chat.text}`
+			);
 			chatDetails = { queryTitle: data.title, response: data.details };
 		} catch (err) {
 			chatError = err.message;
@@ -112,7 +116,10 @@
 		chatError = null;
 		loadingChatDetails = true;
 		try {
-			const data = await fetchApi('/apis/student/chat', { method: 'POST', body: { title: suggestion.query } });
+			const data = await fetchApi('/apis/student/chat', {
+				method: 'POST',
+				body: { title: suggestion.query }
+			});
 			setChatDetailsAndAddToHistory(data);
 		} catch (err) {
 			chatError = err.message;
@@ -123,10 +130,7 @@
 
 	function addNewChatToHistory(data) {
 		const newChat = { uuid: data.id, text: data.title };
-		chatHistory = [
-			...chatHistory,
-			newChat
-		];
+		chatHistory = [...chatHistory, newChat];
 		selectedChat = newChat;
 	}
 
@@ -141,7 +145,10 @@
 		chatError = null;
 		loadingChatDetails = true;
 		try {
-			const data = await fetchApi('/apis/student/chat', { method: 'POST', body: { title: inputText } });
+			const data = await fetchApi('/apis/student/chat', {
+				method: 'POST',
+				body: { title: inputText }
+			});
 			setChatDetailsAndAddToHistory(data);
 		} catch (err) {
 			chatError = err.message;
@@ -150,10 +157,37 @@
 		}
 	}
 
+	function handlePinChat(chat) {
+		if (!pinnedChats.some((c) => (c.id || c.uuid) === (chat.id || chat.uuid))) {
+			pinnedChats = [...pinnedChats, chat];
+			selectedTab=1;
+		}
+	}
+
+	function handleUnpinChat(chat) {
+		pinnedChats = pinnedChats.filter((c) => (c.id || c.uuid) !== (chat.id || chat.uuid));
+	}
+
+	function handleChatMenuAction(e) {
+		const { chat, action } = e.detail;
+		switch (action) {
+			case 'pin':
+				handlePinChat(chat);
+				break;
+			case 'unpin':
+				handleUnpinChat(chat);
+				break;
+			// Add more actions as needed
+			default:
+				console.log('Unknown chat menu action:', action, chat);
+		}
+		console.log('pinnedChats', pinnedChats);
+	}
+
 	onMount(async () => {
 		try {
 			const data = await fetchApi('/apis/student/chat');
-			chatHistory = data
+			chatHistory = data;
 		} catch (err) {
 			console.error('Failed to fetch chat history:', err);
 		}
@@ -167,9 +201,11 @@
 			<Profile {...profileData} />
 			<ChatHistory
 				history={chatHistory}
-				pinnedCount={pinnedChats}
 				on:chatSelected={handleChatSelection}
 				selected={selectedChat}
+				on:chatMenuAction={handleChatMenuAction}
+				{pinnedChats}
+				bind:selectedTab
 			/>
 		</div>
 
@@ -198,8 +234,4 @@
 	</div>
 </main>
 
-<style lang="postcss">
-	:global(body) {
-		font-family: 'Roboto', sans-serif;
-	}
-</style>
+

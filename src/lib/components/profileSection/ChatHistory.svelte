@@ -1,15 +1,17 @@
 <script>
-	import Tabs from '$lib/components/Tabs.svelte';
+	import { Tabs, ChatItem, ContextMenu } from '$lib';
+
 	import { createEventDispatcher } from 'svelte';
 	import { fade } from 'svelte/transition';
 
 	export let history = [];
+	export let pinnedChats = [];
 	export let pinnedCount = 0;
 	const dispatch = createEventDispatcher();
 
-	$: console.log('history',history)
+	$: console.log('history', history);
 
-	let selectedTab = 0;
+	export let selectedTab = 0;
 	export let selected;
 
 	const tabs = [
@@ -19,6 +21,16 @@
 
 	function handleChatSelect(chat) {
 		dispatch('chatSelected', chat);
+	}
+
+	const chatHistMenuItems = [{ id: 1, label: 'Pin', value: 'pin' }];
+
+	const pinnedChatMenuItems = [{ id: 1, label: 'Unpin', value: 'unpin' }];
+
+	function handleMenuSelect(event, chat) {
+		const { item } = event.detail;
+		console.log(`Selected "${item.label}" (${item.value}) for chat`, chat);
+		dispatch('chatMenuAction', { chat, action: item.value });
 	}
 
 	$: history = history && history.length ? [...history].sort((a, b) => b.uuid - a.uuid) : history;
@@ -36,17 +48,31 @@
 	<div class="space-y-3 mt-4 h-[clamp(300px,320px,384px)] overflow-y-auto">
 		{#if selectedTab === 0}
 			{#each history as chat}
-				<button
-					class="w-full p-3 text-left rounded-lg text-black text-sm  hover:bg-gray-50 cursor-pointer {selected && ((selected.id || selected.uuid) === (chat.id || chat.uuid)) ? 'bg-gray-100 hover:bg-gray-100' : ''}"
-					class:bg-gray-100={selected && ((selected.id || selected.uuid) === (chat.id || chat.uuid))}
-					on:click={() => handleChatSelect(chat)}
+				<div
+					class="flex justify-between items-center w-full rounded-lg hover:bg-gray-50 relative"
+					class:bg-gray-100={selected && (selected.id || selected.uuid) === (chat.id || chat.uuid)}
 					in:fade={{ duration: 250 }}
 				>
-					{chat.text}
-				</button>
+					<ChatItem {chat} {selected} onSelect={handleChatSelect} />
+					<!-- <ContextMenu {chat} on:pin={handleMenuAction} on:delete={handleMenuAction} /> -->
+					<ContextMenu menuItems={chatHistMenuItems} on:select={(e) => handleMenuSelect(e, chat)} />
+				</div>
 			{/each}
+		{:else if pinnedChats?.length === 0}
+			<div class="text-gray-500 text-sm text-center">No pinned chats.</div>
 		{:else}
-			<div class="text-gray-500 text-sm">You have {pinnedCount} pinned chats.</div>
+			{#each pinnedChats as chat}
+				<div
+					class="flex justify-between items-center w-full rounded-lg hover:bg-gray-50 relative"
+					in:fade={{ duration: 250 }}
+				>
+					<ChatItem {chat} {selected} onSelect={handleChatSelect} />
+					<ContextMenu
+						menuItems={pinnedChatMenuItems}
+						on:select={(e) => handleMenuSelect(e, chat)}
+					/>
+				</div>
+			{/each}
 		{/if}
 	</div>
 </div>
