@@ -73,3 +73,43 @@ export function clickOutside(node, callback) {
 
   return `${day} ${month} '${yearShort}`;
 }
+
+
+/**
+ * Generates a user-friendly error message based on HTTP status.
+ * 
+ * @param {Response | { status: number }} response - The fetch response or error object.
+ * @param {'fetch' | 'create' | 'update' | 'delete'} action - The attempted action.
+ * @param {string} entity - The name of the entity or module (e.g., "chat history").
+ * @returns {string} A human-readable error message.
+ */
+export function getErrorMessage(response, action = 'fetch', entity = 'data') {
+	const status = response?.status;
+
+	switch (status) {
+		case 400:
+			return `Failed to ${action} ${entity}. Invalid request.`;
+		case 401:
+			return `Failed to ${action} ${entity}. You are unauthorized.`;
+		case 403:
+			return `Failed to ${action} ${entity}. Access is forbidden.`;
+		case 404:
+			return `Failed to ${action} ${entity}. Not found.`;
+		case 409:
+			return `Failed to ${action} ${entity}. Conflict occurred.`;
+		case 422:
+			return `Failed to ${action} ${entity}. Unprocessable data.`;
+		case 429:
+			return `Failed to ${action} ${entity}. Too many requests. Please try again later.`;
+		case 500:
+			return `Failed to ${action} ${entity}. Internal server error.`;
+		case 502:
+			return `Failed to ${action} ${entity}. Bad gateway.`;
+		case 503:
+			return `Failed to ${action} ${entity}. Service unavailable.`;
+		case 504:
+			return `Failed to ${action} ${entity}. Gateway timeout.`;
+		default:
+			return `Failed to ${action} ${entity}. Something went wrong.`;
+	}
+}

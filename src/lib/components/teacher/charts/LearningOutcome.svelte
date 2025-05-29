@@ -2,6 +2,7 @@
 	import { Card, ProgressIndicator } from '$lib';
 	import { selectedClassStore } from '$lib/stores/globalFilters.js';
 	import { onMount } from 'svelte';
+	import { fetchApi } from '$lib/apiUtils.js';
 
 	// Props
 	export let title = 'Learning Outcome scores';
@@ -21,11 +22,10 @@
 			error = '';
 			const { className, division, subject } = $selectedClassStore;
 			const classSubject = `${className}${division}_${subject}`;
-			const response = await fetch(`/apis/teacher/learningOutcomes/${classSubject}`);
-			if (!response.ok) {
-				throw new Error('Failed to fetch top performers data');
-			}
-			outcomes = await response.json();
+			outcomes = await fetchApi(`/apis/teacher/learningOutcomes/${classSubject}`, {
+				action: 'fetch',
+				entity: 'learning outcomes'
+			});
 		} catch (err) {
 			error = err.message;
 		} finally {

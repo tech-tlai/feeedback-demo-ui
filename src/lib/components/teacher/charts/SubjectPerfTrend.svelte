@@ -1,7 +1,8 @@
 <script>
-	import { ProgressTrendChart } from '$lib';
+	import { ProgressTrendChart, SkelChartWidget } from '$lib';
 	import { onMount } from 'svelte';
 	import { chatContextStore, selectedClassStore } from '$lib/stores/globalFilters.js';
+	import { fetchApi } from '$lib/apiUtils.js';
 
 	let examDates = [];
 	let subjectData = {};
@@ -15,10 +16,12 @@
 		error = null;
 		try {
 			const { className, division, subject } = $selectedClassStore;
-			const classSubject = `${className}${division}_${subject}`;			
-			const response = await fetch(`/apis/teacher/progress-trend/${classSubject}`);
-			if (!response.ok) throw new Error('Failed to fetch progress trend data');
-			const apiData = await response.json();
+			const classSubject = `${className}${division}_${subject}`;
+			const apiData = await fetchApi(`/apis/teacher/progress-trend/${classSubject}`, {
+				action: 'fetch',
+				entity: 'progress trend'
+			});
+
 			const sortedData = apiData.sort((a, b) => new Date(a.date) - new Date(b.date));
 			examDates = sortedData.map((item) => item.date);
 			subjectData = sortedData.reduce((acc, item) => {
@@ -59,14 +62,13 @@
 	onMount(() => {
 		isMounted = true;
 	});
-
-	
 </script>
 
 {#if isLoading}
-	<div class="p-4 text-center">Loading...</div>
+	<!-- <div class="p-4 text-center bg-white rounded-lg h-full">Loading...</div> -->
+	<SkelChartWidget />
 {:else if error}
-	<div class="p-4 text-center text-red-500">{error}</div>
+	<div class="p-4 text-center text-red-500 bg-white rounded-lg h-full">{error}</div>
 {:else}
 	<ProgressTrendChart
 		{title}

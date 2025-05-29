@@ -3,6 +3,7 @@
 	import { selectedClassStore } from '$lib/stores/globalFilters.js';
 	import { onMount } from 'svelte';
 	import { getMarkColor } from '$lib/utils';
+	import { fetchApi } from '$lib/apiUtils.js';
 
 	let studentData = [];
 	let searchValue = '';
@@ -62,11 +63,10 @@
 			isLoading=true;
 			const { className, division, subject } = $selectedClassStore;
 			const classSubject = `${className}${division}_${subject}`;
-			const response = await fetch(`/apis/teacher/attendance/${classSubject}`);
-			if (!response.ok) {
-				throw new Error('Failed to fetch attendance data');
-			}
-			studentData = await response.json();
+			studentData = await fetchApi(`/apis/teacher/attendance/${classSubject}`, {
+				action: 'fetch',
+				entity: 'attendance'
+			});
 			
 		} catch (err) {
 			error = err.message;

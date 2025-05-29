@@ -92,7 +92,6 @@
 
 	async function handleChatSelection(e) {
 		const chat = e.detail;
-		console.log('chat', chat);
 		selectedChat = chat;
 		chatDetails = null;
 		chatError = null;
@@ -100,7 +99,8 @@
 		loadingChatDetails = true;
 		try {
 			const data = await fetchApi(
-				`/apis/student/chat/details/${chat.id || chat.uuid}?title=${chat.text}`
+				`/apis/student/chat/details/${chat.id || chat.uuid}?title=${chat.text}`,
+				{ action: 'fetch', entity: 'chat details' }
 			);
 			chatDetails = { queryTitle: data.title, response: data.details };
 		} catch (err) {
@@ -118,7 +118,9 @@
 		try {
 			const data = await fetchApi('/apis/student/chat', {
 				method: 'POST',
-				body: { title: suggestion.query }
+				body: { title: suggestion.query },
+				action: 'fetch',
+				entity: 'chat suggestion'
 			});
 			setChatDetailsAndAddToHistory(data);
 		} catch (err) {
@@ -147,7 +149,9 @@
 		try {
 			const data = await fetchApi('/apis/student/chat', {
 				method: 'POST',
-				body: { title: inputText }
+				body: { title: inputText },
+				action: 'fetch',
+				entity: 'chat input'
 			});
 			setChatDetailsAndAddToHistory(data);
 		} catch (err) {
@@ -186,7 +190,10 @@
 
 	onMount(async () => {
 		try {
-			const data = await fetchApi('/apis/student/chat');
+			const data = await fetchApi('/apis/student/chat', {
+				action: 'fetch',
+				entity: 'chat history'
+			});
 			chatHistory = data;
 		} catch (err) {
 			console.error('Failed to fetch chat history:', err);

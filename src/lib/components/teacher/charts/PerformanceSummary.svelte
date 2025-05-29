@@ -2,8 +2,8 @@
 	import { Card, ProgressIndicator } from '$lib';
 	import { onMount } from 'svelte';
 	import { selectedClassStore } from '$lib/stores/globalFilters.js';
+	import { fetchApi } from '$lib/apiUtils.js';
 	// Props
-	export let className = 'Class 3 A';
 	export let studentCount = 37;
 	export let indicators = [
 		{ label: 'Avg. Score', value: 61, period: 'Last 5 tests' },
@@ -22,10 +22,12 @@
 		try {
 			const { className, division, subject } = $selectedClassStore;
 			const classSubject = `${className}${division}_${subject}`;
-			const response = await fetch(`/apis/teacher/perf-summary/${classSubject}`);
-			if (!response.ok) throw new Error('Failed to fetch performance summary');
-			const data = await response.json();
-
+			const data = await fetchApi(`/apis/teacher/perf-summary/${classSubject}`, {
+				action: 'fetch',
+				entity: 'performance summary'
+			});
+			
+			
 			studentCount = data.studentCount || studentCount;
 			indicators = data.indicators || indicators;
 		} catch (err) {
