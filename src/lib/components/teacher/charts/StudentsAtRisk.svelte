@@ -4,6 +4,7 @@
 	import { selectedClassStore, chatContextStore } from '$lib/stores/globalFilters.js';
 	import { FilterIcon } from '$lib/svgComponents';
 	import { getMarkColor } from '$lib/utils';
+	import { fetchApi } from '$lib/apiUtils.js';
 
 	const chartTitle = 'Students at Risk';
 	let studentData = [];
@@ -70,11 +71,10 @@
 		try {
 			const { className, division, subject } = $selectedClassStore;
 			const classSubject = `${className}${division}_${subject}`;
-			const response = await fetch(`/apis/teacher/students-at-risk/${classSubject}`);
-			if (!response.ok) {
-				throw new Error('Failed to fetch data');
-			}
-			const data = await response.json();
+			const data = await fetchApi(`/apis/teacher/students-at-risk/${classSubject}`, {
+				action: 'fetch',
+				entity: 'students at risk'
+			});
 			studentData = data;
 			createTableData();
 		} catch (err) {

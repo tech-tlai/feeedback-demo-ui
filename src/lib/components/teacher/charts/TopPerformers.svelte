@@ -3,6 +3,7 @@
 	import { selectedClassStore, chatContextStore } from '$lib/stores/globalFilters.js';
 	import { FilterIcon } from '$lib/svgComponents';
 	import { getMarkColor } from '$lib/utils';
+	import { fetchApi } from '$lib/apiUtils.js';
 
 	import { onMount } from 'svelte';
 
@@ -74,11 +75,10 @@
 			error=null;
 			const { className, division, subject } = $selectedClassStore;
 			const classSubject = `${className}${division}_${subject}`;
-			const response = await fetch(`/apis/teacher/top-perf-students/${classSubject}`);
-			if (!response.ok) {
-				throw new Error('Failed to fetch top performers data');
-			}
-			studentData = await response.json();
+			studentData = await fetchApi(`/apis/teacher/top-perf-students/${classSubject}`, {
+				action: 'fetch',
+				entity: 'top performers'
+			});
 		} catch (err) {
 			error = err.message;
 		} finally {

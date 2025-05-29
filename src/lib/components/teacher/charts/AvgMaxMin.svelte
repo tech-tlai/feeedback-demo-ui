@@ -3,6 +3,7 @@
 	import { Card, Histogram } from '$lib';
 	import { selectedClassStore, chatContextStore } from '$lib/stores/globalFilters.js';
 	import { FilterIcon } from '$lib/svgComponents';
+	import { fetchApi } from '$lib/apiUtils.js';
 
 	const chartTitle = 'Avg-Max-Min Scores';
 	let students = 'All students';
@@ -13,7 +14,7 @@
 	let data = [];
 	let isLoading = true;
 	let error = null;
-let isMounted = false;
+	let isMounted = false;
 	function setContextInChatBox() {
 		const context = {
 			type: 'performance',
@@ -25,15 +26,14 @@ let isMounted = false;
 
 	async function fetchAvgMaxMin() {
 		try {
-			isLoading=true;
-			error=null
+			isLoading = true;
+			error = null;
 			const { className, division, subject } = $selectedClassStore;
 			const classSubject = `${className}${division}_${subject}`;
-			const response = await fetch(`/apis/teacher/avg-max-min/${classSubject}`);
-			if (!response.ok) {
-				throw new Error('Failed to fetch data');
-			}
-			const apiData = await response.json();
+			const apiData = await fetchApi(`/apis/teacher/avg-max-min/${classSubject}`, {
+				action: 'fetch',
+				entity: 'avg-max-min scores'
+			});
 
 			// Transforming the data
 			testNames = apiData.testScores.map(

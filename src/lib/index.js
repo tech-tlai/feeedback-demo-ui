@@ -60,10 +60,14 @@ export {
 //lib/components/loadingSkeletons
 
 import SkelClassSummary from '$lib/components/loadingSkeletons/SkelClassSummary.svelte';
+import SkelChatHistory from '$lib/components/loadingSkeletons/SkelChatHistory.svelte';
+import SkelChartWidget from '$lib/components/loadingSkeletons/SkelChartWidget.svelte';
 import SkelDataTable from '$lib/components/loadingSkeletons/SkelDataTable.svelte';
 
 export {
   SkelClassSummary,
+  SkelChatHistory,
+  SkelChartWidget,
   SkelDataTable 
 }
 // =========================================================================   

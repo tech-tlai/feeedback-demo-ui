@@ -1,6 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import { formatDateDDMonthShortYear } from '$lib/utils';
+	import { fetchApi } from '$lib/apiUtils.js';
 	export let headers = [
 		{ key: 'name', label: 'Subject' },
 		{ key: 'examName', label: 'Exam' },
@@ -19,12 +20,10 @@
 
 	onMount(async () => {
 		try {
-			const response = await fetch(`/apis/student/progress-report/${STUDENT_ID}`);
-			if (!response.ok) {
-				throw new Error('Failed to fetch progress report');
-			}
-
-			const data = await response.json();
+			const data = await fetchApi(`/apis/student/progress-report/${STUDENT_ID}`, {
+				action: 'fetch',
+				entity: 'progress report'
+			});
 			subjectsData = data.map((sub) => {
 				return { ...sub, date: formatDateDDMonthShortYear(sub.date) };
 			});

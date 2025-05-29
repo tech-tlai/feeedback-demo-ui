@@ -2,6 +2,7 @@
 	import { PercentileTrendChart, FilterDropdown, Button } from '$lib';
 	import { onMount } from 'svelte';
 	import { formatDateDDMonthShortYear } from '$lib/utils';
+	import { fetchApi } from '$lib/apiUtils.js';
 
 	let examDates = [];
 	let subjectData = {};
@@ -14,13 +15,10 @@
 
 	async function fetchPercentileTrend() {
 		try {
-			const response = await fetch(
-				`/apis/student/percentile-trend/${STUDENT_ID}?subject=${selectedLanguage}`
+			const apiData = await fetchApi(
+				`/apis/student/percentile-trend/${STUDENT_ID}?subject=${selectedLanguage}`,
+				{ action: 'fetch', entity: 'percentile trend' }
 			);
-			if (!response.ok) {
-				throw new Error('Failed to fetch progress trend data');
-			}
-			const apiData = await response.json();
 
 			// Sorting the data by date in chronological order
 			const sortedData = apiData.sort((a, b) => new Date(a.date) - new Date(b.date));

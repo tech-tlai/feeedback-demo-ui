@@ -1,3 +1,5 @@
+import { getErrorMessage } from '$lib/utils';
+
 export async function fetchStrengths(url) {
     try {
         const response = await fetch(url);
@@ -62,19 +64,21 @@ export async function fetchChatInputResponse(title) {
     }
 }
 
-export async function fetchApi(endpoint, { method = 'GET', body = null } = {}) {
+export async function fetchApi(endpoint, { method = 'GET', body = null, action = 'fetch', entity = 'data' } = {}) {
     try {
-        const options = { method, headers: {} };
+     const options = { method, headers: {} };
         if (body) {
-            options.headers['Content-Type'] = 'application/json';
+            // options.headers['Content-Type'] = 'application/json';
             options.body = JSON.stringify(body);
         }
         const response = await fetch(endpoint, options);
-        if (!response.ok) {
-            throw new Error('API request failed');
-        }
+        
+       if (!response.ok) {
+			const errorMsg = getErrorMessage(response, action, entity);
+			throw new Error(errorMsg);
+		}
         return await response.json();
     } catch (error) {
-        throw new Error(error.message);
+        throw new Error(error.message || 'Unknown error occurred');
     }
 }

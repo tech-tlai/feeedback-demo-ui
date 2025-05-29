@@ -7,6 +7,7 @@
 	import ChatInterface from '$lib/components/profileSection/ChatInterface.svelte';
 	import AllClassesSummary from '$lib/components/teacher/AllClassesSummary.svelte';
 	import { fetchApi } from '$lib/apiUtils.js';
+	import { getErrorMessage } from '$lib/utils';
 	export let profileData = {
 		name: 'Sabdeep Sharma',
 		role: 'TEACHER',
@@ -22,6 +23,12 @@
 	let chatHistory = [];
 	let pinnedChats = [];
 	let selectedTab = 0;
+	let chatInterface = null;
+
+	let loadingChatHistory = false;
+	let chatHistoryError = null;
+	let loadingChatDetails = false;
+	let chatDetailsError = null;
 
 	const suggestedQueries = [
 		{
@@ -34,22 +41,22 @@
 
 	let selectedChat = null;
 	let chatDetails = null;
-	let loadingChatDetails = false;
-	let chatError = null;
-	let chatInterface = null;
 
 	async function handleChatSelection(e) {
 		const chat = e.detail;
 		selectedChat = chat;
 		chatDetails = null;
-		chatError = null;
+		chatDetailsError = null;
 		if (!chat || (!chat.id && !chat.uuid)) return;
 		loadingChatDetails = true;
 		try {
-			const data = await fetchApi(`/apis/teacher/chat/details/${chat.id || chat.uuid}?title=${chat.text}`);
+			const data = await fetchApi(
+				`/apis/teacher/chat/details/${chat.id || chat.uuid}?title=${chat.text}`,
+				{ action: 'fetch', entity: 'chat details' }
+			);
 			chatDetails = { queryTitle: data.title, response: data.details };
 		} catch (err) {
-			chatError = err.message;
+			chatDetailsError = err.message;
 		} finally {
 			loadingChatDetails = false;
 		}
@@ -58,16 +65,18 @@
 	async function handleFetchFromSuggestion(e) {
 		const suggestion = e.detail;
 		chatDetails = null;
-		chatError = null;
+		chatDetailsError = null;
 		loadingChatDetails = true;
 		try {
 			const data = await fetchApi(`/apis/teacher/chat`, {
 				method: 'POST',
-				body: { title: suggestion.query }
+				body: { title: suggestion.query },
+				action: 'fetch',
+				entity: 'chat suggestion'
 			});
 			setChatDetailsAndAddToHistory(data);
 		} catch (err) {
-			chatError = err.message;
+			chatDetailsError = err.message;
 		} finally {
 			loadingChatDetails = false;
 		}
@@ -87,16 +96,18 @@
 	async function handleChatInput(e) {
 		const inputText = e.detail;
 		chatDetails = null;
-		chatError = null;
+		chatDetailsError = null;
 		loadingChatDetails = true;
 		try {
 			const data = await fetchApi('/apis/teacher/chat', {
 				method: 'POST',
-				body: { title: inputText }
+				body: { title: inputText },
+				action: 'fetch',
+				entity: 'chat input'
 			});
 			setChatDetailsAndAddToHistory(data);
 		} catch (err) {
-			chatError = err.message;
+			chatDetailsError = err.message;
 		} finally {
 			loadingChatDetails = false;
 		}
@@ -130,13 +141,25 @@
 		}
 	}
 
-	onMount(async () => {
+	async function fetchChatHistory() {
+		loadingChatHistory = true;
+		chatHistoryError = null;
 		try {
-			const data = await fetchApi('/apis/teacher/chat');
+			const data = await fetchApi('/apis/teacher/chat', {
+				action: 'fetch',
+				entity: 'chat history'
+			});
+			
 			chatHistory = data;
 		} catch (err) {
-			console.error('Failed to fetch chat history:', err);
+			chatHistoryError = err.message;
+		} finally {
+			loadingChatHistory = false;
 		}
+	}
+
+	onMount(() => {
+		fetchChatHistory();
 	});
 </script>
 
@@ -152,6 +175,10 @@
 			on:chatMenuAction={handleChatMenuAction}
 			{pinnedChats}
 			bind:selectedTab
+			loadingHistory={loadingChatHistory}
+			historyError={chatHistoryError}
+			loadingDetails={loadingChatDetails}
+			detailsError={chatDetailsError}
 		/>
 	</div>
 

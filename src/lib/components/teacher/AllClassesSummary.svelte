@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { OtherClassSummary } from '$lib';
 	import SkelClassSummary from '$lib/components/loadingSkeletons/SkelClassSummary.svelte';
-      import { selectedClassStore } from '$lib/stores/globalFilters.js';
+	import { selectedClassStore } from '$lib/stores/globalFilters.js';
 
 	let classes = [];
 	let isLoading = true;
@@ -10,7 +10,6 @@
 
 	onMount(async () => {
 		try {
-			
 			const response = await fetch(`/apis/teacher/perf-summary/all-classes`);
 			if (response.ok) {
 				classes = await response.json();
@@ -38,9 +37,11 @@
 		<div class="overflow-x-auto scroll-smooth pr-16">
 			<div class="flex space-x-4 min-w-max pb-4">
 				{#if isLoading}
-					{#each Array(5) as _, i}
-						<SkelClassSummary showSubjects={3} />
-					{/each}
+					<div class="w-full grid grid-cols-[repeat(auto-fit,minmax(min(250px,100%),260px))] gap-5">
+						{#each Array(3) as _, i}
+							<SkelClassSummary key={i} />
+						{/each}
+					</div>
 				{:else if classes.length === 0}
 					<div class="text-gray-500">No classes available</div>
 				{:else}

@@ -3,42 +3,10 @@
 	import { onMount } from 'svelte';
 	import ErrorComponent from '$lib/components/ErrorComponent.svelte';
 	import SkelClassSummary from '$lib/components/loadingSkeletons/SkelClassSummary.svelte';
-	import { fetchStrengths, fetchWeaknesses } from '$lib/apiUtils.js';
+	import { fetchApi } from '$lib/apiUtils.js';
 	import { selectedClassStore, chatContextStore } from '$lib/stores/globalFilters.js';
 
-	// const strengths = [
-	// 			{ id: 1, name: 'Subject - Verb Agreement', category: 'major', isNew: false, value: 60 },
-	// 			{ id: 2, name: 'Verbs', category: 'major', isNew: false, value: 30 },
-	// 			{ id: 3, name: 'Nouns', category: 'major', isNew: false, value: 50 },
-	// 			{ id: 4, name: 'Synonyms and Antonyms', category: 'major', isNew: false, value: 110 },
-	// 			{ id: 5, name: 'Punctuation', category: 'major', isNew: false, value: 10 },
-	// 			{ id: 6, name: 'Compound Words', category: 'major', isNew: true, value: 70 },
-	// 			{ id: 7, name: 'Creative Writing', category: 'major', isNew: true, value: 160 }
-	// 		];
-
-	// const weaknesses = [
-	// 		{ id: 1, name: 'Basic Conversation', category: 'major', isNew: false, value: 235 },
-	// 		{ id: 2, name: 'Comprehension', category: 'major', isNew: false, value: 195 },
-	// 		{ id: 3, name: 'Homophones', category: 'major', isNew: false, value: 130 },
-	// 		{ id: 4, name: 'Prefixes and Suffixes', category: 'major', isNew: false, value: 50 },
-	// 		{ id: 5, name: 'Compound Words', category: 'major', isNew: false, value: 90 },
-	// 		{ id: 6, name: 'Letter Writing', category: 'major', isNew: true, value: 75 },
-	// 		// { id: 7, name: 'Parts of speech', category: 'major', isNew: false, value: 100 }
-	// 	]
-
-	// function transformData(data, attribute) {
-	// 	const transformedData = {
-	// 		name: attribute,
-	// 		children: data.map(item => ({
-	//             name: item.name,
-	//             value: item.value
-	//         }))
-	// 	};
-	// 	return transformedData;
-	// }
-
-	// const transformedStrengths = transformData(strengths, 'Strengths');
-	// const transformedWeaknesses = transformData(weaknesses, 'Weaknesses');
+	
 	let strengths = [];
 	let weaknesses = [];
 	let isLoadingStrengths = true;
@@ -49,11 +17,15 @@
 
 	async function loadStrengths() {
 		try {
-			isLoadingStrengths=true;
+			isLoadingStrengths = true;
 			const { className, division, subject } = $selectedClassStore;
 			const classSubject = `${className}${division}_${subject}`;
-			strengths = await fetchStrengths(
-				`/apis/teacher/topic-wise-analysis/strengths/${classSubject}`
+			strengths = await fetchApi(
+				`/apis/teacher/topic-wise-analysis/strengths/${classSubject}`,
+				{
+					action: 'fetch',
+					entity: 'topic-wise strengths'
+				}
 			);
 		} catch (err) {
 			errorStrengths = err.message;
@@ -64,11 +36,15 @@
 
 	async function loadWeaknesses() {
 		try {
-			isLoadingWeaknesses=true;
+			isLoadingWeaknesses = true;
 			const { className, division, subject } = $selectedClassStore;
 			const classSubject = `${className}${division}_${subject}`;
-			weaknesses = await fetchWeaknesses(
-				`/apis/teacher/topic-wise-analysis/weaknesses/${classSubject}`
+			weaknesses = await fetchApi(
+				`/apis/teacher/topic-wise-analysis/weaknesses/${classSubject}`,
+				{
+					action: 'fetch',
+					entity: 'topic-wise weaknesses'
+				}
 			);
 		} catch (err) {
 			errorWeaknesses = err.message;

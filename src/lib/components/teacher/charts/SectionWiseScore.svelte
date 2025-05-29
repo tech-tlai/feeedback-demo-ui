@@ -4,6 +4,7 @@
 	import { selectedClassStore, chatContextStore } from '$lib/stores/globalFilters.js';
 	import { FilterIcon } from '$lib/svgComponents';
 	import { transformForHistogram } from '$lib/utils';
+	import { fetchApi } from '$lib/apiUtils.js';
 
 	const chartTitle = 'Section-wise Score Comparison';
 	let students = 'All students';
@@ -31,14 +32,11 @@
 			error = null;
 			const { className, division, subject } = $selectedClassStore;
 			const classSubject = `${className}${division}_${subject}`;
-			const response = await fetch(`/apis/teacher/section-wise-comparison/${classSubject}`);
-			if (!response.ok) {
-				throw new Error('Failed to fetch data');
-			}
-			const apiData = await response.json();
-			
-			({ scoreRanges, sections, histogramData: data } = transformForHistogram(apiData));
-						
+			const response = await fetchApi(`/apis/teacher/section-wise-comparison/${classSubject}`, {
+				action: 'fetch',
+				entity: 'section-wise score'
+			});
+			({ scoreRanges, sections, histogramData: data } = transformForHistogram(response));
 		} catch (err) {
 			error = err.message;
 		} finally {
