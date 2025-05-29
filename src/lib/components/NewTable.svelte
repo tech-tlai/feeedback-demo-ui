@@ -3,7 +3,7 @@
 	import { error } from '@sveltejs/kit';
 	import Select from '$lib/components/Select.svelte';
 	import GoogleMatrialIcon from './GoogleMatrialIcon.svelte';
-	import ErrorMessage from '$lib/components/ErrorMessage.svelte';
+	// import ErrorMessage from '$lib/components/ErrorMessage.svelte';
 
 	export let showPagination = true;
 	export let tableStyle = 'primary';
@@ -721,5 +721,5 @@
 		</div>
 	{/if}
 {:else}
-	<ErrorMessage error={notFoundMessage} />
+	<!-- <ErrorMessage error={notFoundMessage} /> -->
 {/if}

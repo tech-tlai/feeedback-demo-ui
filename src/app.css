@@ -6,3 +6,7 @@
 body{
     @apply bg-gray-50;
 }
+
+.primary-btn{
+    @apply px-6 py-2 text-white bg-accent-blue rounded-lg hover:bg-blue-600 disabled:bg-gray-dark
+}
