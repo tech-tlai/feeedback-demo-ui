@@ -1,14 +1,29 @@
-
 <script>
-	import { Upload, BarChart3, Users, FileText, CheckCircle, TrendingUp, Clock, Shield, Zap, Target, Award } from 'lucide-svelte';
+	import {
+		Upload,
+		BarChart3,
+		Users,
+		FileText,
+		CheckCircle,
+		TrendingUp,
+		Clock,
+		Shield,
+		Zap,
+		Target,
+		Award
+	} from 'lucide-svelte';
 
 	import { goto } from '$app/navigation';
-  import DummyBarChart from '$lib/components/charts/DummyBarChart.svelte';
+	import DummyBarChart from '$lib/components/charts/DummyBarChart.svelte';
 	import { CommonDashCard, MultiFileUpload } from '$lib';
+	import { ProductFeatures, UploadSteps } from '$lib/components/landing-page';
+	import ContentUploadSection from '$lib/components/landing-page/ContentUploadSection.svelte';
 
 	function handleFileUpload(e) {
 		goto('/dashboard-portal');
 	}
+
+	
 	let files = [];
 
 	function handleFileChange(event) {
@@ -25,7 +40,7 @@
 	}
 </script>
 
-<div class="min-h-screen bg-white ">
+<div class="min-h-screen bg-white">
 	<!-- Header -->
 	<header class="bg-white shadow-lg relative overflow-hidden">
 		<div class="absolute inset-0 bg-gradient-to-r from-white to-accent-blue/20"></div>
@@ -69,7 +84,7 @@
 					</button> -->
 				</nav>
 				<button
-				class=" bg-black/80  text-white border-0 px-6 py-2 rounded-lg font-medium text-base transition-all"
+					class=" bg-black/80 text-white border-0 px-6 py-2 rounded-lg font-medium text-base transition-all"
 				>
 					Start Analysis
 				</button>
@@ -78,7 +93,7 @@
 	</header>
 
 	<!-- Hero Section -->
-	<section class="relative py-24 bg-gradient-to-br from-white  to-accent-blue/30">
+	<section class="relative py-24 bg-gradient-to-br from-white to-accent-blue/30">
 		<div
 			class="absolute inset-0 bg-[url('/placeholder.svg?height=800&width=1200&query=abstract geometric pattern')] opacity-5"
 		></div>
@@ -106,7 +121,7 @@
 					<div class="flex flex-col sm:flex-row gap-4">
 						<a href="#upload">
 							<button
-								class=" bg-black/80  text-white border-0 px-8 py-3 rounded-lg font-medium text-lg transition-all"
+								class=" bg-black/80 text-white border-0 px-8 py-3 rounded-lg font-medium text-lg transition-all"
 							>
 								Start Analysis
 							</button>
@@ -114,53 +129,17 @@
 					</div>
 				</div>
 
-        <div>
-          
-
-          <div class="relative">
-            <div
-              class="bg-gradient-to-br from-purple/20 to-accent-blue/20 rounded-3xl p-8 backdrop-blur-sm border border-gray-light/20"
-            >
-              <div class="bg-white rounded-2xl p-6 shadow-2xl">
-                <DummyBarChart/>
-              </div>
-               <!-- <div class="flex items-center justify-between mb-6">
-                  <h3 class="text-lg font-bold text-black">Live Analytics</h3>
-                  <div class="flex gap-2">
-                    <div class="w-3 h-3 bg-graph-green rounded-full animate-pulse"></div>
-                    <div class="w-3 h-3 bg-graph-blue rounded-full animate-pulse"></div>
-                    <div class="w-3 h-3 bg-graph-purple rounded-full animate-pulse"></div>
-                  </div>
-                </div>
-                <div class="space-y-4">
-                  <div class="flex justify-between items-center">
-                    <span class="text-gray-dark">Class Performance</span>
-                    <span class="font-bold text-green-dark">+12.5%</span>
-                  </div>
-                  <div class="w-full bg-gray-light rounded-full h-3">
-                    <div
-                      class="bg-gradient-to-r from-graph-green to-graph-blue h-3 rounded-full"
-                      style="width: 85%"
-                    ></div>
-                  </div>
-                  <div class="grid grid-cols-3 gap-4 mt-6">
-                    <div class="text-center">
-                      <div class="text-2xl font-bold text-graph-green">94%</div>
-                      <div class="text-xs text-gray-dark">Pass Rate</div>
-                    </div>
-                    <div class="text-center">
-                      <div class="text-2xl font-bold text-graph-blue">78</div>
-                      <div class="text-xs text-gray-dark">Avg Score</div>
-                    </div>
-                    <div class="text-center">
-                      <div class="text-2xl font-bold text-graph-purple">156</div>
-                      <div class="text-xs text-gray-dark">Students</div>
-                    </div>
-                  </div>
-                </div> -->
-            </div>
-          </div>
-        </div>
+				<div>
+					<div class="relative">
+						<div
+							class="bg-gradient-to-br from-purple/20 to-accent-blue/20 rounded-3xl p-8 backdrop-blur-sm border border-gray-light/20"
+						>
+							<div class="bg-white rounded-2xl p-6 shadow-2xl">
+								<DummyBarChart />
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 	</section>
@@ -181,116 +160,13 @@
 				</p>
 			</div>
 
-			<div class="grid items-center">
-				<!--  -->
-				<div class="w-full max-w-6xl mx-auto">
-					<MultiFileUpload on:fileUploadSubmit={handleFileUpload} />
-				</div>
-			</div>
+			<!-- <UploadSteps/> -->
+			<ContentUploadSection onFileUploadSubmit={handleFileUpload} />
 		</div>
 	</section>
 
 	<!-- Features Grid -->
-	<section id="features" class="py-20 bg-white">
-		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-			<div class="text-center mb-16">
-				<h2 class="text-4xl font-bold text-black mb-4">Powerful Features for Modern Education</h2>
-				<p class="text-xl text-gray-dark max-w-3xl mx-auto">
-					Everything you need to transform raw data into actionable educational insights
-				</p>
-			</div>
-
-			<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-				<div
-					class="border border-gray-light/50 hover:shadow-xl transition-all duration-300 group bg-white rounded-lg p-6"
-				>
-					<div
-						class="bg-gradient-to-r from-graph-green/10 to-graph-green/20 p-3 rounded-xl w-fit group-hover:scale-110 transition-transform mb-4"
-					>
-						<TrendingUp class="h-6 w-6 text-graph-green" />
-					</div>
-					<h3 class="text-xl font-bold text-black mb-3">Performance Tracking</h3>
-					<p class="text-gray-dark">
-						Monitor student progress with detailed analytics, trend analysis, and predictive
-						insights for better outcomes.
-					</p>
-				</div>
-
-				<div
-					class="border border-gray-light/50 hover:shadow-xl transition-all duration-300 group bg-white rounded-lg p-6"
-				>
-					<div
-						class="bg-gradient-to-r from-graph-blue/10 to-graph-blue/20 p-3 rounded-xl w-fit group-hover:scale-110 transition-transform mb-4"
-					>
-						<Users class="h-6 w-6 text-graph-blue" />
-					</div>
-					<h3 class="text-xl font-bold text-black mb-3">Class Analytics</h3>
-					<p class="text-gray-dark">
-						Comprehensive class-wide statistics with comparative analysis and improvement
-						recommendations.
-					</p>
-				</div>
-
-				<div
-					class="border border-gray-light/50 hover:shadow-xl transition-all duration-300 group bg-white rounded-lg p-6"
-				>
-					<div
-						class="bg-gradient-to-r from-graph-purple/10 to-graph-purple/20 p-3 rounded-xl w-fit group-hover:scale-110 transition-transform mb-4"
-					>
-						<BarChart3 class="h-6 w-6 text-graph-purple" />
-					</div>
-					<h3 class="text-xl font-bold text-black mb-3">Visual Reports</h3>
-					<p class="text-gray-dark">
-						Generate stunning, interactive charts and reports that make complex data easy to
-						understand.
-					</p>
-				</div>
-
-				<div
-					class="border border-gray-light/50 hover:shadow-xl transition-all duration-300 group bg-white rounded-lg p-6"
-				>
-					<div
-						class="bg-gradient-to-r from-orange-dark/10 to-orange-dark/20 p-3 rounded-xl w-fit group-hover:scale-110 transition-transform mb-4"
-					>
-						<Clock class="h-6 w-6 text-orange-dark" />
-					</div>
-					<h3 class="text-xl font-bold text-black mb-3">Real-time Processing</h3>
-					<p class="text-gray-dark">
-						Lightning-fast analysis with instant results. No waiting, no delays - just immediate
-						insights.
-					</p>
-				</div>
-
-				<div
-					class="border border-gray-light/50 hover:shadow-xl transition-all duration-300 group bg-white rounded-lg p-6"
-				>
-					<div
-						class="bg-gradient-to-r from-red-dark/10 to-red-dark/20 p-3 rounded-xl w-fit group-hover:scale-110 transition-transform mb-4"
-					>
-						<Shield class="h-6 w-6 text-red-dark" />
-					</div>
-					<h3 class="text-xl font-bold text-black mb-3">Enterprise Security</h3>
-					<p class="text-gray-dark">
-						Military-grade encryption and compliance with educational data protection standards.
-					</p>
-				</div>
-
-				<div
-					class="border border-gray-light/50 hover:shadow-xl transition-all duration-300 group bg-white rounded-lg p-6"
-				>
-					<div
-						class="bg-gradient-to-r from-purple/10 to-purple/20 p-3 rounded-xl w-fit group-hover:scale-110 transition-transform mb-4"
-					>
-						<CheckCircle class="h-6 w-6 text-purple" />
-					</div>
-					<h3 class="text-xl font-bold text-black mb-3">Smart Integration</h3>
-					<p class="text-gray-dark">
-						Seamlessly connects with existing school systems and supports all major file formats.
-					</p>
-				</div>
-			</div>
-		</div>
-	</section>
+	<ProductFeatures />
 
 	<!-- CTA Section -->
 	<section
@@ -368,8 +244,8 @@
 	</footer>
 </div>
 
-<style>
+<!-- <style>
 	@import 'tailwindcss/base';
 	@import 'tailwindcss/components';
 	@import 'tailwindcss/utilities';
-</style>
+</style> -->

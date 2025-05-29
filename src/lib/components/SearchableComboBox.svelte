@@ -15,6 +15,7 @@
 	let dropDownRef;
 	let searchFilterValue = '';
 	let debounceTimer;
+	let dropdownPosition = 'bottom'; // 'bottom' or 'top'
 
 	$:if (options?.length === 0) {
 		if (!selectedItemName && !selectedItemId) {
@@ -72,8 +73,24 @@
 		dispatch('handleDispatchFilterData', { selectedItemId, selectedItemName });
 	}
 
+	function checkDropdownPosition() {
+		if (!dropDownRef) return;
+		const inputRect = dropDownRef.getBoundingClientRect();
+		const dropdownHeight = 240; // px, matches max-h-60
+		const spaceBelow = window.innerHeight - inputRect.bottom;
+		const spaceAbove = inputRect.top;
+		if (spaceBelow < dropdownHeight && spaceAbove > dropdownHeight) {
+			dropdownPosition = 'top';
+		} else {
+			dropdownPosition = 'bottom';
+		}
+	}
+
 	function toggleDropdown() {
 		showDropdown = !showDropdown;
+		if (showDropdown) {
+			checkDropdownPosition();
+		}
 	}
 
 	// Handle search input with debouncing
@@ -158,7 +175,7 @@
 		{/if}		
 		{#if showDropdown && !disabled}
 			<ul
-				class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
+				class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm {dropdownPosition === 'top' ? 'bottom-full mb-1' : 'top-full mt-1'}"
 				id="options"
 				role="listbox"
 				on:click={handleListItemSelection}
@@ -203,4 +220,4 @@
 			</div>
 		{/if}
 	</div>
-</div> 
+</div>

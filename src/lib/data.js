@@ -185,3 +185,10 @@ export const teachers = [
   { id: 9, name: 'Mrs. Neha Kulkarni', subject: 'Chemistry' },
   { id: 10, name: 'Ms. Ananya Iyer', subject: 'English' }
 ];
+
+export const teacherChatDetails = {
+    1: { id: 1, title: 'How did Class 10 perform in the end-term exam?', details: 'Class 10 average: 82%. Top scorer: Aryan Mishra.' },
+    2: { id: 2, title: 'What are the weak areas in Mathematics for Class 7?', details: 'Weaknesses: Fractions, Geometry.' },
+    3: { id: 3, title: 'Which students from Class 5 showed the most improvement in English?', details: 'Most improved: Nikita Mehta, Harsh Vardhan.' },
+    4: { id: 4, title: 'What can be done to improve vocabulary for Class 3A?', details: 'Suggestions: Daily reading, vocabulary games.' }
+};
