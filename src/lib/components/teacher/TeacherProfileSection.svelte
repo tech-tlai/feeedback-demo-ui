@@ -104,7 +104,9 @@
 
 	function handlePinChat(chat) {
 		if (!pinnedChats.some((c) => (c.id || c.uuid) === (chat.id || chat.uuid))) {
-			pinnedChats = [...pinnedChats, chat];
+			const maxOrder = pinnedChats.length > 0 ? Math.max(...pinnedChats.map(c => c.order || 1)) : 1;
+			const order = maxOrder + 1;
+			pinnedChats = [...pinnedChats, { ...chat, order }];
 			selectedTab = 1;
 		}
 	}

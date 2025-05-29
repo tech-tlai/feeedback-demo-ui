@@ -13,8 +13,7 @@
 		open = !open;
 	}
 
-    $:console.log('menu clicked',open)
-	function closeMenu() {
+ 	function closeMenu() {
 		open = false;
 	}
 
