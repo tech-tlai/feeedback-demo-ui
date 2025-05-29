@@ -159,8 +159,12 @@
 
 	function handlePinChat(chat) {
 		if (!pinnedChats.some((c) => (c.id || c.uuid) === (chat.id || chat.uuid))) {
-			pinnedChats = [...pinnedChats, chat];
-			selectedTab=1;
+			const maxOrder =
+				pinnedChats.length > 0 ? Math.max(...pinnedChats.map((c) => c.order || 1)) : 1;
+			const order = maxOrder + 1;
+			console.log('new order-student', order);
+			pinnedChats = [...pinnedChats, { ...chat, order }];
+			selectedTab = 1;
 		}
 	}
 
@@ -170,6 +174,7 @@
 
 	function handleChatMenuAction(e) {
 		const { chat, action } = e.detail;
+
 		switch (action) {
 			case 'pin':
 				handlePinChat(chat);
@@ -233,5 +238,3 @@
 		</div>
 	</div>
 </main>
-
-

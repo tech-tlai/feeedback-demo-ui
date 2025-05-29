@@ -29,11 +29,15 @@
 
 	function handleMenuSelect(event, chat) {
 		const { item } = event.detail;
-		console.log(`Selected "${item.label}" (${item.value}) for chat`, chat);
 		dispatch('chatMenuAction', { chat, action: item.value });
 	}
 
 	$: history = history && history.length ? [...history].sort((a, b) => b.uuid - a.uuid) : history;
+	$: pinnedChats =
+		pinnedChats && pinnedChats.length
+			? [...pinnedChats].sort((a, b) => b.order - a.order)
+			: pinnedChats;
+
 </script>
 
 <div class="bg-white rounded-lg shadow p-4">
