@@ -1,18 +1,19 @@
 <script>
 	import { goto } from '$app/navigation';
-	import { FileUpload ,SearchableComboBox} from '$lib';
-	
+	import { FileUpload, SearchableComboBox } from '$lib';
+
 	export let title = 'Card title';
-	export let description =
-		'card description - lorem ipsum';
+	export let description = 'card description - lorem ipsum';
 	export let image = '/placeholder.jpg';
-	export let href = '/location';
+	export let dashboardUrl = '/location';
 	// export let highlight = 'Class Reports Updated';
 	// export let highlightColor = 'text-blue-600';
 	export let buttonText = 'View';
 	export let gradient = 'from-blue-400 to-cyan-500';
-	export let icon = 'teacher'; // for future extensibility
-    // export let fileUploadHelperText='Upload file'
+	export let dataUploadPageUrl = '';
+	export let entity = 'student';
+
+	// export let fileUploadHelperText='Upload file'
 
 	// let uploadedFile = null;
 	// let uploadError = '';
@@ -27,7 +28,7 @@
 			alert('Please select an entity before proceeding.');
 			return;
 		}
-		goto(href);
+		goto(dashboardUrl);
 	}
 
 	// Accept a list of entities as a prop
@@ -43,10 +44,14 @@
 		selectedEntityName = e.detail.selectedItemName;
 		// You can dispatch or use the selected entity as needed
 	}
+
+	function handleNavigation() {
+		goto(dataUploadPageUrl);
+	}
 </script>
 
 <div
-	class="bg-white rounded-xl shadow-lg  transition-transform duration-300 hover:scale-[100.5%] hover:shadow-xl"
+	class="bg-white rounded-xl shadow-lg transition-transform duration-300 hover:scale-[100.5%] hover:shadow-xl text-sm"
 >
 	<div class="h-64 bg-gradient-to-r {gradient} relative overflow-hidden rounded-t-xl">
 		<img src={image} alt={title} class="w-full h-full object-cover" />
@@ -69,39 +74,51 @@
 		</div>
 	</div>
 	<div class="p-6">
-		<h3 class="text-2xl font-bold text-slate-800 mb-2">{title}</h3>
-		<p class="text-slate-600 mb-4">
+		<h3 class="text-2xl font-bold text-slate-800 mb-2 text-left">{title}</h3>
+		<p class="text-slate-600 mb-4 text-left">
 			{description}
 		</p>
-		<div class="mb-4">
-			<SearchableComboBox
-				options={entityList}
-				label={comboLabel}
-				placeholder={comboPlaceholder}
-				selectedItemId={selectedEntityId}
-				selectedItemName={selectedEntityName}
-				on:handleDispatchComboBoxData={handleComboBoxChange}
-			/>
+		<div class=" text-left text-gray-dark my-1">
+			<span>Choose {entity} from dataset</span>
 		</div>
-		<!-- <div class="mb-4">
-			<FileUpload on:fileSelected={handleFileSelected} helperText={fileUploadHelperText}/>
-			{#if uploadError}
-				<p class="text-red-600 text-sm mt-2">{uploadError}</p>
-			{/if}
-		</div> -->
-		<div class="flex items-center justify-end">
-			<!-- <div class="flex items-center gap-2 {highlightColor}">
-				<span class="text-sm font-medium">{highlight}</span>
-				<div class="w-2 h-2 rounded-full bg-green-500"></div>
-			</div> -->
-			<button
-				type="button"
-				class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-dark disabled:cursor-not-allowed"
-				on:click={handleButtonClick}
-				disabled={!selectedEntityId}
-			>
-				{buttonText}
-			</button>
+		<div class="mb-4 flex items-center gap-2 justify-between">
+			<div class="flex-grow">
+				<SearchableComboBox
+					options={entityList}
+					label={comboLabel}
+					placeholder={comboPlaceholder}
+					selectedItemId={selectedEntityId}
+					selectedItemName={selectedEntityName}
+					on:handleDispatchComboBoxData={handleComboBoxChange}
+				/>
+			</div>
+			<a href={dashboardUrl}>
+				<button
+					type="button"
+					class="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-dark disabled:cursor-not-allowed"
+					on:click={handleButtonClick}
+					disabled={!selectedEntityId}
+				>
+					{buttonText}
+				</button>
+			</a>
 		</div>
+		{#if dataUploadPageUrl}
+			<div class=" border-t border-gray-dark relative text-gray-dark my-8">
+				<span class="bg-white inline-block p-2 absolute left-1/2 -top-1/2 -translate-y-1/2">OR</span
+				>
+			</div>
+			<div class="flex items-center justify-center">
+				<a href={dataUploadPageUrl}>
+					<button
+						type="button"
+						class="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-dark disabled:cursor-not-allowed"
+						on:click={handleNavigation}
+					>
+						Upload own data set
+					</button>
+				</a>
+			</div>
+		{/if}
 	</div>
 </div>

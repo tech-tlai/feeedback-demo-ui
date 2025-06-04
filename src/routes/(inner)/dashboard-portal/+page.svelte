@@ -5,11 +5,11 @@
 	const { students = [], teachers = [] } = data || {};
 
 	// Transform for SearchableComboBox: id, name
-	const studentOptions = students.map(s => ({ id: s.id, name: s.name }));
-	const teacherOptions = teachers.map(t => ({ id: t.id, name: t.name }));
+	const studentOptions = students.map((s) => ({ id: s.id, name: s.name }));
+	const teacherOptions = teachers.map((t) => ({ id: t.id, name: t.name }));
 </script>
 
-<main class="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6">
+<main class="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6" id="content-section">
 	<div class="w-full max-w-6xl mx-auto">
 		<div class="text-center mb-10">
 			<h1 class="text-3xl font-bold text-slate-800">Govt. Higher Secondary School</h1>
@@ -23,11 +23,12 @@
 				title="Student Dashboard"
 				description="Track your performance, view exam schedules, and get personalized insights."
 				image="/students-thumbnail.png"
-				href="/student-dashboard"
 				gradient="from-black/50 to-transparent"
 				fileUploadHelperText="Upload student performance data"
+				entity="student"
 				entityList={studentOptions}
-				
+				dashboardUrl="/student/dashboard"
+				dataUploadPageUrl="/student/upload"
 				comboPlaceholder="Search student..."
 			/>
 
@@ -38,8 +39,10 @@
 				image="/school-thumbnail.png"
 				href="/teacher-dashboard"
 				fileUploadHelperText="Upload class performance data"
+				entity="teacher"
 				entityList={teacherOptions}
-				
+				dashboardUrl="/teacher/dashboard"
+				dataUploadPageUrl="/teacher/upload"
 				comboPlaceholder="Search teacher..."
 			/>
 		</div>

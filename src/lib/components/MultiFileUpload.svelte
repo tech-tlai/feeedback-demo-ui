@@ -6,6 +6,7 @@
 	export let dragText = 'or drag and drop';
 	export let fileTypes = '.csv,.xlsx,.xls';
 	export let placeholderImage = '/placeholder.svg?height=120&width=120&query=file upload icon';
+	export let maxFileSize = 5;
 
 	let files = [];
 	let isDragOver = false;
@@ -15,8 +16,8 @@
 	$: console.log('files', files);
 	function handleFiles(event) {
 		const newFiles = Array.from(event.target.files);
-		const existingNames = files.map(f => f.name);
-		const filteredFiles = newFiles.filter(f => !existingNames.includes(f.name));
+		const existingNames = files.map((f) => f.name);
+		const filteredFiles = newFiles.filter((f) => !existingNames.includes(f.name));
 		if (filteredFiles.length < newFiles.length) {
 			uploadError = 'Some files were already added and have been skipped.';
 		}
@@ -27,8 +28,8 @@
 		event.preventDefault();
 		isDragOver = false;
 		const droppedFiles = Array.from(event.dataTransfer.files);
-		const existingNames = files.map(f => f.name);
-		const filteredFiles = droppedFiles.filter(f => !existingNames.includes(f.name));
+		const existingNames = files.map((f) => f.name);
+		const filteredFiles = droppedFiles.filter((f) => !existingNames.includes(f.name));
 		if (filteredFiles.length < droppedFiles.length) {
 			uploadError = 'Some files were already added and have been skipped.';
 		}
@@ -81,13 +82,13 @@
 
 	function removeFile(indexOfItem) {
 		files = files.filter((_, index) => index !== indexOfItem);
-		submittedIndexes = submittedIndexes.filter(idx => idx !== indexOfItem);
+		submittedIndexes = submittedIndexes.filter((idx) => idx !== indexOfItem);
 	}
 
 	$: allFilesSubmitted = files.length > 0 && submittedIndexes.length === files.length;
 </script>
 
-<div class=" bg-gray-50">
+<div>
 	<!-- <h1 class="text-2xl font-bold mb-6">Upload Files</h1> -->
 
 	<div
@@ -106,7 +107,9 @@
 
 		<label for={`file-upload-${id}`} class="cursor-pointer">
 			<p class="font-semibold text-lg mb-2">Drag and drop files here</p>
-			<p class=" mb-4">Or <span class="text-accent-blue">click to select files</span> from your computer</p>
+			<p class=" mb-4">
+				Or <span class="text-accent-blue">click to select files</span> from your computer
+			</p>
 		</label>
 
 		<input
@@ -117,6 +120,7 @@
 			on:change={handleFiles}
 			class="hidden"
 		/>
+		<p class="mb-2">Maximum file size: {maxFileSize} MB</p>
 	</div>
 
 	<!-- {#if files.length > 0}
@@ -142,10 +146,18 @@
 		</div>
 	{/if} -->
 	{#if files.length > 0}
-		<div class="space-y-3 rounded-lg p-4 {allFilesSubmitted ? 'bg-green-light' : 'bg-gradient-to-r from-accent-blue/20 to-accent-blue/10'}">
-			<h4 class="font-medium flex items-center gap-2 {allFilesSubmitted ? 'text-green-dark' : 'text-black'}">
+		<div
+			class="space-y-3 rounded-lg p-4 {allFilesSubmitted
+				? 'bg-green-light'
+				: 'bg-gradient-to-r from-accent-blue/20 to-accent-blue/10'}"
+		>
+			<h4
+				class="font-medium flex items-center gap-2 {allFilesSubmitted
+					? 'text-green-dark'
+					: 'text-black'}"
+			>
 				<CheckCircle class="h-4 w-4" />
-				{allFilesSubmitted? 'All files added!': 'Files to upload'}
+				{allFilesSubmitted ? 'All files added!' : 'Files to upload'}
 			</h4>
 			{#each files as file, index}
 				<div class="flex items-center gap-3 text-sm text-gray-dark bg-white rounded-lg p-2">
@@ -176,9 +188,10 @@
 				disabled={isSubmitting}
 			>
 				{#if isSubmitting}
-					<Loader2 class="animate-spin h-5 w-5" />
+					<Loader2 class="animate-spin h-5 w-5" /> Submitting
+				{:else}
+					Submit
 				{/if}
-				Submit
 			</button>
 		{/if}
 	</div>
