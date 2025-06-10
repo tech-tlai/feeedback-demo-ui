@@ -7,13 +7,13 @@
 	export let fileTypes = '.csv,.xlsx,.xls';
 	export let placeholderImage = '/placeholder.svg?height=120&width=120&query=file upload icon';
 	export let maxFileSize = 5;
+	export let files = [];
 
-	let files = [];
 	let isDragOver = false;
 	let isSubmitting = false;
 	let submittedIndexes = [];
 	const id = Math.ceil(Math.random() * 1000) + 1;
-	$: console.log('files', files);
+	
 	function handleFiles(event) {
 		const newFiles = Array.from(event.target.files);
 		const existingNames = files.map((f) => f.name);
@@ -80,9 +80,13 @@
 		});
 	}
 
-	function removeFile(indexOfItem) {
-		files = files.filter((_, index) => index !== indexOfItem);
+	// function removeFile(indexOfItem) {
+	// 	files = files.filter((_, index) => index !== indexOfItem);
+	// submittedIndexes = submittedIndexes.filter((idx) => idx !== indexOfItem);
+	// }
+	function handleRemove(indexOfItem) {
 		submittedIndexes = submittedIndexes.filter((idx) => idx !== indexOfItem);
+		dispatch('fileRemove', { index: indexOfItem });
 	}
 
 	$: allFilesSubmitted = files.length > 0 && submittedIndexes.length === files.length;
@@ -123,28 +127,6 @@
 		<p class="mb-2">Maximum file size: {maxFileSize} MB</p>
 	</div>
 
-	<!-- {#if files.length > 0}
-		<div class="mt-10">
-			<h2 class="text-xl font-semibold mb-4">Uploaded Files</h2>
-			<div class="border border-gray-200 rounded-lg overflow-hidden">
-				<div class="grid grid-cols-2 bg-gray-100 p-3 font-semibold">
-					<span>Name</span>
-					<span>Size</span>
-				</div>
-				{#each files as file}
-					<div
-						class="grid grid-cols-2 p-3 border-t border-gray-100 bg-white hover:bg-gray-50 transition"
-					>
-						<span class="flex gap-2 items-center"
-							><FileText class="h-4 w-4 text-accent-blue " /> {file.name}</span
-						>
-						<span class="text-accent-blue">{formatSize(file.size)}</span>
-					</div>
-				{/each}
-				
-			</div>
-		</div>
-	{/if} -->
 	{#if files.length > 0}
 		<div
 			class="space-y-3 rounded-lg p-4 {allFilesSubmitted
@@ -167,7 +149,7 @@
 						<span class="text-xs text-green-dark">✓ Submitted</span>
 					{:else}
 						<button
-							on:click={() => removeFile(index)}
+							on:click={() => handleRemove(index)}
 							class="text-red-dark hover:text-red-dark/80 text-xs"
 						>
 							Remove

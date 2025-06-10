@@ -5,10 +5,9 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { studentUploadState } from '$lib/stores/studentUploadState.js';
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 
 	let currentStep = 0; // 0-based index for steps
-
 
 	// Add as many steps as you want, just update the array
 	const steps = [
@@ -17,10 +16,17 @@
 		// { label: 'Review & Submit' }, // Example: add more steps here
 	];
 
-	let files;
+	let files = [];
 
-	// Restore files from store on mount
-
+	let studentsList = [
+		{ id: 1, name: 'Aarav Nair', grade: '10', section: 'A' },
+		{ id: 2, name: 'Saanvi Das', grade: '10', section: 'A' },
+		{ id: 3, name: 'Ishaan Gupta', grade: '10', section: 'B' },
+		{ id: 4, name: 'Meera Menon', grade: '10', section: 'B' },
+		{ id: 5, name: 'Aditya Pillai', grade: '10', section: 'C' },
+		{ id: 6, name: 'Riya Sharma', grade: '10', section: 'C' },
+		{ id: 7, name: 'Krishna Reddy', grade: '10', section: 'D' }
+	];
 
 	// Derive step states for the indicator
 	$: stepsWithState = steps.map((step, i) => ({
@@ -30,8 +36,7 @@
 	}));
 
 	async function onAnswerSheetUploadSubmit(e) {
-		 files = e.detail.files;
-		 studentUploadState.update(state => ({ ...state, files })); // Save to store
+		files = e.detail.files;
 		const done = e.detail.done;
 		if (!files || files.length === 0) {
 			done && done();
@@ -44,6 +49,13 @@
 			await new Promise((res) => setTimeout(res, 1500));
 			const res = await fetch('/apis/teacher/upload', { method: 'POST', body: formData });
 			if (res.ok) {
+				// Save file names/types to sessionStorage (cannot store File objects directly)
+				const fileMeta = Array.from(files).map((f) => ({
+					name: f.name,
+					type: f.type,
+					size: f.size
+				}));
+				sessionStorage.setItem('studentUploadFiles', JSON.stringify(fileMeta));
 				currentStep = 1; // Move to next step
 				// goto(`?step=1`, { replaceState: false }); // This adds to history
 			}
@@ -54,16 +66,31 @@
 		}
 	}
 
-	// Example student options, replace with real data as needed
-	let studentsList = [
-		{ id: 1, name: 'Aarav Nair', grade: '10', section: 'A' },
-		{ id: 2, name: 'Saanvi Das', grade: '10', section: 'A' },
-		{ id: 3, name: 'Ishaan Gupta', grade: '10', section: 'B' },
-		{ id: 4, name: 'Meera Menon', grade: '10', section: 'B' },
-		{ id: 5, name: 'Aditya Pillai', grade: '10', section: 'C' },
-		{ id: 6, name: 'Riya Sharma', grade: '10', section: 'C' },
-		{ id: 7, name: 'Krishna Reddy', grade: '10', section: 'D' }
-	];
+	function handleFileRemove(e) {
+		const idx = e.detail.index;
+
+		console.log('index', idx);
+		files = files.filter((_, i) => i !== idx);
+		console.log('files after removal', files);
+		// Update sessionStorage
+		const fileMeta = files.map((f) => ({ name: f.name, type: f.type, size: f.size }));
+		sessionStorage.setItem('studentUploadFiles', JSON.stringify(fileMeta));
+	}
+
+	// Restore files from sessionStorage on mount
+	onMount(() => {
+		const saved = sessionStorage.getItem('studentUploadFiles');
+		if (saved) {
+			try {
+				files = JSON.parse(saved);
+			} catch {}
+		}
+	});
+
+	// Clear student upload data from sessionStorage on page destroy
+	onDestroy(() => {
+		sessionStorage.removeItem('studentUploadFiles');
+	});
 </script>
 
 <div class="px-12">
@@ -72,13 +99,15 @@
 		{#if currentStep === 0}
 			<FileUploadComponent
 				title="Upload Answer sheets"
+				{files}
 				on:fileUploadSubmit={onAnswerSheetUploadSubmit}
+				on:fileRemove={handleFileRemove}
 			/>
 		{/if}
 		{#if currentStep === 1}
-			<div class="grid max-w-md mx-auto  mt-12">
-			<h3 class="text-xl font-semibold mb-4 text-black text-center">Select Student</h3>
-			
+			<div class="grid max-w-md mx-auto mt-12">
+				<h3 class="text-xl font-semibold mb-4 text-black text-center">Select Student</h3>
+
 				<CommonDashCard
 					title="Student Dashboard"
 					description="Track your performance, view exam schedules, and get personalized insights."
@@ -90,6 +119,9 @@
 					dashboardUrl="/student/dashboard"
 					comboPlaceholder="Search student..."
 				/>
+				<!-- <div class="mt-8">
+					<button on:click={() => (currentStep = 0)} class="secondary-btn">Prev</button>
+				</div> -->
 			</div>
 		{/if}
 	</div>

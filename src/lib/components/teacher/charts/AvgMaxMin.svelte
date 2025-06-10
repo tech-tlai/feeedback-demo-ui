@@ -22,7 +22,6 @@
 		};
 		chatContextStore.set(context);
 	}
-	
 
 	async function fetchAvgMaxMin() {
 		try {
@@ -34,7 +33,7 @@
 				action: 'fetch',
 				entity: 'avg-max-min scores'
 			});
-
+			console.log('apiData', apiData);
 			// Transforming the data
 			testNames = apiData.testScores.map(
 				(test) =>
@@ -68,7 +67,7 @@
 	</div>
 
 	<div class="flex flex-wrap gap-6 mb-4 text-sm text-gray-dark">
-		<span>{$selectedClassStore.fullClassName ?$selectedClassStore.fullClassName :''}</span>
+		<span>{$selectedClassStore.fullClassName ? $selectedClassStore.fullClassName : ''}</span>
 		<span>Students: {students}</span>
 		<span>Tests: {testPeriod}</span>
 	</div>

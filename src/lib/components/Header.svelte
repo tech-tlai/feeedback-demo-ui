@@ -28,7 +28,7 @@
 	};
 </script>
 
-<header class="bg-white shadow-lg relative overflow-hidden">
+<header class="bg-white shadow-lg relative ">
 	<div class="absolute inset-0 bg-gradient-to-r from-white to-accent-blue/20"></div>
 	<div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 		<div class="flex justify-between items-center py-6">
@@ -72,6 +72,8 @@
 					{/each}
 				</div>
 			{/if}
+			<!-- Custom header content slot -->
+			<slot name="header-custom-actions" />
 		</div>
 	</div>
 </header>

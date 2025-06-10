@@ -41,7 +41,7 @@
 	const navItems = [
 		{ label: 'Features', href: '#features' },
 		{ label: 'Upload', href: '#upload' },
-		{ label: 'Start Analysis', href: '/dashboad-portal?#content-section', cta: true }
+		// { label: 'Start Analysis', href: '/dashboad-portal?#content-section', cta: true }
 	];
 	const actionButtons = [{ label: 'Start Analysis', href: '/dashboard-portal?#content-section', type: 'primary' }];
 </script>

@@ -4,6 +4,7 @@
 	export let title = 'Upload answer sheets';
 	export let maxFileSize = '5';
 	export let sampleFileUrl = '';
+    export let files=[]
 </script>
 
 <div class=" card max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-sm">
@@ -21,5 +22,5 @@
 	>
 		Download sample template
 	</a>
-	<MultiFileUpload {maxFileSize} on:fileUploadSubmit/>
+	<MultiFileUpload {maxFileSize} {files} on:fileUploadSubmit on:fileRemove/>
 </div>

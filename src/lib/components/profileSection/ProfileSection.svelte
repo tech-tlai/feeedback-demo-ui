@@ -9,15 +9,7 @@
 	import { onMount } from 'svelte';
 
 	// Sample data
-	export let profileData = {
-		name: 'Kavya Reddy',
-		role: 'STUDENT',
-		class_: '3',
-		id: '321468',
-		school: "St. Mary's Higher Secondary School",
-		location: 'Trivandrum',
-		image: '/kavya_reddy.png'
-	};
+	export let profileData = {};
 
 	const statsData = [
 		{
