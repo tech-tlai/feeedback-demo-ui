@@ -9,9 +9,12 @@
 	let students = 'All students';
 	let subject = 'English';
 	let testPeriod = 'Last 3 tests';
-	let testNames = [];
-	let scoreRanges = [];
-	let data = [];
+	export let chartData = {};
+
+	$: testNames = chartData.testNames || [];
+	$: scoreRanges = chartData.scoreRanges || [];
+	$: data = chartData.data || [];
+
 	let isLoading = true;
 	let error = null;
 	let isMounted = false;
@@ -24,35 +27,36 @@
 	}
 	
 
-	async function fetchAvgMaxMin() {
-		try {
-			isLoading = true;
-			error = null;
-			const { className, division, subject } = $selectedClassStore;
-			const classSubject = `${className}${division}_${subject}`;
-			const apiData = await fetchApi(`/apis/teacher/avg-max-min/${classSubject}`, {
-				action: 'fetch',
-				entity: 'avg-max-min scores'
-			});
+	// Commented out API call for now
+	// async function fetchAvgMaxMin() {
+	//     try {
+	//         isLoading = true;
+	//         error = null;
+	//         const { className, division, subject } = $selectedClassStore;
+	//         const classSubject = `${className}${division}_${subject}`;
+	//         const apiData = await fetchApi(`/apis/teacher/avg-max-min/${classSubject}`, {
+	//             action: 'fetch',
+	//             entity: 'avg-max-min scores'
+	//         });
 
-			// Transforming the data
-			testNames = apiData.testScores.map(
-				(test) =>
-					`${test.examName}-${new Date(test.dateOfExam).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' }).replace(/ /g, ' ')}`
-			);
-			scoreRanges = apiData.scoreTypes;
-			data = apiData.testScores.map((test) => [test.avg, test.max, test.min]);
-		} catch (err) {
-			console.log(err.message);
-			error = err.message;
-		} finally {
-			isLoading = false;
-		}
-	}
+	//         // Transforming the data
+	//         testNames = apiData.testScores.map(
+	//             (test) =>
+	//                 `${test.examName}-${new Date(test.dateOfExam).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' }).replace(/ /g, ' ')}`
+	//         );
+	//         scoreRanges = apiData.scoreTypes;
+	//         data = apiData.testScores.map((test) => [test.avg, test.max, test.min]);
+	//     } catch (err) {
+	//         console.log(err.message);
+	//         error = err.message;
+	//     } finally {
+	//         isLoading = false;
+	//     }
+	// }
 
-	$: if (isMounted && $selectedClassStore) {
-		fetchAvgMaxMin();
-	}
+	// $: if (isMounted && $selectedClassStore) {
+	//     fetchAvgMaxMin();
+	// }
 
 	onMount(async () => {
 		isMounted = true;

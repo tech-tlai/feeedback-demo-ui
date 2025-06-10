@@ -12,9 +12,10 @@
 <main class="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6" id="content-section">
 	<div class="w-full max-w-6xl mx-auto">
 		<div class="text-center mb-10">
-			<h1 class="text-3xl font-bold text-slate-800">Govt. Higher Secondary School</h1>
-			<p class="mb-2 text-gray-dark">Pattom, Trivandrum</p>
-			<h2 class="text-xl text-black">Dashboard Portal</h2>
+			<h1 class="text-2xl font-bold text-slate-800">Dashboard Portal</h1>
+			<p class="mb-2 text-gray-dark">Choose one student/teacher from pre-fed data or upload a new dataset</p>
+			<!-- 
+			<h2 class="text-xl text-black">Dashboard Portal</h2> -->
 		</div>
 
 		<div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">

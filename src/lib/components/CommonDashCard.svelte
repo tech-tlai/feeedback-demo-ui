@@ -115,7 +115,7 @@
 						class="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-dark disabled:cursor-not-allowed"
 						on:click={handleNavigation}
 					>
-						Upload own data set
+						Upload new data set
 					</button>
 				</a>
 			</div>
