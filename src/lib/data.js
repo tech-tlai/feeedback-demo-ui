@@ -141,7 +141,7 @@ export const studentChatDetails = {
 
 
 export const students = [
-  { id: 1, name: 'Aarav Nair', grade: '10', section: 'A' },
+  { id: 1, name: 'Kavya Reddy', grade: '3', section: 'A' },
   { id: 2, name: 'Saanvi Das', grade: '10', section: 'A' },
   { id: 3, name: 'Ishaan Gupta', grade: '10', section: 'B' },
   { id: 4, name: 'Meera Menon', grade: '10', section: 'B' },
@@ -174,7 +174,7 @@ export const students = [
 ];
 
 export const teachers = [
-  { id: 1, name: 'Mrs. Kavya Reddy', subject: 'English' },
+  { id: 1, name: 'Mr.Sandeep Sharma', subject: 'English' },
   { id: 2, name: 'Mr. Sandeep Kumar', subject: 'Mathematics' },
   { id: 3, name: 'Ms. Jance Joseph', subject: 'Science' },
   { id: 4, name: 'Mr. Rajeev Menon', subject: 'Social Science' },
