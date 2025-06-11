@@ -1,15 +1,37 @@
 <script>
+	import { goto } from '$app/navigation';
 	import { CommonDashCard, MultiFileUpload } from '$lib';
 	// Get students and teachers from the page data
 	export let data;
 	const { students = [], teachers = [] } = data || {};
 
 	// Transform for SearchableComboBox: id, name
-	const studentOptions = students.map((s) => ({ ...s,id: s.id, name: s.name }));
+	const studentOptions = students.map((s) => ({ ...s, id: s.id, name: s.name }));
 	const teacherOptions = teachers.map((t) => ({ ...t, id: t.id, name: t.name }));
+
+	function handleEntitySelected(e) {
+		const { entity, selectedEntityId, selectedEntityName, selectedEntity } = e.detail;
+		if (entity === 'teacher') {
+			const teacherId = selectedEntityId;
+			const teacherName = encodeURIComponent(selectedEntityName || selectedEntity.name || '');
+			const teacherSubject = encodeURIComponent(
+				selectedEntity.subject || selectedEntity.subjects?.[0] || ''
+			);
+			// Optionally set selectedClassStore here if needed
+			// selectedClassStore.set(...)
+			goto(
+				`/teacher/dashboard/${teacherId}?id=${teacherId}&&name=${teacherName}&&sub=${teacherSubject}`
+			);
+		} else if (entity === 'student') {
+			goto('/student/dashboard');
+		}
+	}
 </script>
 
-<main class="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6" id="content-section">
+<main
+	class="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6"
+	id="content-section"
+>
 	<div class="w-full max-w-6xl mx-auto">
 		<div class="text-center mb-10">
 			<h1 class="text-3xl font-bold text-slate-800">Dashboard Portal</h1>
@@ -30,6 +52,7 @@
 				dashboardUrl="/student/dashboard"
 				dataUploadPageUrl="/student/upload"
 				comboPlaceholder="Search student..."
+				on:entitySelected={handleEntitySelected}
 			/>
 
 			<!-- Teacher Dashboard Card -->
@@ -44,6 +67,7 @@
 				dashboardUrl="/teacher/dashboard"
 				dataUploadPageUrl="/teacher/upload"
 				comboPlaceholder="Search teacher..."
+				on:entitySelected={handleEntitySelected}
 			/>
 		</div>
 	</div>

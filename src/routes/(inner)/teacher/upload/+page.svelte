@@ -36,6 +36,8 @@
 	import StepsIndicator from '$lib/components/StepsIndicator.svelte';
 	import CommonDashCard from '$lib/components/CommonDashCard.svelte';
 	import { teacherUploadedFiles } from '$lib/stores/teacherUploadStore.js';
+	import { selectedClassStore } from '$lib/stores/globalFilters';
+	import { goto } from '$app/navigation';
 
 	let currentStep = 0; // 0-based index for steps
 
@@ -56,7 +58,7 @@
 	async function onTeacherFileUploadSubmit(e) {
 		const files = e.detail.files;
 		const done = e.detail.done;
-		
+
 		if (!files || files.length === 0) {
 			done && done();
 			return;
@@ -69,23 +71,32 @@
 			const res = await fetch('/apis/teacher/upload', { method: 'POST', body: formData });
 			if (res.ok) {
 				const data = await res.json();
-				teachersList = (data.teachers || []).map(t => ({
-					id: t.teacherId + " " +t.className,
-					name: t.teacherName + "("+t.className + " " +t.subjects[0]+")",
-					subject: t.subjects[0],
-					// className: t.className,
-					class:t.className[0],
-					division:t.className[1],
-
-				}));
-				
-				console.log('teachersList',teachersList)
+				// Transform teachers to unique list with class_subject array
+				const teacherMap = {};
+				(data.teachers || []).forEach((t) => {
+					if (!teacherMap[t.teacherId]) {
+						teacherMap[t.teacherId] = {
+							id: t.teacherId,
+							name: t.teacherName,
+							class_subject: []
+						};
+					}
+					// For each subject, add a class_subject entry
+					(t.subjects || []).forEach((subj) => {
+						teacherMap[t.teacherId].class_subject.push({
+							class: t.className,
+							subject: subj
+						});
+					});
+				});
+				teachersList = Object.values(teacherMap);
+				console.log('teachersList', teachersList);
 				currentStep = 1;
 				done && done();
 			} else {
 				const result = await res.json();
 				const errorMsg = result?.error || 'Upload failed. Please try again.';
-				console.log('errorMsg in uplaod', errorMsg)
+				console.log('errorMsg in uplaod', errorMsg);
 				done && done(errorMsg);
 			}
 		} catch (err) {
@@ -102,6 +113,26 @@
 		{ id: 4, name: 'Mr. Singh', subject: 'Social', section: 'B' },
 		{ id: 5, name: 'Ms. Reddy', subject: 'Hindi', section: 'C' }
 	];
+
+	function handleEntitySelected(e) {
+		const { entity, selectedEntityId, selectedEntityName, selectedEntity } = e.detail;
+		console.log('entitySelected event:', e.detail);
+
+		selectedClassStore.set({
+			className: selectedEntity.class_subject[0]?.class,
+			class_: selectedEntity.class_subject[0]?.class[0],
+			division: selectedEntity.class_subject[0]?.class[1],
+			subject: selectedEntity.class_subject[0]?.subject,
+			teacherId: selectedEntity.id
+			// fullClassName: `${className}${division} ${subject}`
+		});
+		goto(
+			`/teacher/dashboard/${selectedEntity.id}?id=${encodeURIComponent(selectedEntity.id)}&&name=${encodeURIComponent(selectedEntity.name)}&&sub=${encodeURIComponent(selectedEntity.class_subject[0]?.subject || '')}`
+		);
+		console.log('selectedClassStore', $selectedClassStore);
+		// You can perform any logic here, but do not navigate
+		// For example, you could set a store, show a message, etc.
+	}
 </script>
 
 <div class="px-12">
@@ -126,6 +157,7 @@
 					entityList={teachersList}
 					dashboardUrl="/teacher/dashboard"
 					comboPlaceholder="Search teacher..."
+					on:entitySelected={handleEntitySelected}
 				/>
 			</div>
 		{/if}

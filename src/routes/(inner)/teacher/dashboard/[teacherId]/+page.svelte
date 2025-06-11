@@ -40,14 +40,23 @@
 	let perfAnalysis = {};
 	let avgMaxMin = {};
 	let strengthAnalysis = {};
-	let sectionWiseData = {}
-	let perfTrend=[]
+	let sectionWiseData = {};
+	let perfTrend = [];
 
 	async function fetchChartData() {
 		try {
-			const { className, division, subject } = $selectedClassStore;
-			const classSubject = `class=${className}&&division=${division}&&sub=${subject}`;
-			console.log('classSubject', classSubject);
+			const { className, teacherId, subject } = $selectedClassStore;
+			console.log(
+				'DASHBOARD====',
+				'className:',
+				className,
+				'teacherId:',
+				teacherId,
+				'subject:',
+				subject
+			);
+			// const classSubject = `class=${className}&&division=${division}&&sub=${subject}`;
+
 			chartDataLoading = true;
 			chartDataError = null;
 
@@ -61,28 +70,36 @@
 			console.log('files in dashboard page', files);
 			if (files && files.length > 0) {
 				const formData = new FormData();
-				files.forEach((file) => formData.append('files', file));
+				formData.append('excel_file', files[0]);
+				formData.append('class_name', className || '');
+				formData.append('teacher_id', teacherId || '');
+				formData.append('subject', subject || '');
 				fetchOptions.body = formData;
 				// Remove Content-Type header so browser sets it for multipart
-			} 
+			}
 			// else {
 			// 	fetchOptions.method = 'GET';
 			// }
 
-			chartData = await fetch(`/apis/teacher/upload`, {
-				method:'POST',
+			const res = await fetch(`/apis/teacher/upload`, {
+				method: 'POST',
 				...fetchOptions
 			});
+
+			if (!res.ok) {
+				throw new Error('Something went wrong');
+			}
+			const chartData = await res.json();
 			allClassesSummary = chartData?.all_classes_summary || [];
-			perfSummary = chartData?.performance_analysis || {};
+			perfSummary = chartData?.performance_summary || {};
 			learningOutcomes = chartData?.learning_outcomes || [];
 			topPerformers = chartData?.top_performers || [];
 			studentsAtRisk = chartData?.students_at_risk || [];
 			perfAnalysis = chartData?.llm_performance_analysis || [];
 			avgMaxMin = chartData?.average_max_min || [];
 			strengthAnalysis = chartData?.topic_analysis || [];
-			sectionWiseData = chartData?.section_wise_data || {},
-			perfTrend = chartData?.perf_trend || {}
+			(sectionWiseData = chartData?.section_wise_data || {}),
+				(perfTrend = chartData?.perf_trend || {});
 			tabs = allClassesSummary
 				.flatMap((cls) =>
 					(cls.subjects || []).map((subj) => {
@@ -100,19 +117,19 @@
 					})
 				)
 				.map((tab, i) => ({ ...tab, id: i + 1 }));
-				
-			const initialSelectedTab = tabs.length > 0 ? tabs[0] : null;
 
-			if (initialSelectedTab) {
-				const { class: className, division, subject } = initialSelectedTab;
+			// const initialSelectedTab = tabs.length > 0 ? tabs[0] : null;
 
-				selectedClassStore.set({
-					className,
-					division,
-					subject,
-					fullClassName: `${className}${division} ${subject}`
-				});
-			}
+			// if (initialSelectedTab) {
+			// 	const { class: className, division, subject } = initialSelectedTab;
+
+			// 	selectedClassStore.set({
+			// 		className,
+			// 		division,
+			// 		subject,
+			// 		fullClassName: `${className}${division} ${subject}`
+			// 	});
+			// }
 		} catch (err) {
 			chartDataError = err.message;
 		} finally {
@@ -125,7 +142,7 @@
 		isMounted = true;
 	});
 
-	$: if (isMounted) {
+	$: if (isMounted ) {
 		fetchChartData();
 	}
 
@@ -133,8 +150,6 @@
 		retryKey += 1;
 		// fetchChartData();
 	}
-
-	$: console.log('selectedClassStore', $selectedClassStore);
 
 	onDestroy(() => {
 		chatContextStore.set(null);
@@ -177,8 +192,8 @@
 				{allClassesSummary}
 			/>
 			<GlobalFilters {tabs} />
-			<TeacherRow1 {perfSummary} {learningOutcomes} {perfTrend}/>
-			<TeacherRow2 {topPerformers} {studentsAtRisk} {perfAnalysis} {sectionWiseData}/>
+			<TeacherRow1 {perfSummary} {learningOutcomes} {perfTrend} />
+			<TeacherRow2 {topPerformers} {studentsAtRisk} {perfAnalysis} {sectionWiseData} />
 			<TopicWiseAnalysisSection {strengthAnalysis} />
 			<ScoreDistributionSection {avgMaxMin} />
 		</div>

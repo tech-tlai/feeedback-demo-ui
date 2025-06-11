@@ -1,8 +1,8 @@
 <script>
-	import { goto } from '$app/navigation';
 	import { FileUpload, SearchableComboBox } from '$lib';
 	import { createEventDispatcher } from 'svelte';
 	import { selectedClassStore } from '$lib/stores/globalFilters.js';
+	import { goto } from '$app/navigation';
 
 	export let title = 'Card title';
 	export let description = 'card description - lorem ipsum';
@@ -40,18 +40,13 @@
 			alert('Please select an entity before proceeding.');
 			return;
 		}
-		console.log('entity', entity);
-		if (entity === 'teacher') {
-			const teacherId = selectedEntityId;
-			const teacherName = encodeURIComponent(selectedEntityName || selectedEntity.name || '');
-			const teacherSubject = encodeURIComponent(selectedEntity.subject || '');
-			goto(`/teacher/dashboard/${teacherId}?id=${teacherId}&&name=${teacherName}&&sub=${teacherSubject}`);
-		} else if (entity === 'student') {
-			goto('/student/dashboard');
-		} 
-		// else {
-		// 	goto(dashboardUrl);
-		// }
+		// Instead of navigating here, dispatch an event to the parent with the selected entity details
+		dispatch('entitySelected', {
+			entity,
+			selectedEntityId,
+			selectedEntityName,
+			selectedEntity
+		});
 	}
 
 	function handleComboBoxChange(e) {
@@ -60,15 +55,22 @@
 		selectedEntityId = e.detail.selectedItemId;
 		selectedEntityName = e.detail.selectedItemName;
 
+		// dispatch('entitySelected', {
+		// 	entity,
+		// 	selectedEntityId,
+		// 	selectedEntityName,
+		// 	selectedEntity
+		// });
+
 		// Set selected class details to the selectedClassStore if available
-		if (selectedEntity && selectedEntity.className && selectedEntity.subjects && selectedEntity.subjects.length > 0) {
-			selectedClassStore.set({
-				className: selectedEntity.className.replace(/[^0-9]/g, ''), // Extract class number
-				division: selectedEntity.className.replace(/[^A-Z]/g, ''), // Extract division letter
-				subject: selectedEntity.subjects[0],
-				fullClassName: `${selectedEntity.className} ${selectedEntity.subjects[0]}`
-			});
-		}
+		// if (selectedEntity && selectedEntity.className && selectedEntity.subjects && selectedEntity.subjects.length > 0) {
+		// 	selectedClassStore.set({
+		// 		className: selectedEntity.className.replace(/[^0-9]/g, ''), // Extract class number
+		// 		division: selectedEntity.className.replace(/[^A-Z]/g, ''), // Extract division letter
+		// 		subject: selectedEntity.subjects[0],
+		// 		fullClassName: `${selectedEntity.className} ${selectedEntity.subjects[0]}`
+		// 	});
+		// }
 		// You can dispatch or use the selected entity as needed
 	}
 

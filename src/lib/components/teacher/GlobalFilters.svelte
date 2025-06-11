@@ -9,12 +9,13 @@
 		if (tab) {
 			const { class: className, division, subject } = tab;
 
-			selectedClassStore.set({
+			selectedClassStore.update((prev) => ({
+				...prev,
 				className,
 				division,
 				subject,
 				fullClassName: `${className}${division} ${subject}`
-			});
+			}));
 		}
 	}
 
