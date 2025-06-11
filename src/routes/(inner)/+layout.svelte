@@ -10,7 +10,7 @@
 	const navConfig = {
 		'/dashboard-portal': {
 			navItems: [
-				// { label: 'Home', href: '/' }
+				// { label: 'Upload teacher data', href: '/teacher/upload' }
 				// { label: 'Profile', href: '/dashboard/profile', icon: User }
 			],
 			actionButtons: []
@@ -91,17 +91,24 @@
 				on:handleDispatchComboBoxData={handleStudentSelect}
 			/>
 		{:else if $page.url.pathname.startsWith('/teacher/dashboard')}
-			<SearchableComboBox
-				options={[
-					{ id: 1, name: 'Mrs. Sharma', subject: 'Maths', section: 'A' },
-					{ id: 2, name: 'Mr. Kumar', subject: 'Science', section: 'A' },
-					{ id: 3, name: 'Ms. Iyer', subject: 'English', section: 'B' },
-					{ id: 4, name: 'Mr. Singh', subject: 'Social', section: 'B' },
-					{ id: 5, name: 'Ms. Reddy', subject: 'Hindi', section: 'C' }
-				]}
-				placeholder="Search teacher..."
-				on:handleDispatchComboBoxData={handleTeacherSelect}
-			/>
+			<div class="flex w-[400px] gap-8 items-center">
+				<ul>
+					<li>
+						<a href="/teacher/upload" class="min-w-[200px]">Upload teachers</a>
+					</li>
+				</ul>
+				<SearchableComboBox
+					options={[
+						{ id: 1, name: 'Mrs. Sharma', subject: 'Maths', section: 'A' },
+						{ id: 2, name: 'Mr. Kumar', subject: 'Science', section: 'A' },
+						{ id: 3, name: 'Ms. Iyer', subject: 'English', section: 'B' },
+						{ id: 4, name: 'Mr. Singh', subject: 'Social', section: 'B' },
+						{ id: 5, name: 'Ms. Reddy', subject: 'Hindi', section: 'C' }
+					]}
+					placeholder="Search teacher..."
+					on:handleDispatchComboBoxData={handleTeacherSelect}
+				/>
+			</div>
 		{/if}
 	</div>
 </Header>

@@ -7,9 +7,9 @@
     <SectionTitle title="Student Distribution" />
 </div>
 <div class="grid grid-cols-12 gap-5">
-    <div class="col-span-4">
+    <!-- <div class="col-span-4">
         <StudentDistribution />
-    </div>
+    </div> -->
     <div class="col-span-6">
         <AvgMaxMin  {avgMaxMin}/>
     </div>

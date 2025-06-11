@@ -43,7 +43,7 @@
 				</div>
 			</a>
 
-			<nav class="hidden md:flex space-x-8">
+			<nav class="hidden md:flex w-full space-x-8">
 				{#each navItems as item, i}
 					<a
 						href={item.href}
