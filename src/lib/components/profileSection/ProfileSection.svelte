@@ -191,7 +191,7 @@
 				action: 'fetch',
 				entity: 'chat history'
 			});
-			chatHistory = data;
+			chatHistory = []
 		} catch (err) {
 			console.error('Failed to fetch chat history:', err);
 		}

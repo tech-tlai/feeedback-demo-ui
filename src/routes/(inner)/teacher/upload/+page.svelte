@@ -35,6 +35,7 @@
 	import { FileUploadComponent } from '$lib';
 	import StepsIndicator from '$lib/components/StepsIndicator.svelte';
 	import CommonDashCard from '$lib/components/CommonDashCard.svelte';
+	import { teacherUploadedFiles } from '$lib/stores/teacherUploadStore.js';
 
 	let currentStep = 0; // 0-based index for steps
 
@@ -45,8 +46,7 @@
 		// Add more steps if needed
 	];
 
-	
-		// Derive step states for the indicator
+	// Derive step states for the indicator
 	$: stepsWithState = steps.map((step, i) => ({
 		...step,
 		complete: i < currentStep,
@@ -56,23 +56,41 @@
 	async function onTeacherFileUploadSubmit(e) {
 		const files = e.detail.files;
 		const done = e.detail.done;
+		
 		if (!files || files.length === 0) {
 			done && done();
 			return;
 		}
+		// Store file in the teacherUploadedFiles store (single file)
+		teacherUploadedFiles.set(files);
 		const formData = new FormData();
-		files.forEach((file) => formData.append('files', file));
+		formData.append('excel_file', files[0]);
 		try {
-			// Artificial delay to simulate submission
-			await new Promise((res) => setTimeout(res, 1500));
 			const res = await fetch('/apis/teacher/upload', { method: 'POST', body: formData });
 			if (res.ok) {
-				currentStep = 1; // Move to next step
+				const data = await res.json();
+				teachersList = (data.teachers || []).map(t => ({
+					id: t.teacherId + " " +t.className,
+					name: t.teacherName + "("+t.className + " " +t.subjects[0]+")",
+					subject: t.subjects[0],
+					// className: t.className,
+					class:t.className[0],
+					division:t.className[1],
+
+				}));
+				
+				console.log('teachersList',teachersList)
+				currentStep = 1;
+				done && done();
+			} else {
+				const result = await res.json();
+				const errorMsg = result?.error || 'Upload failed. Please try again.';
+				console.log('errorMsg in uplaod', errorMsg)
+				done && done(errorMsg);
 			}
 		} catch (err) {
 			console.error('Teacher master data upload failed', err);
-		} finally {
-			done && done();
+			done && done(err.message || 'Upload failed. Please try again.');
 		}
 	}
 
@@ -113,4 +131,3 @@
 		{/if}
 	</div>
 </div>
-

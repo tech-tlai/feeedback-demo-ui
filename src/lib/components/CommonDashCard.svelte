@@ -1,6 +1,8 @@
 <script>
 	import { goto } from '$app/navigation';
 	import { FileUpload, SearchableComboBox } from '$lib';
+	import { createEventDispatcher } from 'svelte';
+	import { selectedClassStore } from '$lib/stores/globalFilters.js';
 
 	export let title = 'Card title';
 	export let description = 'card description - lorem ipsum';
@@ -13,6 +15,7 @@
 	export let dataUploadPageUrl = '';
 	export let entity = 'student';
 
+	const dispatch = createEventDispatcher();
 	// export let fileUploadHelperText='Upload file'
 
 	// let uploadedFile = null;
@@ -23,14 +26,6 @@
 	// 	uploadError = '';
 	// }
 
-	function handleButtonClick() {
-		if (!selectedEntityId) {
-			alert('Please select an entity before proceeding.');
-			return;
-		}
-		goto(dashboardUrl);
-	}
-
 	// Accept a list of entities as a prop
 	export let entityList = [];
 	// Optionally, accept a label and placeholder for the combobox
@@ -38,10 +33,42 @@
 	export let comboPlaceholder = '';
 	let selectedEntityId = '';
 	let selectedEntityName = '';
+	let selectedEntity = {};
+
+	function handleButtonClick() {
+		if (!selectedEntityId) {
+			alert('Please select an entity before proceeding.');
+			return;
+		}
+		console.log('entity', entity);
+		if (entity === 'teacher') {
+			const teacherId = selectedEntityId;
+			const teacherName = encodeURIComponent(selectedEntityName || selectedEntity.name || '');
+			const teacherSubject = encodeURIComponent(selectedEntity.subject || '');
+			goto(`/teacher/dashboard/${teacherId}?id=${teacherId}&&name=${teacherName}&&sub=${teacherSubject}`);
+		} else if (entity === 'student') {
+			goto('/student/dashboard');
+		} 
+		// else {
+		// 	goto(dashboardUrl);
+		// }
+	}
 
 	function handleComboBoxChange(e) {
+		console.log(e.detail);
+		selectedEntity = e.detail.itemDetails;
 		selectedEntityId = e.detail.selectedItemId;
 		selectedEntityName = e.detail.selectedItemName;
+
+		// Set selected class details to the selectedClassStore if available
+		if (selectedEntity && selectedEntity.className && selectedEntity.subjects && selectedEntity.subjects.length > 0) {
+			selectedClassStore.set({
+				className: selectedEntity.className.replace(/[^0-9]/g, ''), // Extract class number
+				division: selectedEntity.className.replace(/[^A-Z]/g, ''), // Extract division letter
+				subject: selectedEntity.subjects[0],
+				fullClassName: `${selectedEntity.className} ${selectedEntity.subjects[0]}`
+			});
+		}
 		// You can dispatch or use the selected entity as needed
 	}
 
@@ -92,16 +119,15 @@
 					on:handleDispatchComboBoxData={handleComboBoxChange}
 				/>
 			</div>
-			<a href={dashboardUrl}>
-				<button
-					type="button"
-					class="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-dark disabled:cursor-not-allowed"
-					on:click={handleButtonClick}
-					disabled={!selectedEntityId}
-				>
-					{buttonText}
-				</button>
-			</a>
+
+			<button
+				type="button"
+				class="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-dark disabled:cursor-not-allowed"
+				on:click={handleButtonClick}
+				disabled={!selectedEntityId}
+			>
+				{buttonText}
+			</button>
 		</div>
 		{#if dataUploadPageUrl}
 			<div class=" border-t border-gray-dark relative text-gray-dark my-8">

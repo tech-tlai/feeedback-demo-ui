@@ -6,57 +6,58 @@
 	import { fetchApi } from '$lib/apiUtils.js';
 	import { selectedClassStore, chatContextStore } from '$lib/stores/globalFilters.js';
 
+	export let strengthAnalysis ={}
 	
 	let strengths = [];
 	let weaknesses = [];
-	let isLoadingStrengths = true;
-	let isLoadingWeaknesses = true;
+	let isLoadingStrengths = false;
+	let isLoadingWeaknesses = false;
 	let errorStrengths = null;
 	let errorWeaknesses = null;
 	let isMounted = false;
 
-	async function loadStrengths() {
-		try {
-			isLoadingStrengths = true;
-			const { className, division, subject } = $selectedClassStore;
-			const classSubject = `${className}${division}_${subject}`;
-			strengths = await fetchApi(
-				`/apis/teacher/topic-wise-analysis/strengths/${classSubject}`,
-				{
-					action: 'fetch',
-					entity: 'topic-wise strengths'
-				}
-			);
-		} catch (err) {
-			errorStrengths = err.message;
-		} finally {
-			isLoadingStrengths = false;
-		}
-	}
+	// async function loadStrengths() {
+	// 	try {
+	// 		isLoadingStrengths = true;
+	// 		const { className, division, subject } = $selectedClassStore;
+	// 		const classSubject = `${className}${division}_${subject}`;
+	// 		strengths = await fetchApi(
+	// 			`/apis/teacher/topic-wise-analysis/strengths/${classSubject}`,
+	// 			{
+	// 				action: 'fetch',
+	// 				entity: 'topic-wise strengths'
+	// 			}
+	// 		);
+	// 	} catch (err) {
+	// 		errorStrengths = err.message;
+	// 	} finally {
+	// 		isLoadingStrengths = false;
+	// 	}
+	// }
 
-	async function loadWeaknesses() {
-		try {
-			isLoadingWeaknesses = true;
-			const { className, division, subject } = $selectedClassStore;
-			const classSubject = `${className}${division}_${subject}`;
-			weaknesses = await fetchApi(
-				`/apis/teacher/topic-wise-analysis/weaknesses/${classSubject}`,
-				{
-					action: 'fetch',
-					entity: 'topic-wise weaknesses'
-				}
-			);
-		} catch (err) {
-			errorWeaknesses = err.message;
-		} finally {
-			isLoadingWeaknesses = false;
-		}
-	}
+	// async function loadWeaknesses() {
+	// 	try {
+	// 		isLoadingWeaknesses = true;
+	// 		const { className, division, subject } = $selectedClassStore;
+	// 		const classSubject = `${className}${division}_${subject}`;
+	// 		weaknesses = await fetchApi(
+	// 			`/apis/teacher/topic-wise-analysis/weaknesses/${classSubject}`,
+	// 			{
+	// 				action: 'fetch',
+	// 				entity: 'topic-wise weaknesses'
+	// 			}
+	// 		);
+	// 	} catch (err) {
+	// 		errorWeaknesses = err.message;
+	// 	} finally {
+	// 		isLoadingWeaknesses = false;
+	// 	}
+	// }
 
-	$: if (isMounted && $selectedClassStore) {
-		loadStrengths();
-		loadWeaknesses();
-	}
+	// $: if (isMounted && $selectedClassStore) {
+	// 	loadStrengths();
+	// 	loadWeaknesses();
+	// }
 
 	function transformData(data, attribute) {
 		if (!data || !Array.isArray(data)) {
@@ -77,6 +78,10 @@
 
 	$: transformedStrengths = transformData(strengths, 'Strengths');
 	$: transformedWeaknesses = transformData(weaknesses, 'Weaknesses');
+
+	// Map strengthAnalysis.strong_topics and challenging_topics to strengths and weaknesses
+	$: strengths = (strengthAnalysis.strong_topics || []).map(t => ({ name: t.name, value: t.accuracy }));
+	$: weaknesses = (strengthAnalysis.challenging_topics || []).map(t => ({ name: t.name, value: t.accuracy }));
 
 	onMount(() => {
 		isMounted = true;

@@ -5,6 +5,7 @@
 	import { FilterIcon } from '$lib/svgComponents';
 	import { fetchApi } from '$lib/apiUtils.js';
 
+	export let avgMaxMin={};
 	const chartTitle = 'Avg-Max-Min Scores';
 	let students = 'All students';
 	let subject = 'English';
@@ -12,7 +13,7 @@
 	let testNames = [];
 	let scoreRanges = [];
 	let data = [];
-	let isLoading = true;
+	let isLoading = false;
 	let error = null;
 	let isMounted = false;
 	function setContextInChatBox() {
@@ -23,39 +24,45 @@
 		chatContextStore.set(context);
 	}
 
-	async function fetchAvgMaxMin() {
-		try {
-			isLoading = true;
-			error = null;
-			const { className, division, subject } = $selectedClassStore;
-			const classSubject = `${className}${division}_${subject}`;
-			const apiData = await fetchApi(`/apis/teacher/avg-max-min/${classSubject}`, {
-				action: 'fetch',
-				entity: 'avg-max-min scores'
-			});
-			console.log('apiData', apiData);
-			// Transforming the data
-			testNames = apiData.testScores.map(
-				(test) =>
-					`${test.examName}-${new Date(test.dateOfExam).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' }).replace(/ /g, ' ')}`
-			);
-			scoreRanges = apiData.scoreTypes;
-			data = apiData.testScores.map((test) => [test.avg, test.max, test.min]);
-		} catch (err) {
-			console.log(err.message);
-			error = err.message;
-		} finally {
-			isLoading = false;
-		}
-	}
+	// async function fetchAvgMaxMin() {
+	// 	try {
+	// 		isLoading = true;
+	// 		error = null;
+	// 		const { className, division, subject } = $selectedClassStore;
+	// 		const classSubject = `${className}${division}_${subject}`;
+	// 		const apiData = await fetchApi(`/apis/teacher/avg-max-min/${classSubject}`, {
+	// 			action: 'fetch',
+	// 			entity: 'avg-max-min scores'
+	// 		});
+	// 		console.log('apiData', apiData);
+	// 		// Transforming the data
+	// 		testNames = apiData.testScores.map(
+	// 			(test) =>
+	// 				`${test.examName}-${new Date(test.dateOfExam).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' }).replace(/ /g, ' ')}`
+	// 		);
+	// 		scoreRanges = apiData.scoreTypes;
+	// 		data = apiData.testScores.map((test) => [test.avg, test.max, test.min]);
+	// 	} catch (err) {
+	// 		console.log(err.message);
+	// 		error = err.message;
+	// 	} finally {
+	// 		isLoading = false;
+	// 	}
+	// }
 
-	$: if (isMounted && $selectedClassStore) {
-		fetchAvgMaxMin();
-	}
+	// $: if (isMounted && $selectedClassStore) {
+	// 	fetchAvgMaxMin();
+	// }
 
 	onMount(async () => {
 		isMounted = true;
 	});
+
+	$: testNames = (avgMaxMin.testScores || []).map(
+		(test, i) => `Test ${i + 1} - ${test.dateOfExam ? new Date(test.dateOfExam).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' }) : ''}`
+	);
+	$: scoreRanges = avgMaxMin.scoreTypes || [];
+	$: data = (avgMaxMin.testScores || []).map(test => [test.avg, test.max, test.min]);
 </script>
 
 <Card>

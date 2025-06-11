@@ -7,8 +7,8 @@
 	import { fetchApi } from '$lib/apiUtils.js';
 
 	const chartTitle = 'Students at Risk';
-	let studentData = [];
-	let isLoading = true;
+	export let studentData = [];
+	let isLoading = false;
 	let error = null;
 	let searchValue = '';
 	let isMounted = false;
@@ -67,25 +67,26 @@
 		chatContextStore.set(context);
 	}
 
-	async function fetchStudentsAtRisk() {
-		try {
-			const { className, division, subject } = $selectedClassStore;
-			const classSubject = `${className}${division}_${subject}`;
-			const data = await fetchApi(`/apis/teacher/students-at-risk/${classSubject}`, {
-				action: 'fetch',
-				entity: 'students at risk'
-			});
-			studentData = data;
-			createTableData();
-		} catch (err) {
-			error = err.message;
-		} finally {
-			isLoading = false;
-		}
-	}
+	// async function fetchStudentsAtRisk() {
+	// 	try {
+	// 		const { className, division, subject } = $selectedClassStore;
+	// 		const classSubject = `${className}${division}_${subject}`;
+	// 		const data = await fetchApi(`/apis/teacher/students-at-risk/${classSubject}`, {
+	// 			action: 'fetch',
+	// 			entity: 'students at risk'
+	// 		});
+	// 		studentData = data;
+	// 		createTableData();
+	// 	} catch (err) {
+	// 		error = err.message;
+	// 	} finally {
+	// 		isLoading = false;
+	// 	}
+	// }
 
 	$: if (isMounted && $selectedClassStore) {
-		fetchStudentsAtRisk();
+		// fetchStudentsAtRisk();
+		createTableData()
 	}
 
 	onMount(async () => {

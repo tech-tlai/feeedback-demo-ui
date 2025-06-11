@@ -5,7 +5,7 @@
 	import { getMarkColor } from '$lib/utils';
 	import { fetchApi } from '$lib/apiUtils.js';
 
-	let studentData = [];
+	export let studentData = [];
 	let searchValue = '';
 	let headers = [
 		{ key: 'name', name: 'Name', align: 'left', width: '60%' },
@@ -24,7 +24,7 @@
 
 	let tableData = [];
 
-	let isLoading = true;
+	let isLoading = false;
 	let error = null;
 
 	let customRenderers = {
@@ -58,26 +58,27 @@
 
 	let isMounted = false;
 
-	async function fetchAttendance() {
-		try {
-			isLoading=true;
-			const { className, division, subject } = $selectedClassStore;
-			const classSubject = `${className}${division}_${subject}`;
-			studentData = await fetchApi(`/apis/teacher/attendance/${classSubject}`, {
-				action: 'fetch',
-				entity: 'attendance'
-			});
+	// async function fetchAttendance() {
+	// 	try {
+	// 		isLoading=true;
+	// 		const { className, division, subject } = $selectedClassStore;
+	// 		const classSubject = `${className}${division}_${subject}`;
+	// 		studentData = await fetchApi(`/apis/teacher/attendance/${classSubject}`, {
+	// 			action: 'fetch',
+	// 			entity: 'attendance'
+	// 		});
 			
-		} catch (err) {
-			error = err.message;
-		} finally {
-			isLoading = false;
-		}
-		createTableData();
-	}
+	// 	} catch (err) {
+	// 		error = err.message;
+	// 	} finally {
+	// 		isLoading = false;
+	// 	}
+	// 	createTableData();
+	// }
 
 	$: if (isMounted && $selectedClassStore) {
-		fetchAttendance();
+		// fetchAttendance();
+		createTableData();
 	}
 
 	onMount(async () => {

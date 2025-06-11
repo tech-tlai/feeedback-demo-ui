@@ -7,25 +7,34 @@
 		PerformanceAnalysis,
 		TeacherPerfAnalysis
 	} from '$lib';
+	export let topPerformers = [];
+	export let studentsAtRisk = [];
+	export let perfAnalysis = {};
+	export let sectionWiseData={}
+	// export let perfAnalysis = {
+	// 	achievement: { feedback: [] },
+	// 	roomForImprovement: { feedback: [] },
+	// 	suggestions: { feedback: [] }
+	// };
 </script>
 
 <div class="grid grid-cols-12 gap-5">
 	<div class="col-span-4">
-		<TopPerformers />
+		<TopPerformers studentData={topPerformers} />
 	</div>
 	<div class="col-span-5">
-		<StudentsAtRisk />
+		<StudentsAtRisk studentData={studentsAtRisk} />
 	</div>
 	<div class="col-span-3">
-		<AttendanceSheet />
+		<AttendanceSheet studentData={[...topPerformers, ...studentsAtRisk]} />
 	</div>
 </div>
 
 <div class="grid grid-cols-12 gap-5">
 	<div class="col-span-12">
-		<TeacherPerfAnalysis />
+		<TeacherPerfAnalysis perfData={perfAnalysis} />
 	</div>
 	<div class="col-span-6">
-		<SectionWiseScore />
+		<SectionWiseScore {sectionWiseData}/>
 	</div>
 </div>

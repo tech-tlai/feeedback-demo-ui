@@ -25,13 +25,16 @@
 	};
 
 	$: studentId = $page.params.studentId;
-	$: studentName = $page.url.searchParams.get('name') || studentId;
-	$: studentClass = $page.url.searchParams.get('class_') || profileData.class_;
+	$: studentName = $page.url.searchParams.get('name') || '';
+	$: studentClass = $page.url.searchParams.get('class') || profileData.class_;
+	$: profilePic = $page.url.searchParams.get('img') || profileData.image;
 </script>
 
 <div class="w-full space-y-8 bg-gray-50 p-4">
 	<div class="mx-auto flex max-w-[1400px] flex-col gap-5">
-		<ProfileSection profileData={{...profileData, name: studentName, class_: studentClass}}/>
+		<ProfileSection
+			profileData={{ ...profileData, name: studentName, class_: studentClass, image: profilePic }}
+		/>
 		<StudentRow1 />
 		<StudentRow2 />
 		<StudentRow3 />

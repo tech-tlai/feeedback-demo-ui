@@ -1,5 +1,6 @@
 <script>
     import {StudentDistribution, AvgMaxMin, SectionTitle} from "$lib"
+    export let avgMaxMin={}
 </script>
 
 <div class="flex w-full justify-center my-6">
@@ -10,6 +11,6 @@
         <StudentDistribution />
     </div>
     <div class="col-span-6">
-        <AvgMaxMin />
+        <AvgMaxMin  {avgMaxMin}/>
     </div>
 </div>

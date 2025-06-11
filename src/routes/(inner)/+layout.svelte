@@ -10,7 +10,7 @@
 	const navConfig = {
 		'/dashboard-portal': {
 			navItems: [
-				{ label: 'Home', href: '/' }
+				// { label: 'Home', href: '/' }
 				// { label: 'Profile', href: '/dashboard/profile', icon: User }
 			],
 			actionButtons: []
@@ -31,33 +31,38 @@
 	let selectedTeacher = null;
 
 	function handleStudentSelect(event) {
-		const itemDetails = event.detail;
+		console.log('e.detail from combobox', event.detail);
+		const itemDetails = event.detail.itemDetails;
 		selectedStudent = itemDetails;
 		console.log('selectedStudent', selectedStudent);
 
 		// Extract name and class from the selected item
-		const name = itemDetails.name;
-		const class_ = itemDetails.grade || itemDetails.class || itemDetails.class_; // fallback for different keys
-
+		const name = selectedStudent.name;
+		const class_ = selectedStudent.grade || itemDetails.class || itemDetails.class_; // fallback for different keys
+		const id = selectedStudent.id;
 		if (name) {
 			const params = new URLSearchParams();
 			params.set('name', name);
 			if (class_) params.set('class', class_);
-			goto(`/student/dashboard/${encodeURIComponent(name)}?${params.toString()}`);
+			goto(`/student/dashboard/${encodeURIComponent(id)}?${params.toString()}`);
+			// goto(`/student/dashboard?${params.toString()}`);
 		}
 	}
 
 	function handleTeacherSelect(event) {
-		const itemDetails = event.detail;
+		const itemDetails = event.detail.itemDetails;
 		selectedTeacher = itemDetails;
+		console.log('selectedTeacher', selectedTeacher);
 
-		const name = itemDetails.name;
-		const subject = itemDetails.subject;
+		// Extract name and subject from the selected item
+		const name = selectedTeacher.name;
+		const subject = selectedTeacher.subject;
+		const id = selectedTeacher.id;
 		const params = new URLSearchParams();
 		params.set('name', name);
 		if (subject) params.set('subject', subject);
 		if (name) {
-			goto(`/teacher/dashboard/${encodeURIComponent(name)}?${params.toString()}`);
+			goto(`/teacher/dashboard/${encodeURIComponent(id)}?${params.toString()}`);
 		}
 	}
 

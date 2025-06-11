@@ -9,6 +9,7 @@
 	export let chartType = 'strengths';
 	export let keywords = [];
 	export let showNewKeywordsMsg = false;
+
 	export let dataForChart = {
 		name: 'Global Markets',
 		children: [
@@ -74,7 +75,7 @@
 						</div>
 					{/each}
 				</div>
-				{#if showNewKeywordsMsg}
+				{#if showNewKeywordsMsg  && newKeywords?.length >0}
 					<StrengthWeaknessNotfn msgType={chartType} {newKeywords} />
 					<div class="mt-4">
 						<button class="text-link" on:click={setContextInChatBox}>{chartActionWord}</button>

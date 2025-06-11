@@ -13,7 +13,7 @@
 	let isSubmitting = false;
 	let submittedIndexes = [];
 	const id = Math.ceil(Math.random() * 1000) + 1;
-	
+
 	function handleFiles(event) {
 		const newFiles = Array.from(event.target.files);
 		const existingNames = files.map((f) => f.name);
@@ -59,7 +59,7 @@
 	let uploadError = '';
 	const dispatch = createEventDispatcher();
 
-	$: uploadError = files && files?.length > 0 ? '' : uploadError;
+	// $: uploadError = files && files?.length > 0 ? '' : uploadError;
 	$: if (!isSubmitting && files.length === 0) {
 		uploadError = '';
 	}
@@ -73,9 +73,13 @@
 		isSubmitting = true;
 		dispatch('fileUploadSubmit', {
 			files,
-			done: () => {
+			done: (errorMsg) => {
 				isSubmitting = false;
-				submittedIndexes = files.map((_, idx) => idx);
+				if (errorMsg) {
+					uploadError = errorMsg;
+					console.log('errormessage', errorMsg);
+				}
+				// submittedIndexes = files.map((_, idx) => idx);
 			}
 		});
 	}
@@ -160,7 +164,7 @@
 		</div>
 	{/if}
 	{#if uploadError}
-		<p class="text-red-600 text-sm mt-4">{uploadError}</p>
+		<p class="text-red-600 text-sm mt-4 capitalize">{uploadError}</p>
 	{/if}
 	<div class="w-full flex justify-end">
 		{#if files?.length > 0 && !allFilesSubmitted}

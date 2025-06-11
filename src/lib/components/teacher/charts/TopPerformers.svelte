@@ -8,8 +8,8 @@
 	import { onMount } from 'svelte';
 
 	const chartTitle = 'Top Performers';
-	let studentData = [];
-	let isLoading = true;
+	export let studentData = [];
+	let isLoading = false;
 	let error = null;
 	let searchValue = '';
 	let isMounted = false;
@@ -69,26 +69,26 @@
 	}
 
 
-	async function fetchTopPerformers() {
-		try {
-			isLoading=true;
-			error=null;
-			const { className, division, subject } = $selectedClassStore;
-			const classSubject = `${className}${division}_${subject}`;
-			studentData = await fetchApi(`/apis/teacher/top-perf-students/${classSubject}`, {
-				action: 'fetch',
-				entity: 'top performers'
-			});
-		} catch (err) {
-			error = err.message;
-		} finally {
-			isLoading = false;
-		}
-		createTableData();
-	}
+	// async function fetchTopPerformers() {
+	// 	try {
+	// 		isLoading=true;
+	// 		error=null;
+	// 		const { className, division, subject } = $selectedClassStore;
+	// 		const classSubject = `${className}${division}_${subject}`;
+	// 		studentData = await fetchApi(`/apis/teacher/top-perf-students/${classSubject}`, {
+	// 			action: 'fetch',
+	// 			entity: 'top performers'
+	// 		});
+	// 	} catch (err) {
+	// 		error = err.message;
+	// 	} finally {
+	// 		isLoading = false;
+	// 	}
+	// 	createTableData();
+	// }
 
 	$: if (isMounted && $selectedClassStore) {
-		fetchTopPerformers();
+		createTableData()
 	}
 
 	onMount(() => {

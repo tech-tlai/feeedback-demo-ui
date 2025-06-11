@@ -1,5 +1,5 @@
 <script>
-	import { Tabs, ChatItem, ContextMenu,SkelChatHistory } from '$lib';
+	import { Tabs, ChatItem, ContextMenu, SkelChatHistory } from '$lib';
 
 	import { createEventDispatcher } from 'svelte';
 	import { fade } from 'svelte/transition';
@@ -39,7 +39,6 @@
 		pinnedChats && pinnedChats.length
 			? [...pinnedChats].sort((a, b) => b.order - a.order)
 			: pinnedChats;
-
 </script>
 
 <div class="bg-white rounded-lg shadow p-4">
@@ -52,12 +51,17 @@
 	/>
 
 	{#if loadingHistory}
-		<SkelChatHistory/>
+		<SkelChatHistory />
 	{:else if historyError}
-		<div class="flex justify-center items-center text-red-500 text-center py-2 h-64">{historyError}</div>
+		<div class="flex justify-center items-center text-red-500 text-center py-2 h-64">
+			{historyError}
+		</div>
 	{:else}
 		<div class="space-y-3 mt-4 h-[clamp(300px,320px,384px)] overflow-y-auto relative">
 			{#if selectedTab === 0}
+				{#if history?.length === 0}
+					<div class="text-gray-500 text-sm text-center">No chats found.</div>
+				{/if}
 				{#each history as chat}
 					<div
 						class="flex justify-between items-center w-full rounded-lg hover:bg-gray-50 relative"

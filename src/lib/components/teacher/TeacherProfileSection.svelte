@@ -18,7 +18,7 @@
 		image: '/sandeep_pic.png'
 	};
 	// Sample class data for the horizontal scrollable area
-	export let classes = [];
+	export let allClassesSummary = [];
 
 	let chatHistory = [];
 	let pinnedChats = [];
@@ -150,7 +150,8 @@
 				entity: 'chat history'
 			});
 			
-			chatHistory = data;
+			// chatHistory = data;
+			chatHistory = []
 		} catch (err) {
 			chatHistoryError = err.message;
 		} finally {
@@ -186,7 +187,7 @@
 	<div class="lg:col-span-9 space-y-5 h-full">
 		<div class="flex flex-col gap-4 h-full">
 			<!-- Horizontal Scrollable Class Cards -->
-			<AllClassesSummary />
+			<AllClassesSummary classes={allClassesSummary} />
 			<div class=" flex-grow">
 				<ChatInterface
 					aiResponse={chatDetails}

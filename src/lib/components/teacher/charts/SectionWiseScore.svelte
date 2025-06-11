@@ -6,6 +6,8 @@
 	import { transformForHistogram } from '$lib/utils';
 	import { fetchApi } from '$lib/apiUtils.js';
 
+	export let sectionWiseData={};
+	
 	const chartTitle = 'Section-wise Score Comparison';
 	let students = 'All students';
 	let subject = 'English';
@@ -26,27 +28,27 @@
 	}
 
 	
-	async function fetchSectionWiseScore() {
-		try {
-			isLoading = true;
-			error = null;
-			const { className, division, subject } = $selectedClassStore;
-			const classSubject = `${className}${division}_${subject}`;
-			const response = await fetchApi(`/apis/teacher/section-wise-comparison/${classSubject}`, {
-				action: 'fetch',
-				entity: 'section-wise score'
-			});
-			({ scoreRanges, sections, histogramData: data } = transformForHistogram(response));
-		} catch (err) {
-			error = err.message;
-		} finally {
-			isLoading = false;
-		}
-	}
+	// async function fetchSectionWiseScore() {
+	// 	try {
+	// 		isLoading = true;
+	// 		error = null;
+	// 		const { className, division, subject } = $selectedClassStore;
+	// 		const classSubject = `${className}${division}_${subject}`;
+	// 		const response = await fetchApi(`/apis/teacher/section-wise-comparison/${classSubject}`, {
+	// 			action: 'fetch',
+	// 			entity: 'section-wise score'
+	// 		});
+	// 		({ scoreRanges, sections, histogramData: data } = transformForHistogram(response));
+	// 	} catch (err) {
+	// 		error = err.message;
+	// 	} finally {
+	// 		isLoading = false;
+	// 	}
+	// }
 
-	$: if (isMounted && $selectedClassStore) {
-		fetchSectionWiseScore();
-	}
+	// $: if (isMounted && $selectedClassStore) {
+	// 	fetchSectionWiseScore();
+	// }
 
 	onMount(async () => {
 		isMounted = true;

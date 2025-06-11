@@ -11,35 +11,34 @@
 		{ label: 'Pass Percentage', value: 82, period: 'Last 5 tests' }
 	];
 
-	let isLoading = true;
+	let isLoading = false;
 	let error = null;
 	let isMounted = false;
 	let unsubscribe;
 
-	async function fetchPerformanceSummary() {
-		isLoading = true;
-		error = null;
-		try {
-			const { className, division, subject } = $selectedClassStore;
-			const classSubject = `${className}${division}_${subject}`;
-			const data = await fetchApi(`/apis/teacher/perf-summary/${classSubject}`, {
-				action: 'fetch',
-				entity: 'performance summary'
-			});
-			
-			
-			studentCount = data.studentCount || studentCount;
-			indicators = data.indicators || indicators;
-		} catch (err) {
-			error = err.message;
-		} finally {
-			isLoading = false;
-		}
-	}
+	// async function fetchPerformanceSummary() {
+	// 	isLoading = true;
+	// 	error = null;
+	// 	try {
+			// const { className, division, subject } = $selectedClassStore;
+			// const classSubject = `${className}${division}_${subject}`;
+			// const data = await fetchApi(`/apis/teacher/perf-summary/${classSubject}`, {
+			// 	action: 'fetch',
+			// 	entity: 'performance summary'
+			// });
+			// 
+			// studentCount = data.studentCount || studentCount;
+			// indicators = data.indicators || indicators;
+	// 	} catch (err) {
+	// 		error = err.message;
+	// 	} finally {
+	// 		isLoading = false;
+	// 	}
+	// }
 
-	$: if (isMounted && $selectedClassStore) {
-		fetchPerformanceSummary($selectedClassStore);
-	}
+	// $: if (isMounted && $selectedClassStore) {
+	// 	fetchPerformanceSummary($selectedClassStore);
+	// }
 
 	onMount(() => {
 		isMounted = true;

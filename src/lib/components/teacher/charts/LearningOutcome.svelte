@@ -11,35 +11,35 @@
 		{ label: 'Application', value: 0 },
 		{ label: 'Understanding', value: 0 }
 	];
-	let isLoading = true;
+	let isLoading = false;
 	let error = '';
 
 	let isMounted = false;
 
-	async function fetchLearningOutcomes() {
-		try {
-			isLoading = true;
-			error = '';
-			const { className, division, subject } = $selectedClassStore;
-			const classSubject = `${className}${division}_${subject}`;
-			outcomes = await fetchApi(`/apis/teacher/learningOutcomes/${classSubject}`, {
-				action: 'fetch',
-				entity: 'learning outcomes'
-			});
-		} catch (err) {
-			error = err.message;
-		} finally {
-			isLoading = false;
-		}
-	}
+	// async function fetchLearningOutcomes() {
+	// 	try {
+	// 		isLoading = true;
+	// 		error = '';
+	// 		const { className, division, subject } = $selectedClassStore;
+	// 		const classSubject = `${className}${division}_${subject}`;
+	// 		outcomes = await fetchApi(`/apis/teacher/learningOutcomes/${classSubject}`, {
+	// 			action: 'fetch',
+	// 			entity: 'learning outcomes'
+	// 		});
+	// 	} catch (err) {
+	// 		error = err.message;
+	// 	} finally {
+	// 		isLoading = false;
+	// 	}
+	// }
 
-	$: if (isMounted && $selectedClassStore) {
-		fetchLearningOutcomes();
-	}
+	// $: if (isMounted && $selectedClassStore) {
+	// 	fetchLearningOutcomes();
+	// }
 
-	onMount(() => {
-		isMounted = true;
-	});
+	// onMount(() => {
+	// 	isMounted = true;
+	// });
 </script>
 
 <Card>

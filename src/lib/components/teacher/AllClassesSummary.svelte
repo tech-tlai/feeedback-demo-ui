@@ -1,30 +1,30 @@
 <script>
-	import { onMount } from 'svelte';
 	import { OtherClassSummary } from '$lib';
 	import SkelClassSummary from '$lib/components/loadingSkeletons/SkelClassSummary.svelte';
 	import { selectedClassStore } from '$lib/stores/globalFilters.js';
 
-	let classes = [];
-	let isLoading = true;
+	export let classes = [];
+	let isLoading = false;
 	let error = null;
 
-	onMount(async () => {
-		try {
-			const response = await fetch(`/apis/teacher/perf-summary/all-classes`);
-			if (response.ok) {
-				classes = await response.json();
-			} else {
-				//get mock data
-				classes = await response.json();
-				// error = 'Failed to fetch class summaries';
-				console.log('classes when api fails', classes);
-			}
-		} catch (err) {
-			error = 'An error occurred while fetching class summaries';
-		} finally {
-			isLoading = false;
-		}
-	});
+	// Commented out API call; classes are now passed as a prop from parent
+	// onMount(async () => {
+	// 	try {
+	// 		const response = await fetch(`/apis/teacher/perf-summary/all-classes`);
+	// 		if (response.ok) {
+	// 			classes = await response.json();
+	// 		} else {
+	// 			//get mock data
+	// 			classes = await response.json();
+	// 			// error = 'Failed to fetch class summaries';
+	// 			console.log('classes when api fails', classes);
+	// 		}
+	// 	} catch (err) {
+	// 		error = 'An error occurred while fetching class summaries';
+	// 	} finally {
+	// 		isLoading = false;
+	// 	}
+	// });
 </script>
 
 <!-- {#each classes as classItem}
