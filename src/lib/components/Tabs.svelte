@@ -18,6 +18,7 @@
 	// Function to handle tab selection
 	function selectTab(index, tab) {
 		selectedIndex = index;
+		console.log('selectedIndex in tab',selectedIndex)
 		dispatch('tabSelected', { index, tab });
 	}
 

@@ -14,7 +14,6 @@
 	let searchValue = '';
 	let isMounted = false;
 
-
 	const markThresholds = {
 		poor: 50,
 		average: 70
@@ -25,13 +24,16 @@
 	}
 
 	let customRenderers = {
-		percentage: (data) => `
+		percentage: (data) => {
+			const percentage = data.percentage.toFixed(2);
+			return `
       <div>
-		<span class="inline-block px-3 py-1 rounded-full text-center min-w-[60px] ${getMarkColor(data.percentage, markThresholds)}"}>
-				${data.percentage}
+		<span class="inline-block px-3 py-1 rounded-full text-center min-w-[60px] ${getMarkColor(percentage, markThresholds)}"}>
+				${percentage}
 			</span>
 		</div>
-    `
+    `;
+		}
 	};
 
 	let tableData = [];
@@ -52,7 +54,7 @@
 	}
 
 	async function createTableData() {
-		if (!studentData?.error)
+		if (!studentData?.error) {
 			// Format data for display
 			tableData = studentData?.map((student) => ({
 				...student,
@@ -63,11 +65,11 @@
 				rank: student?.rank,
 				percentage: student?.percentage
 			}));
-		else {
+			console.log('tableData', tableData);
+		} else {
 			tableData = [];
 		}
 	}
-
 
 	// async function fetchTopPerformers() {
 	// 	try {
@@ -88,7 +90,7 @@
 	// }
 
 	$: if (isMounted && $selectedClassStore) {
-		createTableData()
+		createTableData();
 	}
 
 	onMount(() => {
@@ -107,7 +109,7 @@
 		</div>
 
 		<div class="chart-meta text-gray-dark text-sm flex gap-4">
-			<span>{$selectedClassStore.fullClassName ?$selectedClassStore.fullClassName :''}</span>
+			<span>{$selectedClassStore.fullClassName ? $selectedClassStore.fullClassName : ''}</span>
 			<span>Total: {studentData.length}</span>
 		</div>
 	</div>

@@ -12,6 +12,8 @@
 	import { fetchApi } from '$lib/apiUtils.js';
 	import SkelDataTable from '$lib/components/loadingSkeletons/SkelDataTable.svelte';
 	import { teacherUploadedFiles } from '$lib/stores/teacherUploadStore.js';
+	import { browser } from '$app/environment';
+	import AnimLoader from '$lib/components/AnimLoader.svelte';
 
 	$: teacherId = $page.params.teacherId;
 	$: teacherName = $page.url.searchParams.get('name') || teacherId;
@@ -42,32 +44,21 @@
 	let strengthAnalysis = {};
 	let sectionWiseData = {};
 	let perfTrend = [];
+	let dashboardLoading = true;
+	let dashboardError = null;
 
 	async function fetchChartData() {
 		try {
 			const { className, teacherId, subject } = $selectedClassStore;
-			console.log(
-				'DASHBOARD====',
-				'className:',
-				className,
-				'teacherId:',
-				teacherId,
-				'subject:',
-				subject
-			);
-			// const classSubject = `class=${className}&&division=${division}&&sub=${subject}`;
-
 			chartDataLoading = true;
 			chartDataError = null;
 
-			// Prepare FormData if files exist
 			let fetchOptions = {
 				method: 'POST',
 				headers: {},
 				body: undefined
 			};
 			let files = $teacherUploadedFiles;
-			console.log('files in dashboard page', files);
 			if (files && files.length > 0) {
 				const formData = new FormData();
 				formData.append('excel_file', files[0]);
@@ -75,21 +66,14 @@
 				formData.append('teacher_id', teacherId || '');
 				formData.append('subject', subject || '');
 				fetchOptions.body = formData;
-				// Remove Content-Type header so browser sets it for multipart
 			}
-			// else {
-			// 	fetchOptions.method = 'GET';
-			// }
 
-			const res = await fetch(`/apis/teacher/upload`, {
-				method: 'POST',
-				...fetchOptions
-			});
-
-			if (!res.ok) {
+			// Only call the main API here
+			const mainRes = await fetch('/apis/teacher/upload', { method: 'POST', ...fetchOptions });
+			if (!mainRes.ok) {
 				throw new Error('Something went wrong');
 			}
-			const chartData = await res.json();
+			const chartData = await mainRes.json();
 			allClassesSummary = chartData?.all_classes_summary || [];
 			perfSummary = chartData?.performance_summary || {};
 			learningOutcomes = chartData?.learning_outcomes || [];
@@ -98,8 +82,6 @@
 			perfAnalysis = chartData?.llm_performance_analysis || [];
 			avgMaxMin = chartData?.average_max_min || [];
 			strengthAnalysis = chartData?.topic_analysis || [];
-			(sectionWiseData = chartData?.section_wise_data || {}),
-				(perfTrend = chartData?.perf_trend || {});
 			tabs = allClassesSummary
 				.flatMap((cls) =>
 					(cls.subjects || []).map((subj) => {
@@ -117,19 +99,6 @@
 					})
 				)
 				.map((tab, i) => ({ ...tab, id: i + 1 }));
-
-			// const initialSelectedTab = tabs.length > 0 ? tabs[0] : null;
-
-			// if (initialSelectedTab) {
-			// 	const { class: className, division, subject } = initialSelectedTab;
-
-			// 	selectedClassStore.set({
-			// 		className,
-			// 		division,
-			// 		subject,
-			// 		fullClassName: `${className}${division} ${subject}`
-			// 	});
-			// }
 		} catch (err) {
 			chartDataError = err.message;
 		} finally {
@@ -142,28 +111,98 @@
 		isMounted = true;
 	});
 
-	$: if (isMounted ) {
-		fetchChartData();
+	// $: console.log('selectedClassStore in dashboard page ===', $selectedClassStore);
+
+	$: if (isMounted) {
+		fetchAllDashboardData();
 	}
 
 	function handleRetry() {
 		retryKey += 1;
-		// fetchChartData();
+		fetchAllDashboardData();
 	}
 
 	onDestroy(() => {
 		chatContextStore.set(null);
-		selectedClassStore.set('');
+		// selectedClassStore.set('');
 	});
+
+	// Generic function to POST form data to a given API route
+	async function postFormDataToApi(apiRoute) {
+		try {
+			const { className, teacherId, subject } = $selectedClassStore;
+			let files = $teacherUploadedFiles;
+			let fetchOptions = {
+				method: 'POST',
+				headers: {},
+				body: undefined
+			};
+			if (files && files.length > 0) {
+				const formData = new FormData();
+				formData.append('excel_file', files[0]);
+				formData.append('class_name', className || '');
+				formData.append('teacher_id', teacherId || '');
+				formData.append('subject', subject || '');
+				fetchOptions.body = formData;
+			}
+			const res = await fetch(apiRoute, {
+				method: 'POST',
+				...fetchOptions
+			});
+			if (!res.ok) {
+				throw new Error('Something went wrong');
+			}
+			return await res.json();
+		} catch (err) {
+			throw err;
+		}
+	}
+
+	
+	async function fetchPerfApi() {
+		return await postFormDataToApi('/apis/teacher/upload/perf-trend');
+	}
+
+	async function fetchStudentDistributionApi() {
+		return await postFormDataToApi('/apis/teacher/upload/student-distribution');
+	}
+
+	async function fetchAllDashboardData() {
+		dashboardLoading = true;
+		dashboardError = null;
+		console.log('fetching ALL dashboard data')
+		try {
+			const [chartRes, perfRes, sectionRes] = await Promise.all([
+				fetchChartData(),
+				fetchPerfApi(),
+				fetchStudentDistributionApi()
+			]);
+			// chartRes is undefined because fetchChartData sets state directly
+			// perfRes and sectionRes are returned from their respective APIs
+			console.log('perfRes',perfRes)
+			console.log('sectionRes',sectionRes)
+			perfTrend = perfRes || [];
+			sectionWiseData = sectionRes?.sectionWiseData || {};
+		} catch (err) {
+			dashboardError = err.message || 'Failed to load dashboard data';
+		} finally {
+			dashboardLoading = false;
+		}
+	}
 </script>
 
 <div class="w-full space-y-8 bg-gray-50 p-4">
-	{#if chartDataLoading}
+	{#if chartDataLoading || dashboardLoading}
 		<div class="flex items-center justify-center min-h-screen w-full">
 			<!-- <SkelDataTable /> -->
-			Loading performance data...
+			<AnimLoader
+				active={true}
+				size={'large'}
+				loaderType={'bars'}
+				description="Loading performance data..."
+			/>
 		</div>
-	{:else if chartDataError}
+	{:else if chartDataError || dashboardError}
 		<div
 			class="flex flex-col items-center justify-center min-h-[40vh] w-full bg-red-50 rounded-lg border border-red-200 p-8"
 		>
@@ -176,7 +215,7 @@
 						d="M18.364 5.636l-12.728 12.728M5.636 5.636l12.728 12.728"
 					/></svg
 				>
-				Error loading chart data: {chartDataError}
+				Error loading chart data: {chartDataError || dashboardError}
 			</p>
 			<button
 				class="px-6 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition"

@@ -24,6 +24,9 @@
 			});
 			return acc;
 		}, {});
+
+		console.log('examDates',examDates)
+		console.log('subjectData',subjectData)
 	}
 
 	function setContextInChatBox(e) {

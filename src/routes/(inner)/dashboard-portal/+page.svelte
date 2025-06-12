@@ -40,6 +40,21 @@
 		</div>
 
 		<div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+			
+			<!-- Teacher Dashboard Card -->
+			<CommonDashCard
+				title="Teacher Dashboard"
+				description="Analyze class performance, track student progress, and manage academic insights."
+				image="/school-thumbnail.png"
+				href="/teacher-dashboard"
+				fileUploadHelperText="Upload class performance data"
+				entity="teacher"
+				entityList={teacherOptions}
+				dashboardUrl="/teacher/dashboard"
+				dataUploadPageUrl="/teacher/upload"
+				comboPlaceholder="Search teacher..."
+				on:entitySelected={handleEntitySelected}
+			/>
 			<!-- Student Dashboard Card -->
 			<CommonDashCard
 				title="Student Dashboard"
@@ -55,20 +70,6 @@
 				on:entitySelected={handleEntitySelected}
 			/>
 
-			<!-- Teacher Dashboard Card -->
-			<CommonDashCard
-				title="Teacher Dashboard"
-				description="Analyze class performance, track student progress, and manage academic insights."
-				image="/school-thumbnail.png"
-				href="/teacher-dashboard"
-				fileUploadHelperText="Upload class performance data"
-				entity="teacher"
-				entityList={teacherOptions}
-				dashboardUrl="/teacher/dashboard"
-				dataUploadPageUrl="/teacher/upload"
-				comboPlaceholder="Search teacher..."
-				on:entitySelected={handleEntitySelected}
-			/>
 		</div>
 	</div>
 </main>

@@ -5,13 +5,13 @@
 
 	function handleClassTabSelection(e) {
 		const { index, tab } = e.detail;
-		
+
 		if (tab) {
 			const { class: className, division, subject } = tab;
 
 			selectedClassStore.update((prev) => ({
 				...prev,
-				className,
+				className: className + division,
 				division,
 				subject,
 				fullClassName: `${className}${division} ${subject}`
@@ -25,7 +25,7 @@
 </script>
 
 <div class="flex flex-col gap-8 items-center w-full my-8">
-	<Tabs on:tabSelected={handleClassTabSelection} {tabs}/>
+	<Tabs on:tabSelected={handleClassTabSelection} {tabs} />
 	<div class="w-full lg:w-1/2">
 		<SearchBar placeholder="Filter by student" />
 	</div>
