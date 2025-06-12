@@ -4,10 +4,12 @@
 	import { selectedClassStore, chatContextStore } from '$lib/stores/globalFilters.js';
 	import { FilterIcon } from '$lib/svgComponents';
 	import { transformForHistogram } from '$lib/utils';
+	import { transformSectionWiseData, toHistogramArray } from '$lib/utils.js';
 	import { fetchApi } from '$lib/apiUtils.js';
 
-	export let sectionWiseData={};
-	
+	export let sectionWiseData = {};
+	let sectionDataForChart;
+
 	const chartTitle = 'Section-wise Score Comparison';
 	let students = 'All students';
 	let subject = 'English';
@@ -15,30 +17,60 @@
 	let sections = [];
 	let scoreRanges = [];
 	let data = [];
-	let isLoading = true;
+	let isLoading = false;
 	let error = null;
 	let isMounted = false;
+
+	// Extract data from sectionWiseData prop
+	$: if (sectionWiseData && Object.keys(sectionWiseData).length > 0) {
+		error = null;
+
+		sectionDataForChart = transformSectionWiseData(sectionWiseData);
+		data = toHistogramArray(sectionDataForChart);
+		scoreRanges = sectionWiseData.scoreRanges.map((d) => d.name);
+		sections = sectionWiseData.sections.map((d) => d.name);
+		// console.log('data in reactive block', toHistogramArray(sectionDataForChart));
+		// console.log(
+		// 	'sectionWiseData --- in reactive block',
+		// 	sectionWiseData.scoreRanges.map((d) => d.name)
+		// );
+		// console.log(
+		// 	'sectionWiseData --- in reactive block',
+		// 	sectionWiseData.sections.map((d) => d.name)
+		// );
+
+		// Optionally update students, subject, testPeriod if available in sectionWiseData
+		// students = sectionWiseData.students || students;
+		// subject = sectionWiseData.subject || subject;
+		// testPeriod = sectionWiseData.testPeriod || testPeriod;
+		isLoading = false;
+	} else {
+		isLoading = true;
+	}
 
 	function setContextInChatBox() {
 		const context = {
 			type: 'performance',
-			title: `${$selectedClassStore ? `${$selectedClassStore} -` : ''} ${chartTitle}`
+			title: `${$selectedClassStore ? `${$selectedClassStore.className} -` : ''} ${chartTitle}`
 		};
 		chatContextStore.set(context);
 	}
 
-	
 	// async function fetchSectionWiseScore() {
 	// 	try {
 	// 		isLoading = true;
 	// 		error = null;
 	// 		const { className, division, subject } = $selectedClassStore;
-	// 		const classSubject = `${className}${division}_${subject}`;
-	// 		const response = await fetchApi(`/apis/teacher/section-wise-comparison/${classSubject}`, {
+	// 		const classSubject = `${className[0]}${division}_${subject}`;
+	// 		const response = await fetchApi(`/apis/teacher/section-wise-comparison/3A_English`, {
 	// 			action: 'fetch',
 	// 			entity: 'section-wise score'
 	// 		});
-	// 		({ scoreRanges, sections, histogramData: data } = transformForHistogram(response));
+	// 		// ({ scoreRanges, sections, histogramData: data } = transformForHistogram(response));
+
+	// 		// console.log('scorerange in api', scoreRanges);
+	// 		// console.log('sections in api', sections);
+	// 		// console.log('data in api', data);
 	// 	} catch (err) {
 	// 		error = err.message;
 	// 	} finally {

@@ -35,7 +35,7 @@
 	import { FileUploadComponent } from '$lib';
 	import StepsIndicator from '$lib/components/StepsIndicator.svelte';
 	import CommonDashCard from '$lib/components/CommonDashCard.svelte';
-	import { teacherUploadedFiles } from '$lib/stores/teacherUploadStore.js';
+	import { teacherUploadedFiles, teacherListStore } from '$lib/stores/teacherUploadStore.js';
 	import { selectedClassStore } from '$lib/stores/globalFilters';
 	import { goto } from '$app/navigation';
 
@@ -55,6 +55,27 @@
 		active: i === currentStep
 	}));
 
+	// Helper to transform teachers to unique list with class_subject array
+	function transformTeachersList(teachers) {
+		const teacherMap = {};
+		(teachers || []).forEach((t) => {
+			if (!teacherMap[t.teacherId]) {
+				teacherMap[t.teacherId] = {
+					id: t.teacherId,
+					name: t.teacherName,
+					class_subject: []
+				};
+			}
+			(t.subjects || []).forEach((subj) => {
+				teacherMap[t.teacherId].class_subject.push({
+					class: t.className,
+					subject: subj
+				});
+			});
+		});
+		return Object.values(teacherMap);
+	}
+
 	async function onTeacherFileUploadSubmit(e) {
 		const files = e.detail.files;
 		const done = e.detail.done;
@@ -71,25 +92,9 @@
 			const res = await fetch('/apis/teacher/upload', { method: 'POST', body: formData });
 			if (res.ok) {
 				const data = await res.json();
-				// Transform teachers to unique list with class_subject array
-				const teacherMap = {};
-				(data.teachers || []).forEach((t) => {
-					if (!teacherMap[t.teacherId]) {
-						teacherMap[t.teacherId] = {
-							id: t.teacherId,
-							name: t.teacherName,
-							class_subject: []
-						};
-					}
-					// For each subject, add a class_subject entry
-					(t.subjects || []).forEach((subj) => {
-						teacherMap[t.teacherId].class_subject.push({
-							class: t.className,
-							subject: subj
-						});
-					});
-				});
-				teachersList = Object.values(teacherMap);
+				const transformed = transformTeachersList(data.teachers);
+				teacherListStore.set(transformed);
+				teachersList = transformed;
 				console.log('teachersList', teachersList);
 				currentStep = 1;
 				done && done();

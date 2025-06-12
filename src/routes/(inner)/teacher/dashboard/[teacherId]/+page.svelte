@@ -10,6 +10,7 @@
 	import { chatContextStore, selectedClassStore } from '$lib/stores/globalFilters.js';
 	import { page } from '$app/stores';
 	import { fetchApi } from '$lib/apiUtils.js';
+
 	import SkelDataTable from '$lib/components/loadingSkeletons/SkelDataTable.svelte';
 	import { teacherUploadedFiles } from '$lib/stores/teacherUploadStore.js';
 	import { browser } from '$app/environment';
@@ -158,7 +159,6 @@
 		}
 	}
 
-	
 	async function fetchPerfApi() {
 		return await postFormDataToApi('/apis/teacher/upload/perf-trend');
 	}
@@ -170,7 +170,7 @@
 	async function fetchAllDashboardData() {
 		dashboardLoading = true;
 		dashboardError = null;
-		console.log('fetching ALL dashboard data')
+		console.log('fetching ALL dashboard data');
 		try {
 			const [chartRes, perfRes, sectionRes] = await Promise.all([
 				fetchChartData(),
@@ -179,10 +179,10 @@
 			]);
 			// chartRes is undefined because fetchChartData sets state directly
 			// perfRes and sectionRes are returned from their respective APIs
-			console.log('perfRes',perfRes)
-			console.log('sectionRes',sectionRes)
+			console.log('perfRes', perfRes);
+			console.log('sectionRes', sectionRes);
 			perfTrend = perfRes || [];
-			sectionWiseData = sectionRes?.sectionWiseData || {};
+			sectionWiseData = sectionRes || {};
 		} catch (err) {
 			dashboardError = err.message || 'Failed to load dashboard data';
 		} finally {

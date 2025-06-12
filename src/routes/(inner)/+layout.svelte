@@ -5,6 +5,8 @@
 	import { Home, User, Upload } from 'lucide-svelte'; // example icons
 	import SearchableComboBox from '$lib/components/SearchableComboBox.svelte';
 	import { goto } from '$app/navigation';
+	import { teacherListStore } from '$lib/stores/teacherUploadStore.js';
+	import { selectedClassStore } from '$lib/stores/globalFilters.js';
 
 	// Define your navItems and actionButtons for each route
 	const navConfig = {
@@ -56,11 +58,18 @@
 
 		// Extract name and subject from the selected item
 		const name = selectedTeacher.name;
-		const subject = selectedTeacher.subject;
 		const id = selectedTeacher.id;
+		const classSubject = selectedTeacher.class_subject?.[0] || {};
+		selectedClassStore.set({
+			className: classSubject.class,
+			class_: classSubject.class?.[0],
+			division: classSubject.class?.[1],
+			subject: classSubject.subject,
+			teacherId: id
+		});
 		const params = new URLSearchParams();
 		params.set('name', name);
-		if (subject) params.set('subject', subject);
+		if (classSubject.subject) params.set('subject', classSubject.subject);
 		if (name) {
 			goto(`/teacher/dashboard/${encodeURIComponent(id)}?${params.toString()}`);
 		}
@@ -98,13 +107,7 @@
 					</li>
 				</ul>
 				<SearchableComboBox
-					options={[
-						{ id: 1, name: 'Mrs. Sharma', subject: 'Maths', section: 'A' },
-						{ id: 2, name: 'Mr. Kumar', subject: 'Science', section: 'A' },
-						{ id: 3, name: 'Ms. Iyer', subject: 'English', section: 'B' },
-						{ id: 4, name: 'Mr. Singh', subject: 'Social', section: 'B' },
-						{ id: 5, name: 'Ms. Reddy', subject: 'Hindi', section: 'C' }
-					]}
+					options={$teacherListStore}
 					placeholder="Search teacher..."
 					on:handleDispatchComboBoxData={handleTeacherSelect}
 				/>
@@ -113,6 +116,8 @@
 	</div>
 </Header>
 
+{#key $page.url.pathname}
 <main>
 	<slot></slot>
 </main>
+{/key}

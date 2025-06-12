@@ -1,9 +1,11 @@
 <script>
     import { onMount } from 'svelte';
     import {Card, DrilldownChart} from "$lib";
+    import V2DrillDown from '$lib/components/charts/V2_DrillDown.svelte';
     import { selectedClassStore, chatContextStore } from '$lib/stores/globalFilters.js';
 	import { FilterIcon } from '$lib/svgComponents';
 	import { fetchApi } from '$lib/apiUtils.js';
+
 
     const chartTitle = "Student distribution";
     let transformedData = null;
@@ -41,6 +43,7 @@
                     }))
                 }))
             };
+            console.log('transformedData',transformedData)
         } catch (err) {
             error = err.message;
         } finally {
@@ -77,6 +80,6 @@
     {:else if error}
         <div class="p-4 text-center text-red-500">{error}</div>
     {:else}
-        <DrilldownChart data={transformedData} />
+        <V2DrillDown data={transformedData} />
     {/if}
 </Card>

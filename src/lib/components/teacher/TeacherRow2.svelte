@@ -34,7 +34,7 @@
 	<div class="col-span-12">
 		<TeacherPerfAnalysis perfData={perfAnalysis} />
 	</div>
-	<!-- <div class="col-span-6">
+	<div class="col-span-6">
 		<SectionWiseScore {sectionWiseData}/>
-	</div> -->
+	</div>
 </div>
