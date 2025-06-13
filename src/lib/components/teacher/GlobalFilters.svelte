@@ -1,7 +1,11 @@
 <script>
 	import { Tabs, SearchBar } from '$lib';
-	import { onMount } from 'svelte';
+	import { createEventDispatcher, onMount } from 'svelte';
 	import { selectedClassStore } from '$lib/stores/globalFilters.js'; // Import the store
+	
+
+	export let selectedClassSubjFilterIndex
+	const dispatch = createEventDispatcher();
 
 	function handleClassTabSelection(e) {
 		const { index, tab } = e.detail;
@@ -17,6 +21,7 @@
 				fullClassName: `${className}${division} ${subject}`
 			}));
 		}
+		dispatch('tabSelected', e.detail);
 	}
 
 	// Example structure for tabs array:
@@ -25,7 +30,7 @@
 </script>
 
 <div class="flex flex-col gap-8 items-center w-full my-8">
-	<Tabs on:tabSelected={handleClassTabSelection} {tabs} />
+	<Tabs on:tabSelected={handleClassTabSelection} {tabs} selectedIndex={selectedClassSubjFilterIndex} />
 	<div class="w-full lg:w-1/2">
 		<SearchBar placeholder="Filter by student" />
 	</div>

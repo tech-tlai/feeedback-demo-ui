@@ -47,6 +47,8 @@
 	let perfTrend = [];
 	let dashboardLoading = true;
 	let dashboardError = null;
+	let selectedClassSubjFilterIndex = 0;
+
 
 	async function fetchChartData() {
 		try {
@@ -158,7 +160,11 @@
 			throw err;
 		}
 	}
-
+	function handleTabSelected(e) {
+		selectedClassSubjFilterIndex = e.detail.index
+		// Call your API or update state here
+		fetchAllDashboardData();
+	}
 	async function fetchPerfApi() {
 		return await postFormDataToApi('/apis/teacher/upload/perf-trend');
 	}
@@ -170,7 +176,6 @@
 	async function fetchAllDashboardData() {
 		dashboardLoading = true;
 		dashboardError = null;
-		console.log('fetching ALL dashboard data');
 		try {
 			const [chartRes, perfRes, sectionRes] = await Promise.all([
 				fetchChartData(),
@@ -179,8 +184,6 @@
 			]);
 			// chartRes is undefined because fetchChartData sets state directly
 			// perfRes and sectionRes are returned from their respective APIs
-			console.log('perfRes', perfRes);
-			console.log('sectionRes', sectionRes);
 			perfTrend = perfRes || [];
 			sectionWiseData = sectionRes || {};
 		} catch (err) {
@@ -230,7 +233,7 @@
 				profileData={{ ...profileData, name: teacherName, subject: teacherSubject }}
 				{allClassesSummary}
 			/>
-			<GlobalFilters {tabs} />
+			<GlobalFilters {tabs} on:tabSelected={handleTabSelected} {selectedClassSubjFilterIndex}/>
 			<TeacherRow1 {perfSummary} {learningOutcomes} {perfTrend} />
 			<TeacherRow2 {topPerformers} {studentsAtRisk} {perfAnalysis} {sectionWiseData} />
 			<TopicWiseAnalysisSection {strengthAnalysis} />
