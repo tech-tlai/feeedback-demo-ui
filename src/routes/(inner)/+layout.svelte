@@ -55,17 +55,19 @@
 		const itemDetails = event.detail.itemDetails;
 		selectedTeacher = itemDetails;
 		console.log('selectedTeacher', selectedTeacher);
-
 		// Extract name and subject from the selected item
+		
 		const name = selectedTeacher.name;
 		const id = selectedTeacher.id;
 		const classSubject = selectedTeacher.class_subject?.[0] || {};
+		const className =classSubject.class ?classSubject.class:'-';
 		selectedClassStore.set({
-			className: classSubject.class,
+			className: className,
 			class_: classSubject.class?.[0],
 			division: classSubject.class?.[1],
 			subject: classSubject.subject,
-			teacherId: id
+			teacherId: id,
+			fullClassName: `${className} ${classSubject.subject}`
 		});
 		const params = new URLSearchParams();
 		params.set('name', name);
@@ -117,7 +119,7 @@
 </Header>
 
 {#key $page.url.pathname}
-<main>
-	<slot></slot>
-</main>
+	<main>
+		<slot></slot>
+	</main>
 {/key}

@@ -20,15 +20,15 @@
 	// 	isLoading = true;
 	// 	error = null;
 	// 	try {
-			// const { className, division, subject } = $selectedClassStore;
-			// const classSubject = `${className}${division}_${subject}`;
-			// const data = await fetchApi(`/apis/teacher/perf-summary/${classSubject}`, {
-			// 	action: 'fetch',
-			// 	entity: 'performance summary'
-			// });
-			// 
-			// studentCount = data.studentCount || studentCount;
-			// indicators = data.indicators || indicators;
+	// const { className, division, subject } = $selectedClassStore;
+	// const classSubject = `${className}${division}_${subject}`;
+	// const data = await fetchApi(`/apis/teacher/perf-summary/${classSubject}`, {
+	// 	action: 'fetch',
+	// 	entity: 'performance summary'
+	// });
+	//
+	// studentCount = data.studentCount || studentCount;
+	// indicators = data.indicators || indicators;
 	// 	} catch (err) {
 	// 		error = err.message;
 	// 	} finally {
@@ -43,6 +43,7 @@
 	onMount(() => {
 		isMounted = true;
 	});
+	$: console.log('selectedClassStore', $selectedClassStore);
 </script>
 
 <Card>
@@ -57,7 +58,7 @@
 		{:else}
 			<div>
 				<h4 class="text-2xl font-bold text-accent-blue mb-2">
-					Class: {$selectedClassStore.fullClassName?$selectedClassStore.fullClassName :''}
+					Class: {$selectedClassStore.fullClassName ? $selectedClassStore.fullClassName : ''}
 				</h4>
 				<div class="flex items-center mb-8">
 					<svg

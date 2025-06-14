@@ -123,13 +123,23 @@
 		const { entity, selectedEntityId, selectedEntityName, selectedEntity } = e.detail;
 		console.log('entitySelected event:', e.detail);
 
+		
+
+		const className = selectedEntity?.class_subject[0]?.class
+			? selectedEntity?.class_subject[0]?.class
+			: '-';
+
+		const subject = selectedEntity.class_subject[0]?.subject
+			? selectedEntity.class_subject[0]?.subject
+			: '-';
+
 		selectedClassStore.set({
 			className: selectedEntity.class_subject[0]?.class,
 			class_: selectedEntity.class_subject[0]?.class[0],
 			division: selectedEntity.class_subject[0]?.class[1],
 			subject: selectedEntity.class_subject[0]?.subject,
-			teacherId: selectedEntity.id
-			// fullClassName: `${className}${division} ${subject}`
+			teacherId: selectedEntity.id,
+			fullClassName: `${className} ${subject}`
 		});
 		goto(
 			`/teacher/dashboard/${selectedEntity.id}?id=${encodeURIComponent(selectedEntity.id)}&&name=${encodeURIComponent(selectedEntity.name)}&&sub=${encodeURIComponent(selectedEntity.class_subject[0]?.subject || '')}`
