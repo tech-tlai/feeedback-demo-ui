@@ -10,7 +10,7 @@
   'rgba(255, 140, 148, 0.7)'  // light red
 ]
 
-	let data = {
+	export let data = {
 		name: 'Student Distribution',
 		children: [
 			{ name: '0-35%', value: '15', unit:"%" },

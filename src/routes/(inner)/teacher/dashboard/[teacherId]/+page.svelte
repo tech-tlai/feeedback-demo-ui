@@ -33,6 +33,8 @@
 	let chartData = null;
 	let chartDataLoading = true;
 	let chartDataError = null;
+	let perfTrendError = null;
+	let sectionWiseError = null;
 	let retryKey = 0;
 	let allClassesSummary = [];
 	let tabs = [];
@@ -48,7 +50,6 @@
 	let dashboardLoading = true;
 	let dashboardError = null;
 	let selectedClassSubjFilterIndex = 0;
-
 
 	async function fetchChartData() {
 		try {
@@ -161,7 +162,7 @@
 		}
 	}
 	function handleTabSelected(e) {
-		selectedClassSubjFilterIndex = e.detail.index
+		selectedClassSubjFilterIndex = e.detail.index;
 		// Call your API or update state here
 		fetchAllDashboardData();
 	}
@@ -176,16 +177,39 @@
 	async function fetchAllDashboardData() {
 		dashboardLoading = true;
 		dashboardError = null;
+		chartDataError = null;
+		perfTrendError = null;
+		sectionWiseError = null;
+
 		try {
-			const [chartRes, perfRes, sectionRes] = await Promise.all([
+			const [chartRes, perfRes, sectionRes] = await Promise.allSettled([
 				fetchChartData(),
 				fetchPerfApi(),
 				fetchStudentDistributionApi()
 			]);
-			// chartRes is undefined because fetchChartData sets state directly
-			// perfRes and sectionRes are returned from their respective APIs
-			perfTrend = perfRes || [];
-			sectionWiseData = sectionRes || {};
+
+			// Chart Data
+			if (chartRes.status === 'fulfilled') {
+				// fetchChartData sets state directly
+			} else {
+				chartDataError = chartRes.reason?.message || 'Failed to load chart data';
+			}
+
+			// Perf Trend
+			if (perfRes.status === 'fulfilled') {
+				perfTrend = perfRes.value || [];
+			} else {
+				perfTrend = [];
+				perfTrendError = perfRes.reason?.message || 'Failed to load performance trend';
+			}
+
+			// Section Wise
+			if (sectionRes.status === 'fulfilled') {
+				sectionWiseData = sectionRes.value || {};
+			} else {
+				sectionWiseData = {};
+				sectionWiseError = sectionRes.reason?.message || 'Failed to load section wise data';
+			}
 		} catch (err) {
 			dashboardError = err.message || 'Failed to load dashboard data';
 		} finally {
@@ -197,7 +221,6 @@
 <div class="w-full space-y-8 bg-gray-50 p-4">
 	{#if chartDataLoading || dashboardLoading}
 		<div class="flex items-center justify-center min-h-screen w-full">
-			<!-- <SkelDataTable /> -->
 			<AnimLoader
 				active={true}
 				size={'large'}
@@ -205,39 +228,26 @@
 				description="Loading performance data..."
 			/>
 		</div>
-	{:else if chartDataError || dashboardError}
-		<div
-			class="flex flex-col items-center justify-center min-h-[40vh] w-full bg-red-50 rounded-lg border border-red-200 p-8"
-		>
-			<p class="text-red-600 text-lg font-semibold mb-4 flex items-center gap-2">
-				<svg class="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-					><path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M18.364 5.636l-12.728 12.728M5.636 5.636l12.728 12.728"
-					/></svg
-				>
-				Error loading chart data: {chartDataError || dashboardError}
-			</p>
-			<button
-				class="px-6 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition"
-				on:click={handleRetry}
-			>
-				Retry
-			</button>
-		</div>
 	{:else}
 		<div class="mx-auto flex max-w-[1400px] flex-col gap-5">
 			<TeacherProfileSection
 				profileData={{ ...profileData, name: teacherName, subject: teacherSubject }}
+				{chartDataError}
 				{allClassesSummary}
 			/>
-			<GlobalFilters {tabs} on:tabSelected={handleTabSelected} {selectedClassSubjFilterIndex}/>
-			<TeacherRow1 {perfSummary} {learningOutcomes} {perfTrend} />
-			<TeacherRow2 {topPerformers} {studentsAtRisk} {perfAnalysis} {sectionWiseData} />
-			<TopicWiseAnalysisSection {strengthAnalysis} />
-			<ScoreDistributionSection {avgMaxMin} />
+			<GlobalFilters {tabs} on:tabSelected={handleTabSelected} {selectedClassSubjFilterIndex} />
+			<TeacherRow1 {perfSummary} {learningOutcomes} {perfTrend} {perfTrendError} {chartDataError} />
+			<TeacherRow2
+				{topPerformers}
+				{studentsAtRisk}
+				{perfAnalysis}
+				{chartDataError}
+				{sectionWiseData}
+				{sectionWiseError}
+			/>
+
+			<TopicWiseAnalysisSection {strengthAnalysis} {chartDataError} />
+			<ScoreDistributionSection {avgMaxMin} {chartDataError} {sectionWiseData} {sectionWiseError} />
 		</div>
 	{/if}
 </div>

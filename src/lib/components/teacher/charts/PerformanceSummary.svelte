@@ -12,7 +12,7 @@
 	];
 
 	let isLoading = false;
-	let error = null;
+	export let error = null;
 	let isMounted = false;
 	let unsubscribe;
 
@@ -47,14 +47,14 @@
 </script>
 
 <Card>
-	<div class="h-full flex flex-col justify-between">
+	<div class="h-full flex flex-col justify-between text-sm">
 		<div class="flex justify-between items-center mb-4">
 			<h2 class="text-black text-sm font-bold">Performance Summary</h2>
 		</div>
 		{#if isLoading}
 			<div class="p-4 text-center">Loading...</div>
 		{:else if error}
-			<div class="p-4 text-center text-red-500">{error}</div>
+			<div class="p-4 text-center text-red-500 text-sm">{error}</div>
 		{:else}
 			<div>
 				<h4 class="text-2xl font-bold text-accent-blue mb-2">

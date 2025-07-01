@@ -6,8 +6,8 @@
 	import { fetchApi } from '$lib/apiUtils.js';
 	import { selectedClassStore, chatContextStore } from '$lib/stores/globalFilters.js';
 
-	export let strengthAnalysis ={}
-	
+	export let strengthAnalysis = {};
+	export let chartDataError = '';
 	let strengths = [];
 	let weaknesses = [];
 	let isLoadingStrengths = false;
@@ -16,6 +16,10 @@
 	let errorWeaknesses = null;
 	let isMounted = false;
 
+	$: if (chartDataError) {
+		errorStrengths = `Failed to load key strengths data. ${chartDataError}`;
+		errorWeaknesses = `Failed to load key weaknesses data. ${chartDataError}`;
+	}
 	// async function loadStrengths() {
 	// 	try {
 	// 		isLoadingStrengths = true;
@@ -79,13 +83,21 @@
 	$: transformedStrengths = transformData(strengths, 'Strengths');
 	$: transformedWeaknesses = transformData(weaknesses, 'Weaknesses');
 
+
 	// Map strengthAnalysis.strong_topics and challenging_topics to strengths and weaknesses
-	$: strengths = (strengthAnalysis.strong_topics || []).map(t => ({ name: t.name, value: t.accuracy }));
-	$: weaknesses = (strengthAnalysis.challenging_topics || []).map(t => ({ name: t.name, value: t.accuracy }));
+	$: strengths = (strengthAnalysis.strong_topics || []).map((t) => ({
+		name: t.name,
+		value: t.accuracy
+	}));
+	$: weaknesses = (strengthAnalysis.challenging_topics || []).map((t) => ({
+		name: t.name,
+		value: t.accuracy
+	}));
 
 	onMount(() => {
 		isMounted = true;
 	});
+
 </script>
 
 <div class="flex w-full justify-center my-6">
@@ -111,7 +123,14 @@
 	{#if isLoadingStrengths}
 		<SkelClassSummary />
 	{:else if errorStrengths}
-		<ErrorComponent message={errorStrengths} />
+		<div class="min-h-40 h-full text-sm bg-white p-4 rounded-lg shadow-sm">
+			<!-- <div class="flex justify-between items-center mb-4">
+				<h4 class="text-black font-bold">{'Key Weaknesses'}</h4>
+			</div> -->
+			<div class=" text-red-500 mb-4 flex gap-4 items-center">
+				<div class="grid 6">{errorStrengths}</div>
+			</div>
+		</div>
 	{:else}
 		<TopicWiseAnalysis
 			dataForChart={transformedStrengths}
@@ -126,7 +145,14 @@
 	{#if isLoadingWeaknesses}
 		<SkelClassSummary />
 	{:else if errorWeaknesses}
-		<ErrorComponent message={errorWeaknesses} />
+		<div class="min-h-40 h-full text-sm bg-white p-4 rounded-lg shadow-sm">
+			<!-- <div class="flex justify-between items-center mb-4">
+				<h4 class="text-black font-bold">{'Key Weaknesses'}</h4>
+			</div> -->
+			<div class=" text-red-500 mb-4 flex gap-4 items-center">
+				<div class="grid 6">{errorWeaknesses}</div>
+			</div>
+		</div>
 	{:else}
 		<TopicWiseAnalysis
 			dataForChart={transformedWeaknesses}

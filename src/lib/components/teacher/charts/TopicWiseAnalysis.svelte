@@ -42,17 +42,17 @@
 
 <Card>
 	<div class="h-full text-sm">
-		<div class="flex justify-between items-center  mb-4">
-			<h4 class="text-black  font-bold ">{title}</h4>
+		<div class="flex justify-between items-center mb-4">
+			<h4 class="text-black font-bold">{title}</h4>
 			<button class="flex gap-2 items-center text-link font-medium" on:click={setContextInChatBox}>
 				Explore with AI <FilterIcon size={16} /></button
 			>
 		</div>
-		<div class=" text-gray-dark  mb-4 flex gap-4">
-			<span>{$selectedClassStore.fullClassName ?$selectedClassStore.fullClassName :''}</span>
+		<div class=" text-gray-dark mb-4 flex gap-4">
+			<span>{$selectedClassStore.fullClassName ? $selectedClassStore.fullClassName : ''}</span>
 			<!-- <span>Date: {'date'}</span> -->
 		</div>
-		<div class="grid grid-cols-6 ">
+		<div class="grid grid-cols-6">
 			<div class="col-span-3 place-items-center">
 				<p
 					class="${chartType === 'strengths'
@@ -62,20 +62,26 @@
 					Key {chartType}
 				</p>
 				<div class="flex flex-wrap gap-3 mb-8 justify-center">
-					{#each keywords as keyword}
-						<div
-							class={`flex items-center gap-2 rounded-lg ${chartType === 'strengths' ? 'bg-green-light text-green-dark' : 'bg-red-light text-red-dark '} px-5 py-2   ${keyword.value > keyword.threshold ? 'font-semibold' : ''}`}
-						>
-							{keyword.name}
-							{#if keyword.isNew}
-								<span class="bg-yellow-400 text-black text-xs px-2 py-0.5 rounded font-bold"
-									>NEW</span
-								>
-							{/if}
+					{#if keywords?.length > 0}
+						{#each keywords as keyword}
+							<div
+								class={`flex items-center gap-2 rounded-lg ${chartType === 'strengths' ? 'bg-green-light text-green-dark' : 'bg-red-light text-red-dark '} px-5 py-2   ${keyword.value > keyword.threshold ? 'font-semibold' : ''}`}
+							>
+								{keyword.name}
+								{#if keyword.isNew}
+									<span class="bg-yellow-400 text-black text-xs px-2 py-0.5 rounded font-bold"
+										>NEW</span
+									>
+								{/if}
+							</div>
+						{/each}
+					{:else if keywords?.length == 0}
+						<div class="text-sm text-red-500">
+							{chartType === 'strengths' ? 'No strengths found' : 'No weaknesses found'}
 						</div>
-					{/each}
+					{/if}
 				</div>
-				{#if showNewKeywordsMsg  && newKeywords?.length >0}
+				{#if showNewKeywordsMsg && newKeywords?.length > 0}
 					<StrengthWeaknessNotfn msgType={chartType} {newKeywords} />
 					<div class="mt-4">
 						<button class="text-link" on:click={setContextInChatBox}>{chartActionWord}</button>

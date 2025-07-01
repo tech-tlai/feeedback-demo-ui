@@ -8,6 +8,7 @@
 	import { fetchApi } from '$lib/apiUtils.js';
 
 	export let sectionWiseData = {};
+	export let error = null;
 	let sectionDataForChart;
 
 	const chartTitle = 'Section-wise Score Comparison';
@@ -18,13 +19,11 @@
 	let scoreRanges = [];
 	let data = [];
 	let isLoading = false;
-	let error = null;
 	let isMounted = false;
+
 
 	// Extract data from sectionWiseData prop
 	$: if (sectionWiseData && Object.keys(sectionWiseData).length > 0) {
-		error = null;
-
 		sectionDataForChart = transformSectionWiseData(sectionWiseData);
 		data = toHistogramArray(sectionDataForChart);
 		scoreRanges = sectionWiseData.scoreRanges.map((d) => d.name);
@@ -43,11 +42,7 @@
 		// students = sectionWiseData.students || students;
 		// subject = sectionWiseData.subject || subject;
 		// testPeriod = sectionWiseData.testPeriod || testPeriod;
-		isLoading = false;
-	} else {
-		isLoading = true;
 	}
-
 	function setContextInChatBox() {
 		const context = {
 			type: 'performance',
@@ -104,7 +99,7 @@
 	{#if isLoading}
 		<div class="p-4 text-center">Loading...</div>
 	{:else if error}
-		<div class="p-4 text-center text-red-500">{error}</div>
+		<div class="p-4 text-center text-red-500 text-sm">{error}</div>
 	{:else}
 		<Histogram classNames={sections} {scoreRanges} {data} />
 	{/if}

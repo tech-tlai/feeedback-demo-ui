@@ -12,7 +12,7 @@
 		{ label: 'Understanding', value: 0 }
 	];
 	let isLoading = false;
-	let error = '';
+	export let error = '';
 
 	let isMounted = false;
 
@@ -40,6 +40,7 @@
 	// onMount(() => {
 	// 	isMounted = true;
 	// });
+
 </script>
 
 <Card>
@@ -52,7 +53,7 @@
 	{#if isLoading}
 		<div class="p-4 text-center">Loading...</div>
 	{:else if error}
-		<div class="p-4 text-center text-red-500">{error}</div>
+		<div class="p-4 text-center text-red-500 text-sm">{error}</div>
 	{:else}
 		<div class="flex flex-col h-full justify-between">
 			<div class="space-y-8 mb-4">

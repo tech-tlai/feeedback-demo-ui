@@ -7,9 +7,9 @@
 	import { fetchApi } from '$lib/apiUtils.js';
 
 	const chartTitle = 'Students at Risk';
+	export let error = null;
 	export let studentData = [];
 	let isLoading = false;
-	let error = null;
 	let searchValue = '';
 	let isMounted = false;
 
@@ -133,6 +133,7 @@
 			searchParameter="name"
 			{searchValue}
 			{customRenderers}
+			notFoundMessage={"No student found"}
 		/>
 	{/if}
 </div>

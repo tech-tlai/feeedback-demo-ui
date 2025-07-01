@@ -6,6 +6,8 @@
 	import { fetchApi } from '$lib/apiUtils.js';
 
 	export let studentData = [];
+	export let error = null;
+
 	let searchValue = '';
 	let headers = [
 		{ key: 'name', name: 'Name', align: 'left', width: '60%' },
@@ -25,7 +27,6 @@
 	let tableData = [];
 
 	let isLoading = false;
-	let error = null;
 
 	let customRenderers = {
 		percentage: (data) => {
@@ -36,7 +37,8 @@
 				${percentage}
 			</span>
 		</div>
-    `}
+    `;
+		}
 	};
 
 	async function createTableData() {
@@ -69,7 +71,7 @@
 	// 			action: 'fetch',
 	// 			entity: 'attendance'
 	// 		});
-			
+
 	// 	} catch (err) {
 	// 		error = err.message;
 	// 	} finally {
@@ -88,12 +90,12 @@
 	});
 </script>
 
-<div class="bg-white rounded-lg shadow-md overflow-hidden h-full">
+<div class="bg-white rounded-lg shadow-md overflow-hidden h-full text-sm">
 	<div class="p-4 space-y-4">
 		<h4 class="text-sm font-bold text-black">Attendance Sheet</h4>
 
 		<div class="chart-meta text-gray-dark text-sm flex gap-4">
-			<span>{$selectedClassStore.fullClassName ?$selectedClassStore.fullClassName :''}</span>
+			<span>{$selectedClassStore.fullClassName ? $selectedClassStore.fullClassName : ''}</span>
 			<span>Total: {studentData.length}</span>
 		</div>
 	</div>
@@ -101,7 +103,7 @@
 	{#if isLoading}
 		<p class="p-4 text-center">Loading...</p>
 	{:else if error}
-		<p class="p-4 text-center text-red-500">{error}</p>
+		<p class="p-4 text-center text-red-500 ">{error}</p>
 	{:else}
 		<div class="mb-4 px-4">
 			<SearchBar
@@ -119,6 +121,7 @@
 			searchParameter="name"
 			{searchValue}
 			{customRenderers}
+			notFoundMessage={'No student found'}
 		/>
 	{/if}
 </div>

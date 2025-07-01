@@ -7,7 +7,7 @@
 	let examDates = [];
 	let subjectData = {};
 	let isLoading = false;
-	let error = null;
+	export let error = null;
 	const title = 'Progress Trend';
 
 	$: if (perfTrend && perfTrend.length > 0) {
@@ -25,8 +25,7 @@
 			return acc;
 		}, {});
 
-		console.log('examDates',examDates)
-		console.log('subjectData',subjectData)
+		
 	}
 
 	function setContextInChatBox(e) {
@@ -79,7 +78,7 @@
 	<!-- <div class="p-4 text-center bg-white rounded-lg h-full">Loading...</div> -->
 	<SkelChartWidget />
 {:else if error}
-	<div class="p-4 text-center text-red-500 bg-white rounded-lg h-full">{error}</div>
+	<div class="p-4 text-center text-red-500 bg-white rounded-lg h-full text-sm">{error}</div>
 {:else}
 	<ProgressTrendChart
 		{title}

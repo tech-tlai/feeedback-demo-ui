@@ -5,7 +5,7 @@
 	import { fetchApi } from '$lib/apiUtils.js';
 
 	let isLoading = false;
-	let error = null;
+	export let error = null;
 	export let perfData = {};
 	// export let perfData = {
 	// 	achievement: {feedback:[]},
@@ -13,7 +13,6 @@
 	// 	suggestions: {feedback:[]}
 	// };
 
-	$: console.log('perfData in teacherperfAnalysis', perfData);
 	let isMounted = false;
 
 	// async function fetchPerformanceAnalysis() {
