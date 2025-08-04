@@ -6,49 +6,49 @@
 
 	let examDates = [];
 	export let subjectData = {};
-	let isLoading = true;
+	let isLoading = false;
 	let error = null;
 	const STUDENT_ID = 1;
 	let selectedLanguage = 'English';
 	let tempLanguage = 'English'; // temporary variable to store value since fitler hasnt been abstracted into a component yet
 	let isMounted = false;
 
-	async function fetchPercentileTrend() {
-		try {
-			const apiData = await fetchApi(
-				`/apis/student/percentile-trend/${STUDENT_ID}?subject=${selectedLanguage}`,
-				{ action: 'fetch', entity: 'percentile trend' }
-			);
+	// async function fetchPercentileTrend() {
+	// 	try {
+	// 		const apiData = await fetchApi(
+	// 			`/apis/student/percentile-trend/${STUDENT_ID}?subject=${selectedLanguage}`,
+	// 			{ action: 'fetch', entity: 'percentile trend' }
+	// 		);
 
-			// Sorting the data by date in chronological order
-			const sortedData = apiData.sort((a, b) => new Date(a.date) - new Date(b.date));
+	// 		// Sorting the data by date in chronological order
+	// 		const sortedData = apiData.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-			// // Extracting exam dates
-			// examDates = sortedData.map((item) => item.date);
-			const uniqueDates = new Set(sortedData.map((item) => formatDateDDMonthShortYear(item.date)));
-			examDates = Array.from(uniqueDates);
+	// 		// // Extracting exam dates
+	// 		// examDates = sortedData.map((item) => item.date);
+	// 		const uniqueDates = new Set(sortedData.map((item) => formatDateDDMonthShortYear(item.date)));
+	// 		examDates = Array.from(uniqueDates);
 
-			// Constructing subjectData
-			subjectData = sortedData.reduce((acc, item) => {
-				if (!acc[item.subject]) {
-					acc[item.subject] = [];
-				}
-				acc[item.subject].push({
-					percentage: item.marksPercentage,
-					studentScorePercentage: item.studentScorePercentage,
-					percentile25: item.percentile25,
-					percentile50: item.percentile50,
-					percentile75: item.percentile75,
-					date: formatDateDDMonthShortYear(item.date)
-				});
-				return acc;
-			}, {});
-		} catch (err) {
-			error = err.message;
-		} finally {
-			isLoading = false;
-		}
-	}
+	// 		// Constructing subjectData
+	// 		subjectData = sortedData.reduce((acc, item) => {
+	// 			if (!acc[item.subject]) {
+	// 				acc[item.subject] = [];
+	// 			}
+	// 			acc[item.subject].push({
+	// 				percentage: item.marksPercentage,
+	// 				studentScorePercentage: item.studentScorePercentage,
+	// 				percentile25: item.percentile25,
+	// 				percentile50: item.percentile50,
+	// 				percentile75: item.percentile75,
+	// 				date: formatDateDDMonthShortYear(item.date)
+	// 			});
+	// 			return acc;
+	// 		}, {});
+	// 	} catch (err) {
+	// 		error = err.message;
+	// 	} finally {
+	// 		isLoading = false;
+	// 	}
+	// }
 
 
 	function handleApplyFilter(e) {
