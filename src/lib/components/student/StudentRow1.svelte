@@ -1,5 +1,7 @@
 <script>
 import {PerfDummyCard, ProgressTrendChart,PerformanceTable,SectionTitle} from '$lib'
+export let progressReport=[]
+export let apiError=false
 </script>
 
 <div class="flex w-full justify-center my-6">
@@ -13,6 +15,6 @@ import {PerfDummyCard, ProgressTrendChart,PerformanceTable,SectionTitle} from '$
     </div>
 </div>
 <div class="col-span-9">
-    <PerformanceTable/>
+    <PerformanceTable subjectsData={progressReport} error={apiError}/>
 </div>
 </div>

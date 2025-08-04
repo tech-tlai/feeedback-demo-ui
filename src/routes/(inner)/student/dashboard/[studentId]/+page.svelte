@@ -9,6 +9,21 @@
 	import { onDestroy } from 'svelte';
 	import { chatContextStore } from '$lib/stores/globalFilters.js';
 	import { page } from '$app/stores';
+	import { studentUploadedFiles } from '$lib/stores/studentUploadState';
+
+	let dashboardLoading = true;
+	let dashboardError = null;
+	let analyisWtStudId = {};
+	let analyisWtSubAndStudId = [];
+	let analyisWtStudIdError = null;
+	let analyisWtSubAndStudIdError = null;
+
+	let perfAnalysis = {};
+	let strengthAnalysis = {};
+	let progressReport = [];
+	let progressTrend =[];
+	let percentileTrend =[];
+
 
 	onDestroy(() => {
 		chatContextStore.set(null);
@@ -28,6 +43,85 @@
 	$: studentName = $page.url.searchParams.get('name') || '';
 	$: studentClass = $page.url.searchParams.get('class') || profileData.class_;
 	$: profilePic = $page.url.searchParams.get('img') || profileData.image;
+
+	// Generic function to POST form data to a given API route with custom params
+	async function postFormDataToApi(apiRoute, params = {}) {
+		try {
+			let files = $studentUploadedFiles;
+			let fetchOptions = {
+				method: 'POST',
+				headers: {},
+				body: undefined
+			};
+			if (files && files.length > 0) {
+				const formData = new FormData();
+				formData.append('excel_file', files[0]);
+				Object.entries(params).forEach(([key, value]) => {
+					formData.append(key, value || '');
+				});
+				fetchOptions.body = formData;
+			}
+			const res = await fetch(apiRoute, {
+				method: 'POST',
+				...fetchOptions
+			});
+			if (!res.ok) {
+				throw new Error('Something went wrong');
+			}
+			return await res.json();
+		} catch (err) {
+			throw err;
+		}
+	}
+
+	async function fetchAnalysisWithStudentId() {
+		return await postFormDataToApi('/apis/student/upload', { student_id: studentId });
+	}
+
+	async function fetchAnalysisWithStudentIdAndSubject() {
+		return await postFormDataToApi('/apis/student/upload', {
+			student_id: studentId,
+			subject: subject
+		});
+	}
+
+	async function fetchAllDashboardData() {
+		dashboardLoading = true;
+		dashboardError = null;
+		analyisWtStudIdError = false;
+		analyisWtSubAndStudIdError = false;
+
+		try {
+			const [respWithStudId, respWithStudIdAndSubj] = await Promise.allSettled([
+				fetchAnalysisWithStudentId(),
+				fetchAnalysisWithStudentIdAndSubject()
+			]);
+
+			if (respWithStudId.status === 'fulfilled') {
+				analyisWtStudId = respWithStudId.value || {};
+				perfAnalysis = analyisWtStudId?.llm_performance_analysis || {};
+				strengthAnalysis = analyisWtStudId?.topic_analysis || {};
+				progressReport = analyisWtStudId?.progressReports || [];
+				progressTrend = analyisWtStudId?.progressTrends || [];
+			} else {
+				analyisWtStudId = {};
+				analyisWtStudIdError = respWithStudId.reason?.message || 'Failed to load chart data';
+			}
+			
+			if (respWithStudIdAndSubj.status === 'fulfilled') {
+				analyisWtSubAndStudId = respWithStudIdAndSubj.value || [];
+				percentileTrend = analyisWtSubAndStudId?.percentileTrends || [];
+			} else {
+				analyisWtSubAndStudId = [];
+				analyisWtSubAndStudIdError =
+					respWithStudIdAndSubj.reason?.message || 'Failed to load performance trend';
+			}
+		} catch (err) {
+			dashboardError = err.message || 'Failed to load dashboard data';
+		} finally {
+			dashboardLoading = false;
+		}
+	}
 </script>
 
 <div class="w-full space-y-8 bg-gray-50 p-4">
@@ -35,10 +129,10 @@
 		<ProfileSection
 			profileData={{ ...profileData, name: studentName, class_: studentClass, image: profilePic }}
 		/>
-		<StudentRow1 />
-		<StudentRow2 />
-		<StudentRow3 />
-		<StudentTopicWiseAnalysis />
+		<StudentRow1 {progressReport} apiError={analyisWtStudIdError}/>
+		<StudentRow2  {progressTrend} progressTrendError={analyisWtStudIdError} {percentileTrend} percentileTrendError={analyisWtSubAndStudId}/>
+		<StudentRow3 apiError={analyisWtStudIdError} {perfAnalysis} />
+		<StudentTopicWiseAnalysis apiError={analyisWtStudIdError} {strengthAnalysis} />
 		<PerfHistorySection />
 		<GoalsSection />
 	</div>

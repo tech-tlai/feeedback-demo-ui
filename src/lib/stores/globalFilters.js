@@ -3,3 +3,4 @@ import { writable } from 'svelte/store';
 
 export const selectedClassStore = writable('');
 export const chatContextStore = writable(null);
+export const selectedStudentStore = writable('');

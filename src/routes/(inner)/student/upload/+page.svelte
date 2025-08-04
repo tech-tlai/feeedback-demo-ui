@@ -4,8 +4,9 @@
 	import CommonDashCard from '$lib/components/CommonDashCard.svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { studentUploadState } from '$lib/stores/studentUploadState.js';
+	import { studentUploadState,studentListStore, studentUploadedFiles } from '$lib/stores/studentUploadState.js';
 	import { onMount, onDestroy } from 'svelte';
+	import { selectedClassStore, selectedStudentStore } from '$lib/stores/globalFilters';
 
 	let currentStep = 0; // 0-based index for steps
 
@@ -19,14 +20,15 @@
 	let files = [];
 
 	let studentsList = [
-		{ id: 1, name: 'Aarav Nair', grade: '10', section: 'A' },
-		{ id: 2, name: 'Saanvi Das', grade: '10', section: 'A' },
-		{ id: 3, name: 'Ishaan Gupta', grade: '10', section: 'B' },
-		{ id: 4, name: 'Meera Menon', grade: '10', section: 'B' },
-		{ id: 5, name: 'Aditya Pillai', grade: '10', section: 'C' },
-		{ id: 6, name: 'Riya Sharma', grade: '10', section: 'C' },
-		{ id: 7, name: 'Krishna Reddy', grade: '10', section: 'D' }
+		{ id: 1, name: 'Aarav Nair', grade: '10', section: 'A',className:'10A' },
+		{ id: 2, name: 'Saanvi Das', grade: '10', section: 'A' ,className:'10A'},
+		{ id: 3, name: 'Ishaan Gupta', grade: '10', section: 'B',className:'10B' },
+		{ id: 4, name: 'Meera Menon', grade: '10', section: 'B',className:'10B' },
+		{ id: 5, name: 'Aditya Pillai', grade: '10', section: 'C',className:'10C' },
+		{ id: 6, name: 'Riya Sharma', grade: '10', section: 'C',className:'10C' },
+		{ id: 7, name: 'Krishna Reddy', grade: '10', section: 'D',className:'10D' }
 	];
+
 
 	// Derive step states for the indicator
 	$: stepsWithState = steps.map((step, i) => ({
@@ -35,93 +37,106 @@
 		active: i === currentStep
 	}));
 
-	async function onAnswerSheetUploadSubmit(e) {
-		files = e.detail.files;
+	// Helper to transform teachers to unique list with class_subject array
+	// function transformStudentList(teachers) {
+	// 	const studentMap = {};
+	// 	(teachers || []).forEach((t) => {
+	// 		if (!studentMap[t.studentId]) {
+	// 			studentMap[t.studentId] = {
+	// 				id: t.studentId,
+	// 				name: t.name,
+	// 				class_subject: []
+	// 			};
+	// 		}
+	// 		(t.subjects || []).forEach((subj) => {
+	// 			studentMap[t.studentId].class_subject.push({
+	// 				class: t.className,
+	// 				subject: subj
+	// 			});
+	// 		});
+	// 	});
+	// 	return Object.values(teacherMap);
+	// }
+
+	async function onStudentFileUploadSubmit(e) {
+		const files = e.detail.files;
 		const done = e.detail.done;
+
 		if (!files || files.length === 0) {
 			done && done();
 			return;
 		}
+		// Store file in the teacherUploadedFiles store (single file)
+		studentUploadedFiles.set(files);
 		const formData = new FormData();
-		files.forEach((file) => formData.append('files', file));
+		formData.append('excel_file', files[0]);
 		try {
-			// Artificial delay to simulate submission
-			await new Promise((res) => setTimeout(res, 1500));
-			const res = await fetch('/apis/teacher/upload', { method: 'POST', body: formData });
+			const res = await fetch('/apis/student/upload', { method: 'POST', body: formData });
 			if (res.ok) {
-				// Save file names/types to sessionStorage (cannot store File objects directly)
-				const fileMeta = Array.from(files).map((f) => ({
-					name: f.name,
-					type: f.type,
-					size: f.size
-				}));
-				sessionStorage.setItem('studentUploadFiles', JSON.stringify(fileMeta));
-				currentStep = 1; // Move to next step
-				// goto(`?step=1`, { replaceState: false }); // This adds to history
+				const data = await res.json();
+				// const transformed = transformStudentList(data.teachers);
+				studentListStore.set(data.students);
+				studentsList = data.students;
+				console.log('studentsList', studentsList);
+				currentStep = 1;
+				done && done();
+			} else {
+				const result = await res.json();
+				const errorMsg = result?.error || 'Upload failed. Please try again.';
+				console.log('errorMsg in uplaod', errorMsg);
+				done && done(errorMsg);
 			}
 		} catch (err) {
-			console.error('Teacher file upload failed', err);
-		} finally {
-			done && done();
+			console.error('Student master data upload failed', err);
+			done && done(err.message || 'Upload failed. Please try again.');
 		}
 	}
 
-	function handleFileRemove(e) {
-		const idx = e.detail.index;
+	function handleEntitySelected(e) {
+		const { entity, selectedEntityId, selectedEntityName, selectedEntity } = e.detail;
+		console.log('entitySelected event:', e.detail);
 
-		console.log('index', idx);
-		files = files.filter((_, i) => i !== idx);
-		console.log('files after removal', files);
-		// Update sessionStorage
-		const fileMeta = files.map((f) => ({ name: f.name, type: f.type, size: f.size }));
-		sessionStorage.setItem('studentUploadFiles', JSON.stringify(fileMeta));
+		selectedStudentStore.set({
+			className: selectedEntity.className,
+				// division: selectedEntity.className[1],
+			subject: selectedEntity.subjects?.[0],
+			studentId: selectedEntity.id,
+			fullClassName: selectedEntity.className
+		});
+		goto(
+			`/student/dashboard/${selectedEntity.id}?id=${encodeURIComponent(selectedEntity.id)}&&name=${encodeURIComponent(selectedEntity.name)}&&sub=${encodeURIComponent(selectedEntity.subject || '')}`
+		);
+		// console.log('selectedClassStore', $selectedClassStore);
+		// You can perform any logic here, but do not navigate
+		// For example, you could set a store, show a message, etc.
 	}
-
-	// Restore files from sessionStorage on mount
-	onMount(() => {
-		const saved = sessionStorage.getItem('studentUploadFiles');
-		if (saved) {
-			try {
-				files = JSON.parse(saved);
-			} catch {}
-		}
-	});
-
-	// Clear student upload data from sessionStorage on page destroy
-	onDestroy(() => {
-		sessionStorage.removeItem('studentUploadFiles');
-	});
 </script>
+
 
 <div class="px-12">
 	<StepsIndicator steps={stepsWithState} />
 	<div class="mt-16">
 		{#if currentStep === 0}
 			<FileUploadComponent
-				title="Upload Answer sheets"
-				{files}
-				on:fileUploadSubmit={onAnswerSheetUploadSubmit}
-				on:fileRemove={handleFileRemove}
+				title="Upload Students' List"
+				on:fileUploadSubmit={onStudentFileUploadSubmit}
 			/>
 		{/if}
 		{#if currentStep === 1}
 			<div class="grid max-w-md mx-auto mt-12">
 				<h3 class="text-xl font-semibold mb-4 text-black text-center">Select Student</h3>
-
 				<CommonDashCard
 					title="Student Dashboard"
-					description="Track your performance, view exam schedules, and get personalized insights."
+					description="View teacher profiles, assign classes, and monitor performance."
 					image="/students-thumbnail.png"
 					gradient="from-black/50 to-transparent"
-					fileUploadHelperText="Upload student performance data"
+					fileUploadHelperText="Upload student master data"
 					entity="student"
 					entityList={studentsList}
 					dashboardUrl="/student/dashboard"
 					comboPlaceholder="Search student..."
+					on:entitySelected={handleEntitySelected}
 				/>
-				<!-- <div class="mt-8">
-					<button on:click={() => (currentStep = 0)} class="secondary-btn">Prev</button>
-				</div> -->
 			</div>
 		{/if}
 	</div>

@@ -5,7 +5,7 @@
 	import { fetchApi } from '$lib/apiUtils.js';
 
 	let examDates = [];
-	let subjectData = {};
+	export let subjectData = {};
 	let isLoading = true;
 	let error = null;
 	const STUDENT_ID = 1;
