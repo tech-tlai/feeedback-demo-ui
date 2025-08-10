@@ -18,7 +18,8 @@ export async function POST({ request, fetch }) {
             uploadForm.append('subject', subject);
         }
         console.log('uploadForm of Student', uploadForm);
-        const BASE_URL = 'http://52.63.181.0:8000';
+        const BASE_URL = 'http://65.2.78.221:8000'
+        ;
         const apiUrl = `${BASE_URL}/v1/feedback/student`;
         const response = await fetch(apiUrl, {
             method: 'POST',

@@ -4,7 +4,11 @@
 	import CommonDashCard from '$lib/components/CommonDashCard.svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { studentUploadState,studentListStore, studentUploadedFiles } from '$lib/stores/studentUploadState.js';
+	import {
+		studentUploadState,
+		studentListStore,
+		studentUploadedFiles
+	} from '$lib/stores/studentUploadState.js';
 	import { onMount, onDestroy } from 'svelte';
 	import { selectedClassStore, selectedStudentStore } from '$lib/stores/globalFilters';
 
@@ -20,15 +24,14 @@
 	let files = [];
 
 	let studentsList = [
-		{ id: 1, name: 'Aarav Nair', grade: '10', section: 'A',className:'10A' },
-		{ id: 2, name: 'Saanvi Das', grade: '10', section: 'A' ,className:'10A'},
-		{ id: 3, name: 'Ishaan Gupta', grade: '10', section: 'B',className:'10B' },
-		{ id: 4, name: 'Meera Menon', grade: '10', section: 'B',className:'10B' },
-		{ id: 5, name: 'Aditya Pillai', grade: '10', section: 'C',className:'10C' },
-		{ id: 6, name: 'Riya Sharma', grade: '10', section: 'C',className:'10C' },
-		{ id: 7, name: 'Krishna Reddy', grade: '10', section: 'D',className:'10D' }
+		{ id: 1, name: 'Aarav Nair', grade: '10', section: 'A', className: '10A' },
+		{ id: 2, name: 'Saanvi Das', grade: '10', section: 'A', className: '10A' },
+		{ id: 3, name: 'Ishaan Gupta', grade: '10', section: 'B', className: '10B' },
+		{ id: 4, name: 'Meera Menon', grade: '10', section: 'B', className: '10B' },
+		{ id: 5, name: 'Aditya Pillai', grade: '10', section: 'C', className: '10C' },
+		{ id: 6, name: 'Riya Sharma', grade: '10', section: 'C', className: '10C' },
+		{ id: 7, name: 'Krishna Reddy', grade: '10', section: 'D', className: '10D' }
 	];
-
 
 	// Derive step states for the indicator
 	$: stepsWithState = steps.map((step, i) => ({
@@ -76,7 +79,19 @@
 				const data = await res.json();
 				// const transformed = transformStudentList(data.teachers);
 				studentListStore.set(data.students);
-				studentsList = data.students;
+				studentsList = data?.students
+					?.map((item, index) => ({ id: index, title: item.name + '-' + item.className, ...item }))
+					.sort((a, b) => {
+						// Primary sort: by className
+						const classNameComparison = a.className.localeCompare(b.className);
+
+						if (classNameComparison !== 0) {
+							return classNameComparison;
+						}
+
+						// Secondary sort: by name (only if className is the same)
+						return a.name.localeCompare(b.name);
+					});
 				console.log('studentsList', studentsList);
 				currentStep = 1;
 				done && done();
@@ -96,22 +111,21 @@
 		const { entity, selectedEntityId, selectedEntityName, selectedEntity } = e.detail;
 		console.log('entitySelected event:', e.detail);
 
-		selectedStudentStore.set({
-			className: selectedEntity.className,
-				// division: selectedEntity.className[1],
-			subject: selectedEntity.subjects?.[0],
-			studentId: selectedEntity.id,
-			fullClassName: selectedEntity.className
-		});
-		goto(
-			`/student/dashboard/${selectedEntity.id}?id=${encodeURIComponent(selectedEntity.id)}&&name=${encodeURIComponent(selectedEntity.name)}&&sub=${encodeURIComponent(selectedEntity.subject || '')}`
-		);
+		// selectedStudentStore.set({
+		// 	className: selectedEntity.className,
+		// 		// division: selectedEntity.className[1],
+		// 	subject: selectedEntity.subjects?.[0],
+		// 	studentId: selectedEntity.id,
+		// 	fullClassName: selectedEntity.className
+		// });
+		// goto(
+		// 	`/student/dashboard/${selectedEntity.id}?id=${encodeURIComponent(selectedEntity.id)}&&name=${encodeURIComponent(selectedEntity.name)}&&sub=${encodeURIComponent(selectedEntity.subject || '')}`
+		// );
 		// console.log('selectedClassStore', $selectedClassStore);
 		// You can perform any logic here, but do not navigate
 		// For example, you could set a store, show a message, etc.
 	}
 </script>
-
 
 <div class="px-12">
 	<StepsIndicator steps={stepsWithState} />
