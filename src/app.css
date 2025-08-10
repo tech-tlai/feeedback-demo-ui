@@ -10,3 +10,13 @@ body{
 .primary-btn{
     @apply px-6 py-2 text-white bg-accent-blue rounded-lg hover:bg-blue-600 disabled:bg-gray-dark
 }
+.secondary-btn{
+    @apply px-6 py-2 text-black bg-accent-blue/10 rounded-lg hover:bg-blue-600/40 disabled:bg-gray-dark
+}
+
+.link-btn{
+    @apply text-link hover:underline;
+}
+.card{
+@apply bg-white rounded-lg shadow-md p-4;
+}

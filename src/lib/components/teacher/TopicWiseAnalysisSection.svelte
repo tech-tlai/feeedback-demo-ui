@@ -6,57 +6,62 @@
 	import { fetchApi } from '$lib/apiUtils.js';
 	import { selectedClassStore, chatContextStore } from '$lib/stores/globalFilters.js';
 
-	
+	export let strengthAnalysis = {};
+	export let chartDataError = '';
 	let strengths = [];
 	let weaknesses = [];
-	let isLoadingStrengths = true;
-	let isLoadingWeaknesses = true;
+	let isLoadingStrengths = false;
+	let isLoadingWeaknesses = false;
 	let errorStrengths = null;
 	let errorWeaknesses = null;
 	let isMounted = false;
 
-	async function loadStrengths() {
-		try {
-			isLoadingStrengths = true;
-			const { className, division, subject } = $selectedClassStore;
-			const classSubject = `${className}${division}_${subject}`;
-			strengths = await fetchApi(
-				`/apis/teacher/topic-wise-analysis/strengths/${classSubject}`,
-				{
-					action: 'fetch',
-					entity: 'topic-wise strengths'
-				}
-			);
-		} catch (err) {
-			errorStrengths = err.message;
-		} finally {
-			isLoadingStrengths = false;
-		}
+	$: if (chartDataError) {
+		errorStrengths = `Failed to load key strengths data. ${chartDataError}`;
+		errorWeaknesses = `Failed to load key weaknesses data. ${chartDataError}`;
 	}
+	// async function loadStrengths() {
+	// 	try {
+	// 		isLoadingStrengths = true;
+	// 		const { className, division, subject } = $selectedClassStore;
+	// 		const classSubject = `${className}${division}_${subject}`;
+	// 		strengths = await fetchApi(
+	// 			`/apis/teacher/topic-wise-analysis/strengths/${classSubject}`,
+	// 			{
+	// 				action: 'fetch',
+	// 				entity: 'topic-wise strengths'
+	// 			}
+	// 		);
+	// 	} catch (err) {
+	// 		errorStrengths = err.message;
+	// 	} finally {
+	// 		isLoadingStrengths = false;
+	// 	}
+	// }
 
-	async function loadWeaknesses() {
-		try {
-			isLoadingWeaknesses = true;
-			const { className, division, subject } = $selectedClassStore;
-			const classSubject = `${className}${division}_${subject}`;
-			weaknesses = await fetchApi(
-				`/apis/teacher/topic-wise-analysis/weaknesses/${classSubject}`,
-				{
-					action: 'fetch',
-					entity: 'topic-wise weaknesses'
-				}
-			);
-		} catch (err) {
-			errorWeaknesses = err.message;
-		} finally {
-			isLoadingWeaknesses = false;
-		}
-	}
+	// async function loadWeaknesses() {
+	// 	try {
+	// 		isLoadingWeaknesses = true;
+	// 		const { className, division, subject } = $selectedClassStore;
+	// 		const classSubject = `${className}${division}_${subject}`;
+	// 		weaknesses = await fetchApi(
+	// 			`/apis/teacher/topic-wise-analysis/weaknesses/${classSubject}`,
+	// 			{
+	// 				action: 'fetch',
+	// 				entity: 'topic-wise weaknesses'
+	// 			}
+	// 		);
+	// 	} catch (err) {
+	// 		errorWeaknesses = err.message;
+	// 	} finally {
+	// 		isLoadingWeaknesses = false;
+	// 	}
+	// }
 
-	$: if (isMounted && $selectedClassStore) {
-		loadStrengths();
-		loadWeaknesses();
-	}
+	// $: if (isMounted && $selectedClassStore) {
+	// 	loadStrengths();
+	// 	loadWeaknesses();
+	// }
 
 	function transformData(data, attribute) {
 		if (!data || !Array.isArray(data)) {
@@ -78,9 +83,21 @@
 	$: transformedStrengths = transformData(strengths, 'Strengths');
 	$: transformedWeaknesses = transformData(weaknesses, 'Weaknesses');
 
+
+	// Map strengthAnalysis.strong_topics and challenging_topics to strengths and weaknesses
+	$: strengths = (strengthAnalysis.strong_topics || []).map((t) => ({
+		name: t.name,
+		value: t.accuracy
+	}));
+	$: weaknesses = (strengthAnalysis.challenging_topics || []).map((t) => ({
+		name: t.name,
+		value: t.accuracy
+	}));
+
 	onMount(() => {
 		isMounted = true;
 	});
+
 </script>
 
 <div class="flex w-full justify-center my-6">
@@ -106,7 +123,14 @@
 	{#if isLoadingStrengths}
 		<SkelClassSummary />
 	{:else if errorStrengths}
-		<ErrorComponent message={errorStrengths} />
+		<div class="min-h-40 h-full text-sm bg-white p-4 rounded-lg shadow-sm">
+			<!-- <div class="flex justify-between items-center mb-4">
+				<h4 class="text-black font-bold">{'Key Weaknesses'}</h4>
+			</div> -->
+			<div class=" text-red-500 mb-4 flex gap-4 items-center">
+				<div class="grid 6">{errorStrengths}</div>
+			</div>
+		</div>
 	{:else}
 		<TopicWiseAnalysis
 			dataForChart={transformedStrengths}
@@ -121,7 +145,14 @@
 	{#if isLoadingWeaknesses}
 		<SkelClassSummary />
 	{:else if errorWeaknesses}
-		<ErrorComponent message={errorWeaknesses} />
+		<div class="min-h-40 h-full text-sm bg-white p-4 rounded-lg shadow-sm">
+			<!-- <div class="flex justify-between items-center mb-4">
+				<h4 class="text-black font-bold">{'Key Weaknesses'}</h4>
+			</div> -->
+			<div class=" text-red-500 mb-4 flex gap-4 items-center">
+				<div class="grid 6">{errorWeaknesses}</div>
+			</div>
+		</div>
 	{:else}
 		<TopicWiseAnalysis
 			dataForChart={transformedWeaknesses}

@@ -15,10 +15,10 @@ async function onTeacherFileUploadSubmit(e) {
 	try {
 		// Artificial delay to simulate submission
 		await new Promise(res => setTimeout(res, 1500));
-		// const res = await fetch('/apis/teacher/upload', { method: 'POST', body: formData });
-		teacherFilesUploaded = true;
-		checkEnableGenerate();
+		const res = await fetch('/apis/teacher/upload', { method: 'POST', body: formData });
 		if (res.ok) {
+			teacherFilesUploaded = true;
+			checkEnableGenerate();
 		}
 	} catch (err) {
 		console.error('Teacher file upload failed', err);
@@ -36,10 +36,10 @@ async function onAnswerFileUploadSubmit(e) {
 	try {
 		// Artificial delay to simulate submission
 		await new Promise(res => setTimeout(res, 1500));
-		// const res = await fetch('/apis/data-upload/answers', { method: 'POST', body: formData });
-		answerFilesUploaded = true;
-		checkEnableGenerate();
+		const res = await fetch('/apis/data-upload/answers', { method: 'POST', body: formData });
 		if (res.ok) {
+			answerFilesUploaded = true;
+			checkEnableGenerate();
 		}
 	} catch (err) {
 		console.error('Answer file upload failed', err);
@@ -70,5 +70,5 @@ function handleGenerateFeedback() {
 	</div>
 </div>
 <div class="w-full flex justify-center">
-    <button class="primary-btn "  on:click={handleGenerateFeedback}>Generate Feedback</button>
+    <button class="primary-btn " disabled={generateBtnDisabled} on:click={handleGenerateFeedback}>Generate Feedback</button>
 </div>

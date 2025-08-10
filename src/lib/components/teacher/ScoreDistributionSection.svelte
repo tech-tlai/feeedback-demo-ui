@@ -1,5 +1,9 @@
 <script>
     import {StudentDistribution, AvgMaxMin, SectionTitle} from "$lib"
+    import V2_StudentDistribution from "$lib/components/teacher/charts/V2_StudentDistribution.svelte"
+    export let avgMaxMin={}
+    export let sectionWiseData ={}
+    export let sectionWiseError =""
 </script>
 
 <div class="flex w-full justify-center my-6">
@@ -7,9 +11,10 @@
 </div>
 <div class="grid grid-cols-12 gap-5">
     <div class="col-span-4">
-        <StudentDistribution />
+        <!-- <StudentDistribution /> -->
+         <V2_StudentDistribution error={sectionWiseError ?`Failed to load student distribution data. ${sectionWiseError}` : ''} {sectionWiseData}/>
     </div>
     <div class="col-span-6">
-        <AvgMaxMin />
+        <AvgMaxMin  {avgMaxMin}/>
     </div>
 </div>

@@ -26,7 +26,7 @@
 			error=null;
 			const { className, division, subject } = $selectedClassStore;
 			const classSubject = `${className}${division}_${subject}`;
-			const data = await fetchApi(`/apis/teacher/student-distribution/${classSubject}`, {
+			const data = await fetchApi(`/apis/teacher/student-distribution/3A_English`, {
 				action: 'fetch',
 				entity: 'student distribution'
 			});

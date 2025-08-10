@@ -11,54 +11,54 @@
 		{ label: 'Pass Percentage', value: 82, period: 'Last 5 tests' }
 	];
 
-	let isLoading = true;
-	let error = null;
+	let isLoading = false;
+	export let error = null;
 	let isMounted = false;
 	let unsubscribe;
 
-	async function fetchPerformanceSummary() {
-		isLoading = true;
-		error = null;
-		try {
-			const { className, division, subject } = $selectedClassStore;
-			const classSubject = `${className}${division}_${subject}`;
-			const data = await fetchApi(`/apis/teacher/perf-summary/${classSubject}`, {
-				action: 'fetch',
-				entity: 'performance summary'
-			});
-			
-			
-			studentCount = data.studentCount || studentCount;
-			indicators = data.indicators || indicators;
-		} catch (err) {
-			error = err.message;
-		} finally {
-			isLoading = false;
-		}
-	}
+	// async function fetchPerformanceSummary() {
+	// 	isLoading = true;
+	// 	error = null;
+	// 	try {
+	// const { className, division, subject } = $selectedClassStore;
+	// const classSubject = `${className}${division}_${subject}`;
+	// const data = await fetchApi(`/apis/teacher/perf-summary/${classSubject}`, {
+	// 	action: 'fetch',
+	// 	entity: 'performance summary'
+	// });
+	//
+	// studentCount = data.studentCount || studentCount;
+	// indicators = data.indicators || indicators;
+	// 	} catch (err) {
+	// 		error = err.message;
+	// 	} finally {
+	// 		isLoading = false;
+	// 	}
+	// }
 
-	$: if (isMounted && $selectedClassStore) {
-		fetchPerformanceSummary($selectedClassStore);
-	}
+	// $: if (isMounted && $selectedClassStore) {
+	// 	fetchPerformanceSummary($selectedClassStore);
+	// }
 
 	onMount(() => {
 		isMounted = true;
 	});
+	$: console.log('selectedClassStore', $selectedClassStore);
 </script>
 
 <Card>
-	<div class="h-full flex flex-col justify-between">
+	<div class="h-full flex flex-col justify-between text-sm">
 		<div class="flex justify-between items-center mb-4">
 			<h2 class="text-black text-sm font-bold">Performance Summary</h2>
 		</div>
 		{#if isLoading}
 			<div class="p-4 text-center">Loading...</div>
 		{:else if error}
-			<div class="p-4 text-center text-red-500">{error}</div>
+			<div class="p-4 text-center text-red-500 text-sm">{error}</div>
 		{:else}
 			<div>
 				<h4 class="text-2xl font-bold text-accent-blue mb-2">
-					Class: {$selectedClassStore.fullClassName?$selectedClassStore.fullClassName :''}
+					Class: {$selectedClassStore.fullClassName ? $selectedClassStore.fullClassName : ''}
 				</h4>
 				<div class="flex items-center mb-8">
 					<svg

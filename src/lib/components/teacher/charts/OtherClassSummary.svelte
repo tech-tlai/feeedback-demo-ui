@@ -5,7 +5,7 @@
       { name: "English", score: 64.5 },
       { name: "Social science", score: 58.5 }
     ];
-    export let testPeriod = "last 5 tests";
+    export let testPeriod = "last 3 tests";
   </script>
   
   <div class="bg-white rounded-xl p-4 shadow-sm max-w-[280px] min-w-[225px] flex-1">

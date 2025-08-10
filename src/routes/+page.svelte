@@ -1,4 +1,9 @@
 <script>
+	import Header from '$lib/components/Header.svelte';
+	import DummyBarChart from '$lib/components/charts/DummyBarChart.svelte';
+	import { CommonDashCard, MultiFileUpload } from '$lib';
+	import { ProductFeatures, UploadSteps } from '$lib/components/landing-page';
+	import ContentUploadSection from '$lib/components/landing-page/ContentUploadSection.svelte';
 	import {
 		Upload,
 		BarChart3,
@@ -12,12 +17,7 @@
 		Target,
 		Award
 	} from 'lucide-svelte';
-
 	import { goto } from '$app/navigation';
-	import DummyBarChart from '$lib/components/charts/DummyBarChart.svelte';
-	import { CommonDashCard, MultiFileUpload } from '$lib';
-	import { ProductFeatures, UploadSteps } from '$lib/components/landing-page';
-	import ContentUploadSection from '$lib/components/landing-page/ContentUploadSection.svelte';
 
 	function handleFileUpload(e) {
 		goto('/dashboard-portal');
@@ -37,61 +37,18 @@
 	function scrollToSection(sectionId) {
 		document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
 	}
+
+	const navItems = [
+		// { label: 'Features', href: '#features' },
+		// { label: 'Upload', href: '#upload' },
+		// { label: 'Start Analysis', href: '/dashboad-portal?#content-section', cta: true }
+	];
+	const actionButtons = [{ label: 'Analyse', href: '/dashboard-portal?#content-section', type: 'primary' }];
 </script>
 
 <div class="min-h-screen bg-white">
 	<!-- Header -->
-	<header class="bg-white shadow-lg relative overflow-hidden">
-		<div class="absolute inset-0 bg-gradient-to-r from-white to-accent-blue/20"></div>
-		<div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-			<div class="flex justify-between items-center py-6">
-				<div class="flex items-center">
-					<div class="">
-						<BarChart3 class="h-6 w-6 text-black" />
-					</div>
-					<span class="ml-3 text-xl font-bold text-black">EduMetrics</span>
-				</div>
-
-				<nav class="hidden md:flex space-x-8">
-					<a href="#">
-						<button
-							onclick={() => scrollToSection('features')}
-							class="text-black hover:text-black/80 transition-colors"
-						>
-							Features
-						</button>
-					</a>
-					<a href="#upload">
-						<button
-							onclick={() => scrollToSection('upload')}
-							class="text-black hover:text-black/80 transition-colors"
-						>
-							Upload
-						</button>
-					</a>
-					<!-- <button
-						onclick={() => scrollToSection('analytics')}
-						class="text-gray-light hover:text-white transition-colors"
-					>
-						Analytics
-					</button>
-					<button
-						onclick={() => scrollToSection('contact')}
-						class="text-gray-light hover:text-white transition-colors"
-					>
-						Contact
-					</button> -->
-				</nav>
-				<a href="#upload">
-					<button
-						class=" bg-black/80 text-white border-0 px-6 py-2 rounded-lg font-medium text-base transition-all"
-					>
-						Start Analysis
-					</button>
-				</a>
-			</div>
-		</div>
-	</header>
+	<Header {navItems} {actionButtons} />
 
 	<!-- Hero Section -->
 	<section class="relative py-24 bg-gradient-to-br from-white to-accent-blue/30">
@@ -120,7 +77,7 @@
 						drive educational excellence with our cutting-edge platform.
 					</p>
 					<div class="flex flex-col sm:flex-row gap-4">
-						<a href="#upload">
+						<a href="/dashboard-portal">
 							<button
 								class=" bg-black/80 text-white border-0 px-8 py-3 rounded-lg font-medium text-lg transition-all"
 							>
@@ -146,7 +103,7 @@
 	</section>
 
 	<!-- File Upload Section -->
-	<section id="upload" class="py-20 bg-gray-light/30">
+	<!-- <section id="upload" class="py-20 bg-gray-light/30">
 		<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
 			<div class="text-center mb-8">
 				<div
@@ -161,10 +118,10 @@
 				</p>
 			</div>
 
-			<!-- <UploadSteps/> -->
+			
 			<ContentUploadSection onFileUploadSubmit={handleFileUpload} />
 		</div>
-	</section>
+	</section> -->
 
 	<!-- Features Grid -->
 	<ProductFeatures />

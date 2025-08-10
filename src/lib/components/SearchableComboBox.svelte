@@ -17,15 +17,14 @@
 	let debounceTimer;
 	let dropdownPosition = 'bottom'; // 'bottom' or 'top'
 
-	$:if (options?.length === 0) {
+	$: if (options?.length === 0) {
 		if (!selectedItemName && !selectedItemId) {
 			selectedItemName = '';
-		selectedItemId = '';
-		searchFilterValue = '';
-		showDropdown = false;
+			selectedItemId = '';
+			searchFilterValue = '';
+			showDropdown = false;
 		}
-		
-	} 
+	}
 
 	// Update `optionsCopy` dynamically based on the `searchFilterValue`
 	$: optionsCopy = searchFilterValue
@@ -37,8 +36,7 @@
 	// If no options match, the user's input stays in the field and dropdown remains open
 	$: if (optionsCopy.length === 0 && searchFilterValue) {
 		showDropdown = true;
-	} 
-
+	}
 
 	onMount(() => {
 		document.addEventListener('click', handleClickOnDocument);
@@ -62,7 +60,17 @@
 		selectedItemName = selectedData.name;
 		searchFilterValue = selectedItemName;
 		showDropdown = false;
-		dispatch('handleDispatchComboBoxData', { selectedItemId, selectedItemName });
+		// dispatch('handleDispatchComboBoxData', { ...selectedData, selectedItemId: selectedData.id, selectedItemName:selectedData.name });
+		// Find the full object from options
+		const selectedObj = options.find(
+			(opt) => opt?.id?.toString() === selectedItemId || opt?.uuid?.toString() === selectedItemId
+		);
+
+		dispatch('handleDispatchComboBoxData', {
+			itemDetails: selectedObj,
+			selectedItemId: selectedItemId,
+			selectedItemName: selectedItemName
+		});
 	}
 
 	function clearSelection() {
@@ -99,12 +107,16 @@
 		clearTimeout(debounceTimer);
 		debounceTimer = setTimeout(() => {
 			searchFilterValue = value;
-		}, 300); }
+		}, 300);
+	}
 </script>
 
 <div>
 	{#if label}
-		<label for={filterCategory} class="block text-xs sm:text-sm font-medium leading-5 text-darkGray">
+		<label
+			for={filterCategory}
+			class="block text-xs sm:text-sm font-medium leading-5 text-darkGray"
+		>
 			{label}
 		</label>
 	{/if}
@@ -126,7 +138,7 @@
 		{#if selectedItemName && showDropdown && !disabled}
 			<button
 				type="button"
-				class="absolute inset-y-0 right-0 flex items-center px-2 focus:outline-none "
+				class="absolute inset-y-0 right-0 flex items-center px-2 focus:outline-none"
 				on:click={clearSelection}
 			>
 				<svg
@@ -172,10 +184,13 @@
 					/>
 				</svg>
 			</button>
-		{/if}		
+		{/if}
 		{#if showDropdown && !disabled}
 			<ul
-				class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm {dropdownPosition === 'top' ? 'bottom-full mb-1' : 'top-full mt-1'}"
+				class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm {dropdownPosition ===
+				'top'
+					? 'bottom-full mb-1'
+					: 'top-full mt-1'}"
 				id="options"
 				role="listbox"
 				on:click={handleListItemSelection}

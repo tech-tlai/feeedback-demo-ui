@@ -12,6 +12,7 @@ import ContextMenu from '$lib/components/ContextMenu.svelte';
 import Button from '$lib/components/Button.svelte';
 import Datatable from '$lib/components/Datatable.svelte';
 import FileUpload from '$lib/components/FileUpload.svelte';
+import FileUploadComponent from '$lib/components/FileUploadComponent.svelte';
 import FilterDropdown from '$lib/components/FilterDropdown.svelte';
 import LegacyDatatable from '$lib/components/LegacyDatatable.svelte';
 import LegacyTabs from '$lib/components/LegacyTabs.svelte';
@@ -30,6 +31,7 @@ export {
     Button,
     Datatable,
     FileUpload,
+    FileUploadComponent,
     FilterDropdown,
     LegacyDatatable,
     LegacyTabs,

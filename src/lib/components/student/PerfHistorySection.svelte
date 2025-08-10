@@ -15,6 +15,8 @@
 				action: 'fetch',
 				entity: 'performance history'
 			});
+
+			console.log('perfHistory', perfHistory);
 		} catch (err) {
 			error = err.message;
 		} finally {

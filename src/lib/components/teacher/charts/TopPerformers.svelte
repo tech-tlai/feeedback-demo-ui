@@ -8,12 +8,11 @@
 	import { onMount } from 'svelte';
 
 	const chartTitle = 'Top Performers';
-	let studentData = [];
-	let isLoading = true;
-	let error = null;
+	export let error = null;
+	export let studentData = [];
+	let isLoading = false;
 	let searchValue = '';
 	let isMounted = false;
-
 
 	const markThresholds = {
 		poor: 50,
@@ -25,13 +24,16 @@
 	}
 
 	let customRenderers = {
-		percentage: (data) => `
+		percentage: (data) => {
+			const percentage = data.percentage.toFixed(2);
+			return `
       <div>
-		<span class="inline-block px-3 py-1 rounded-full text-center min-w-[60px] ${getMarkColor(data.percentage, markThresholds)}"}>
-				${data.percentage}
+		<span class="inline-block px-3 py-1 rounded-full text-center min-w-[60px] ${getMarkColor(percentage, markThresholds)}"}>
+				${percentage}
 			</span>
 		</div>
-    `
+    `;
+		}
 	};
 
 	let tableData = [];
@@ -52,7 +54,7 @@
 	}
 
 	async function createTableData() {
-		if (!studentData?.error)
+		if (!studentData?.error) {
 			// Format data for display
 			tableData = studentData?.map((student) => ({
 				...student,
@@ -63,32 +65,32 @@
 				rank: student?.rank,
 				percentage: student?.percentage
 			}));
-		else {
+			console.log('tableData', tableData);
+		} else {
 			tableData = [];
 		}
 	}
 
-
-	async function fetchTopPerformers() {
-		try {
-			isLoading=true;
-			error=null;
-			const { className, division, subject } = $selectedClassStore;
-			const classSubject = `${className}${division}_${subject}`;
-			studentData = await fetchApi(`/apis/teacher/top-perf-students/${classSubject}`, {
-				action: 'fetch',
-				entity: 'top performers'
-			});
-		} catch (err) {
-			error = err.message;
-		} finally {
-			isLoading = false;
-		}
-		createTableData();
-	}
+	// async function fetchTopPerformers() {
+	// 	try {
+	// 		isLoading=true;
+	// 		error=null;
+	// 		const { className, division, subject } = $selectedClassStore;
+	// 		const classSubject = `${className}${division}_${subject}`;
+	// 		studentData = await fetchApi(`/apis/teacher/top-perf-students/${classSubject}`, {
+	// 			action: 'fetch',
+	// 			entity: 'top performers'
+	// 		});
+	// 	} catch (err) {
+	// 		error = err.message;
+	// 	} finally {
+	// 		isLoading = false;
+	// 	}
+	// 	createTableData();
+	// }
 
 	$: if (isMounted && $selectedClassStore) {
-		fetchTopPerformers();
+		createTableData();
 	}
 
 	onMount(() => {
@@ -107,7 +109,7 @@
 		</div>
 
 		<div class="chart-meta text-gray-dark text-sm flex gap-4">
-			<span>{$selectedClassStore.fullClassName ?$selectedClassStore.fullClassName :''}</span>
+			<span>{$selectedClassStore.fullClassName ? $selectedClassStore.fullClassName : ''}</span>
 			<span>Total: {studentData.length}</span>
 		</div>
 	</div>
@@ -134,6 +136,7 @@
 			searchParameter="name"
 			{searchValue}
 			{customRenderers}
+			notFoundMessage={"No student found"}
 		/>
 	{/if}
 </div>

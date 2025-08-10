@@ -68,6 +68,8 @@
   });
 
   function createBubbleChart() {
+    if (!data || !Array.isArray(data.children) || data.children.length === 0) return;
+
     // Clear previous chart if any
     d3.select(chartContainer).selectAll("*").remove();
     

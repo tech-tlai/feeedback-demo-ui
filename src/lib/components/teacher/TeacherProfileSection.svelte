@@ -18,8 +18,9 @@
 		image: '/sandeep_pic.png'
 	};
 	// Sample class data for the horizontal scrollable area
-	export let classes = [];
-
+	export let allClassesSummary = [];
+	export let chartDataError = '';
+	
 	let chatHistory = [];
 	let pinnedChats = [];
 	let selectedTab = 0;
@@ -115,7 +116,8 @@
 
 	function handlePinChat(chat) {
 		if (!pinnedChats.some((c) => (c.id || c.uuid) === (chat.id || chat.uuid))) {
-			const maxOrder = pinnedChats.length > 0 ? Math.max(...pinnedChats.map(c => c.order || 1)) : 1;
+			const maxOrder =
+				pinnedChats.length > 0 ? Math.max(...pinnedChats.map((c) => c.order || 1)) : 1;
 			const order = maxOrder + 1;
 			pinnedChats = [...pinnedChats, { ...chat, order }];
 			selectedTab = 1;
@@ -149,8 +151,9 @@
 				action: 'fetch',
 				entity: 'chat history'
 			});
-			
-			chatHistory = data;
+
+			// chatHistory = data;
+			chatHistory = [];
 		} catch (err) {
 			chatHistoryError = err.message;
 		} finally {
@@ -186,7 +189,12 @@
 	<div class="lg:col-span-9 space-y-5 h-full">
 		<div class="flex flex-col gap-4 h-full">
 			<!-- Horizontal Scrollable Class Cards -->
-			<AllClassesSummary />
+			<AllClassesSummary
+				classes={allClassesSummary}
+				error={chartDataError
+					? `Failed to load all classes performance summary. ${chartDataError}`
+					: ''}
+			/>
 			<div class=" flex-grow">
 				<ChatInterface
 					aiResponse={chatDetails}

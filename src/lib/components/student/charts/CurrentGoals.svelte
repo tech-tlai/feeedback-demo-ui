@@ -7,7 +7,7 @@
 	let goalsData = [];
 	let isLoading = true;
 	let error = null;
-	const STUDENT_ID=1
+	const STUDENT_ID = 1;
 
 	onMount(async () => {
 		try {
@@ -15,6 +15,7 @@
 				action: 'fetch',
 				entity: 'current goals'
 			});
+			console.log('goalsData', goalsData);
 		} catch (err) {
 			error = err.message;
 		} finally {
