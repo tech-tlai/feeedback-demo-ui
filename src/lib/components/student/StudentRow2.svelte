@@ -4,9 +4,9 @@
 		AllSubjectsPercentileTrend
 	} from '$lib';
 
-export let progressTrend=[]
-export let percentileTrend=[]
-export let percentileTrendError=false
+export let progressTrend={}
+// export let percentileTrend=[]
+// export let percentileTrendError=false
 export let progressTrendError=false
 </script>
 
@@ -14,7 +14,7 @@ export let progressTrendError=false
 	<div class="col-span-6">
 		<AllSubjectsProgressTrend subjectData={progressTrend} error={progressTrendError}/>
 	</div>
-	<div class="col-span-6">
+	<!-- <div class="col-span-6">
 		<AllSubjectsPercentileTrend subjectData={percentileTrend} error={percentileTrendError} />
-	</div>
+	</div> -->
 </div>

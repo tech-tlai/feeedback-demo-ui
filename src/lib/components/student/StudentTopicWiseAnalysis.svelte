@@ -9,15 +9,15 @@
 	export let apiError = false;
 	let strengths = [];
 	let weaknesses = [];
-	let isLoadingStrengths = true;
-	let isLoadingWeaknesses = true;
+	let isLoadingStrengths = false;
+	let isLoadingWeaknesses = false;
 	let errorStrengths = null;
 	let errorWeaknesses = null;
 
 	const STUDENT_ID = 1;
 	$: if (apiError) {
-		errorStrengths = `Failed to load key strengths data. ${chartDataError}`;
-		errorWeaknesses = `Failed to load key weaknesses data. ${chartDataError}`;
+		errorStrengths = `Failed to load key strengths data. `;
+		errorWeaknesses = `Failed to load key weaknesses data. `;
 	}
 
 	// Map strengthAnalysis.strong_topics and challenging_topics to strengths and weaknesses

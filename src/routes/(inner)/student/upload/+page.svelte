@@ -11,6 +11,7 @@
 	} from '$lib/stores/studentUploadState.js';
 	import { onMount, onDestroy } from 'svelte';
 	import { selectedClassStore, selectedStudentStore } from '$lib/stores/globalFilters';
+	import { getStudentDashboardUrl } from '$lib/utils.js';
 
 	let currentStep = 0; // 0-based index for steps
 
@@ -78,7 +79,7 @@
 			if (res.ok) {
 				const data = await res.json();
 				// const transformed = transformStudentList(data.teachers);
-				studentListStore.set(data.students);
+				
 				studentsList = data?.students
 					?.map((item, index) => ({ id: index, title: item.name + '-' + item.className, ...item }))
 					.sort((a, b) => {
@@ -92,7 +93,7 @@
 						// Secondary sort: by name (only if className is the same)
 						return a.name.localeCompare(b.name);
 					});
-				console.log('studentsList', studentsList);
+					studentListStore.set(studentsList);
 				currentStep = 1;
 				done && done();
 			} else {
@@ -109,19 +110,29 @@
 
 	function handleEntitySelected(e) {
 		const { entity, selectedEntityId, selectedEntityName, selectedEntity } = e.detail;
-		console.log('entitySelected event:', e.detail);
 
-		// selectedStudentStore.set({
-		// 	className: selectedEntity.className,
-		// 		// division: selectedEntity.className[1],
-		// 	subject: selectedEntity.subjects?.[0],
-		// 	studentId: selectedEntity.id,
-		// 	fullClassName: selectedEntity.className
-		// });
+		const defaultSelectedSubj = selectedEntity.subjects?.[0] ? selectedEntity.subjects?.[0] : null;
+
+		selectedStudentStore.set({
+			studentId: selectedEntity.studentId,
+			className: selectedEntity.className,
+			// division: selectedEntity.className[1],
+			allSubjects: selectedEntity.subjects,
+			selectedSubject: defaultSelectedSubj,
+			fullClassName: selectedEntity.className
+		});
+		// console.log('selectedStudentStore', $selectedStudentStore);
+		goto(
+			getStudentDashboardUrl({
+				studentId: selectedEntity.studentId,
+				name: selectedEntity.name,
+				subject: defaultSelectedSubj || '',
+				allSubjects: selectedEntity?.subjects
+			})
+		);
 		// goto(
-		// 	`/student/dashboard/${selectedEntity.id}?id=${encodeURIComponent(selectedEntity.id)}&&name=${encodeURIComponent(selectedEntity.name)}&&sub=${encodeURIComponent(selectedEntity.subject || '')}`
+		// 	`/student/dashboard/${selectedEntity.studentId}?id=${encodeURIComponent(selectedEntity.studentId)}&&name=${encodeURIComponent(selectedEntity.name)}&&sub=${encodeURIComponent(defaultSelectedSubj || '')}`
 		// );
-		// console.log('selectedClassStore', $selectedClassStore);
 		// You can perform any logic here, but do not navigate
 		// For example, you could set a store, show a message, etc.
 	}

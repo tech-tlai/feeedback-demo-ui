@@ -6,13 +6,16 @@
 	import StudentTopicWiseAnalysis from '$lib/components/student/StudentTopicWiseAnalysis.svelte';
 	import PerfHistorySection from '$lib/components/student/PerfHistorySection.svelte';
 	import GoalsSection from '$lib/components/student/GoalsSection.svelte';
-	import { onDestroy } from 'svelte';
-	import { chatContextStore } from '$lib/stores/globalFilters.js';
+	import { onDestroy, onMount } from 'svelte';
+	import { chatContextStore, selectedStudentStore } from '$lib/stores/globalFilters.js';
 	import { page } from '$app/stores';
 	import { studentUploadedFiles } from '$lib/stores/studentUploadState';
+	import SubjectWiseSection from '$lib/components/student/SubjectWiseSection.svelte';
+	import AnimLoader from '$lib/components/AnimLoader.svelte';
 
 	let dashboardLoading = true;
 	let dashboardError = null;
+	let subWiseChartsLoading = true;
 	let analyisWtStudId = {};
 	let analyisWtSubAndStudId = [];
 	let analyisWtStudIdError = null;
@@ -21,9 +24,9 @@
 	let perfAnalysis = {};
 	let strengthAnalysis = {};
 	let progressReport = [];
-	let progressTrend =[];
-	let percentileTrend =[];
-
+	let progressTrend = [];
+	let percentileTrend = [];
+	let selectedSubject = '';
 
 	onDestroy(() => {
 		chatContextStore.set(null);
@@ -40,6 +43,8 @@
 	};
 
 	$: studentId = $page.params.studentId;
+	// $: selectedSubject = $page.url.searchParams.get('sub') || '';
+	$: allSubjects = $page.url.searchParams.get('subjects') || '';
 	$: studentName = $page.url.searchParams.get('name') || '';
 	$: studentClass = $page.url.searchParams.get('class') || profileData.class_;
 	$: profilePic = $page.url.searchParams.get('img') || profileData.image;
@@ -47,28 +52,48 @@
 	// Generic function to POST form data to a given API route with custom params
 	async function postFormDataToApi(apiRoute, params = {}) {
 		try {
-			let files = $studentUploadedFiles;
-			let fetchOptions = {
-				method: 'POST',
-				headers: {},
-				body: undefined
-			};
-			if (files && files.length > 0) {
+			const testing = true; // Set to false for production
+			if (testing) {
+				// Use static file for testing
+				const response = await fetch('/7_8_data.xlsx');
+				const blob = await response.blob();
 				const formData = new FormData();
-				formData.append('excel_file', files[0]);
+				formData.append('excel_file', blob, '7_8_data.xlsx');
 				Object.entries(params).forEach(([key, value]) => {
 					formData.append(key, value || '');
 				});
-				fetchOptions.body = formData;
+				const res = await fetch(apiRoute, {
+					method: 'POST',
+					body: formData
+				});
+				if (!res.ok) {
+					throw new Error('Something went wrong');
+				}
+				return await res.json();
+			} else {
+				let files = $studentUploadedFiles;
+				let fetchOptions = {
+					method: 'POST',
+					headers: {},
+					body: undefined
+				};
+				if (files && files.length > 0) {
+					const formData = new FormData();
+					formData.append('excel_file', files[0]);
+					Object.entries(params).forEach(([key, value]) => {
+						formData.append(key, value || '');
+					});
+					fetchOptions.body = formData;
+				}
+				const res = await fetch(apiRoute, {
+					method: 'POST',
+					...fetchOptions
+				});
+				if (!res.ok) {
+					throw new Error('Something went wrong');
+				}
+				return await res.json();
 			}
-			const res = await fetch(apiRoute, {
-				method: 'POST',
-				...fetchOptions
-			});
-			if (!res.ok) {
-				throw new Error('Something went wrong');
-			}
-			return await res.json();
 		} catch (err) {
 			throw err;
 		}
@@ -81,7 +106,7 @@
 	async function fetchAnalysisWithStudentIdAndSubject() {
 		return await postFormDataToApi('/apis/student/upload', {
 			student_id: studentId,
-			subject: subject
+			subject: selectedSubject
 		});
 	}
 
@@ -89,51 +114,104 @@
 		dashboardLoading = true;
 		dashboardError = null;
 		analyisWtStudIdError = false;
-		analyisWtSubAndStudIdError = false;
+		// analyisWtSubAndStudIdError = false;
 
 		try {
-			const [respWithStudId, respWithStudIdAndSubj] = await Promise.allSettled([
-				fetchAnalysisWithStudentId(),
-				fetchAnalysisWithStudentIdAndSubject()
+			const [respWithStudId] = await Promise.allSettled([
+				fetchAnalysisWithStudentId()
+				// fetchAnalysisWithStudentIdAndSubject()
 			]);
 
 			if (respWithStudId.status === 'fulfilled') {
 				analyisWtStudId = respWithStudId.value || {};
 				perfAnalysis = analyisWtStudId?.llm_performance_analysis || {};
-				strengthAnalysis = analyisWtStudId?.topic_analysis || {};
+				// strengthAnalysis = analyisWtStudId?.topic_analysis || {};
 				progressReport = analyisWtStudId?.progressReports || [];
 				progressTrend = analyisWtStudId?.progressTrends || [];
 			} else {
 				analyisWtStudId = {};
 				analyisWtStudIdError = respWithStudId.reason?.message || 'Failed to load chart data';
 			}
-			
-			if (respWithStudIdAndSubj.status === 'fulfilled') {
-				analyisWtSubAndStudId = respWithStudIdAndSubj.value || [];
-				percentileTrend = analyisWtSubAndStudId?.percentileTrends || [];
-			} else {
-				analyisWtSubAndStudId = [];
-				analyisWtSubAndStudIdError =
-					respWithStudIdAndSubj.reason?.message || 'Failed to load performance trend';
-			}
+
+			// if (respWithStudIdAndSubj?.status === 'fulfilled') {
+			// 	analyisWtSubAndStudId = respWithStudIdAndSubj.value || [];
+			// 	percentileTrend = analyisWtSubAndStudId?.percentileTrends || [];
+			// } else {
+			// 	analyisWtSubAndStudId = [];
+			// 	analyisWtSubAndStudIdError =
+			// 		respWithStudIdAndSubj?.reason?.message || 'Failed to load performance trend';
+			// }
 		} catch (err) {
 			dashboardError = err.message || 'Failed to load dashboard data';
 		} finally {
 			dashboardLoading = false;
 		}
 	}
+
+	async function fetchSubjectWiseData() {
+		subWiseChartsLoading = true;
+
+		analyisWtSubAndStudIdError = false;
+
+		try {
+			const res = await postFormDataToApi('/apis/student/upload', {
+				student_id: studentId,
+				subject: selectedSubject
+			});
+
+			const respWithStudIdAndSubj = res;
+			analyisWtSubAndStudId = respWithStudIdAndSubj || [];
+			percentileTrend = analyisWtSubAndStudId?.percentileTrends || [];
+			strengthAnalysis = analyisWtSubAndStudId?.topic_analysis || {};
+		} catch (err) {
+			analyisWtSubAndStudIdError = err.message || 'Failed to load dashboard data';
+			console.error('Dashboard error occured', err);
+		} finally {
+			subWiseChartsLoading = false;
+		}
+	}
+
+	function handleSubjectSelection(e){
+		const { index, tab } = e.detail;
+		selectedSubject = tab.text;
+	}
+	
+	let isMounted = false;
+
+	onMount(() => {
+		isMounted = true;
+		selectedSubject = $page.url.searchParams.get('sub') || '';
+		fetchAllDashboardData();
+	});
+
+	$: if (selectedSubject) {
+		fetchSubjectWiseData();
+	}
 </script>
 
 <div class="w-full space-y-8 bg-gray-50 p-4">
-	<div class="mx-auto flex max-w-[1400px] flex-col gap-5">
-		<ProfileSection
-			profileData={{ ...profileData, name: studentName, class_: studentClass, image: profilePic }}
-		/>
-		<StudentRow1 {progressReport} apiError={analyisWtStudIdError}/>
-		<StudentRow2  {progressTrend} progressTrendError={analyisWtStudIdError} {percentileTrend} percentileTrendError={analyisWtSubAndStudId}/>
-		<StudentRow3 apiError={analyisWtStudIdError} {perfAnalysis} />
-		<StudentTopicWiseAnalysis apiError={analyisWtStudIdError} {strengthAnalysis} />
-		<PerfHistorySection />
-		<GoalsSection />
-	</div>
+	{#if dashboardLoading}
+		<div class="flex items-center justify-center min-h-screen w-full">
+			<AnimLoader
+				active={true}
+				size={'large'}
+				loaderType={'bars'}
+				description="Loading performance data..."
+			/>
+		</div>
+	{:else}
+		<div class="mx-auto flex max-w-[1400px] flex-col gap-5">
+			<ProfileSection
+				profileData={{ ...profileData, name: studentName, class_: studentClass, image: profilePic }}
+			/>
+			<StudentRow1 {progressReport} apiError={analyisWtStudIdError} />
+			<StudentRow2 {progressTrend} progressTrendError={analyisWtStudIdError} />
+			<SubjectWiseSection {strengthAnalysis} {percentileTrend} {subWiseChartsLoading} chartsError={analyisWtSubAndStudIdError} on:tabSelected={handleSubjectSelection}/>
+
+			<!-- <StudentRow3 apiError={analyisWtStudIdError} {perfAnalysis} /> -->
+			<!-- <StudentTopicWiseAnalysis apiError={analyisWtStudIdError} {strengthAnalysis} /> -->
+			<PerfHistorySection />
+			<GoalsSection />
+		</div>
+	{/if}
 </div>

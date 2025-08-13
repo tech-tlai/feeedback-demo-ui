@@ -44,10 +44,10 @@
 	// 	}
 	// });
 	// Transform subjectData to ProgressTrendChart format
-	$: transformedSubjectData = (() => {
+	$: transformedSubjectData = ((subjectData) => {
 		if (!Array.isArray(subjectData)) return {};
 		return subjectData.reduce((acc, subj) => {
-			acc[subj.subject] = (subj.exams || []).map(exam => ({
+			acc[subj.subject] = (subj.exams || []).map((exam) => ({
 				percentage: exam.marksPercentage,
 				total: exam.totalMarks,
 				obtained: exam.marks,
@@ -55,13 +55,15 @@
 			}));
 			return acc;
 		}, {});
-	})();
+	})(subjectData);
 
-	$: examDates = (() => {
+	$: examDates = ((subjectData) => {
 		if (!Array.isArray(subjectData)) return [];
-		const allDates = subjectData.flatMap(subj => (subj.exams || []).map(exam => formatDateDDMonthShortYear(exam.date)));
+		const allDates = subjectData.flatMap((subj) =>
+			(subj.exams || []).map((exam) => formatDateDDMonthShortYear(exam.date))
+		);
 		return Array.from(new Set(allDates)).sort((a, b) => new Date(a) - new Date(b));
-	})();
+	})(subjectData);
 </script>
 
 {#if isLoading}
@@ -69,5 +71,10 @@
 {:else if error}
 	<div class="p-4 text-center text-red-500">{error}</div>
 {:else}
-	<ProgressTrendChart title="Progress Trend" subjectFilter="All" {examDates} {transformedSubjectData} />
+	<ProgressTrendChart
+		title="Progress Trend"
+		subjectFilter="All"
+		{examDates}
+		subjectData={transformedSubjectData}
+	/>
 {/if}

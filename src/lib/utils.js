@@ -1,3 +1,21 @@
+/**
+ * Constructs the student dashboard URL with query params.
+ * @param {Object} params - { studentId, name, subject }
+ * @returns {string} - The constructed URL
+ */
+export function getStudentDashboardUrl({ studentId, name, subject, allSubjects }) {
+    const base = `/student/dashboard/${encodeURIComponent(studentId)}`;
+    const searchParams = [];
+    if (studentId) searchParams.push(`id=${encodeURIComponent(studentId)}`);
+    if (name) searchParams.push(`name=${encodeURIComponent(name)}`);
+    if (subject) searchParams.push(`sub=${encodeURIComponent(subject)}`);
+    if (Array.isArray(allSubjects) && allSubjects.length > 0) {
+        const subjectsStr = allSubjects.map(s => encodeURIComponent(s)).join(',');
+        searchParams.push(`subjects=${subjectsStr}`);
+    }
+    return searchParams.length ? `${base}?${searchParams.join('&&')}` : base;
+}
+
 export function getMarkColor(percentage,markThresholds) {
     if (percentage <= markThresholds.poor) return 'bg-red-light text-red-dark';
     if (percentage > markThresholds.poor && percentage <= markThresholds.average)
@@ -48,20 +66,20 @@ export function transformForHistogram(data) {
 }
 
 export function clickOutside(node, callback) {
-		const handleClick = (event) => {
-			if (!node.contains(event.target)) {
-				callback();
-			}
-		};
+    const handleClick = (event) => {
+      if (!node.contains(event.target)) {
+        callback();
+      }
+    };
 
-		document.addEventListener('click', handleClick, true);
+    document.addEventListener('click', handleClick, true);
 
-		return {
-			destroy() {
-				document.removeEventListener('click', handleClick, true);
-			}
-		};
-	}
+    return {
+      destroy() {
+        document.removeEventListener('click', handleClick, true);
+      }
+    };
+  }
 
   export function formatDateDDMonthShortYear(inputDate) {
   const date = new Date(inputDate);
@@ -84,34 +102,34 @@ export function clickOutside(node, callback) {
  * @returns {string} A human-readable error message.
  */
 export function getErrorMessage(response, action = 'fetch', entity = 'data') {
-	const status = response?.status;
+  const status = response?.status;
 
-	switch (status) {
-		case 400:
-			return `Failed to ${action} ${entity}. Invalid request.`;
-		case 401:
-			return `Failed to ${action} ${entity}. You are unauthorized.`;
-		case 403:
-			return `Failed to ${action} ${entity}. Access is forbidden.`;
-		case 404:
-			return `Failed to ${action} ${entity}. Not found.`;
-		case 409:
-			return `Failed to ${action} ${entity}. Conflict occurred.`;
-		case 422:
-			return `Failed to ${action} ${entity}. Unprocessable data.`;
-		case 429:
-			return `Failed to ${action} ${entity}. Too many requests. Please try again later.`;
-		case 500:
-			return `Failed to ${action} ${entity}. Internal server error.`;
-		case 502:
-			return `Failed to ${action} ${entity}. Bad gateway.`;
-		case 503:
-			return `Failed to ${action} ${entity}. Service unavailable.`;
-		case 504:
-			return `Failed to ${action} ${entity}. Gateway timeout.`;
-		default:
-			return `Failed to ${action} ${entity}. Something went wrong.`;
-	}
+  switch (status) {
+    case 400:
+      return `Failed to ${action} ${entity}. Invalid request.`;
+    case 401:
+      return `Failed to ${action} ${entity}. You are unauthorized.`;
+    case 403:
+      return `Failed to ${action} ${entity}. Access is forbidden.`;
+    case 404:
+      return `Failed to ${action} ${entity}. Not found.`;
+    case 409:
+      return `Failed to ${action} ${entity}. Conflict occurred.`;
+    case 422:
+      return `Failed to ${action} ${entity}. Unprocessable data.`;
+    case 429:
+      return `Failed to ${action} ${entity}. Too many requests. Please try again later.`;
+    case 500:
+      return `Failed to ${action} ${entity}. Internal server error.`;
+    case 502:
+      return `Failed to ${action} ${entity}. Bad gateway.`;
+    case 503:
+      return `Failed to ${action} ${entity}. Service unavailable.`;
+    case 504:
+      return `Failed to ${action} ${entity}. Gateway timeout.`;
+    default:
+      return `Failed to ${action} ${entity}. Something went wrong.`;
+  }
 }
 
 

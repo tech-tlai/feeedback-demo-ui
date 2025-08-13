@@ -7,6 +7,8 @@
 	import { goto } from '$app/navigation';
 	import { teacherListStore } from '$lib/stores/teacherUploadStore.js';
 	import { selectedClassStore } from '$lib/stores/globalFilters.js';
+	import { studentListStore } from '$lib/stores/studentUploadState.js';
+	import {getStudentDashboardUrl} from "$lib/utils"
 
 	// Define your navItems and actionButtons for each route
 	const navConfig = {
@@ -39,16 +41,22 @@
 		console.log('selectedStudent', selectedStudent);
 
 		// Extract name and class from the selected item
-		const name = selectedStudent.name;
-		const class_ = selectedStudent.grade || itemDetails.class || itemDetails.class_; // fallback for different keys
-		const id = selectedStudent.id;
-		if (name) {
-			const params = new URLSearchParams();
-			params.set('name', name);
-			if (class_) params.set('class', class_);
-			goto(`/student/dashboard/${encodeURIComponent(id)}?${params.toString()}`);
-			// goto(`/student/dashboard?${params.toString()}`);
-		}
+		// const name = selectedStudent.name;
+		// const class_ = selectedStudent.grade || itemDetails.class || itemDetails.class_; // fallback for different keys
+		// const id = selectedStudent.id;
+		// if (name) {
+		// 	// const params = new URLSearchParams();
+		// 	// params.set('name', name);
+		// 	// if (class_) params.set('class', class_);
+		// 	// goto(`/student/dashboard/${encodeURIComponent(id)}?${params.toString()}`);
+			
+		// }
+		goto(getStudentDashboardUrl({
+			studentId: selectedStudent.studentId,
+			name: selectedStudent.name,
+			subject: selectedStudent?.subjects[0] || '',
+			allSubjects: selectedStudent?.subjects
+		}));
 	}
 
 	function handleTeacherSelect(event) {
@@ -56,11 +64,11 @@
 		selectedTeacher = itemDetails;
 		console.log('selectedTeacher', selectedTeacher);
 		// Extract name and subject from the selected item
-		
+
 		const name = selectedTeacher.name;
 		const id = selectedTeacher.id;
 		const classSubject = selectedTeacher.class_subject?.[0] || {};
-		const className =classSubject.class ?classSubject.class:'-';
+		const className = classSubject.class ? classSubject.class : '-';
 		selectedClassStore.set({
 			className: className,
 			class_: classSubject.class?.[0],
@@ -89,15 +97,7 @@
 	<div slot="header-custom-actions">
 		{#if $page.url.pathname.startsWith('/student/dashboard')}
 			<SearchableComboBox
-				options={[
-					{ id: 1, name: 'Aarav Nair', grade: '10', section: 'A' },
-					{ id: 2, name: 'Saanvi Das', grade: '10', section: 'A' },
-					{ id: 3, name: 'Ishaan Gupta', grade: '10', section: 'B' },
-					{ id: 4, name: 'Meera Menon', grade: '10', section: 'B' },
-					{ id: 5, name: 'Aditya Pillai', grade: '10', section: 'C' },
-					{ id: 6, name: 'Riya Sharma', grade: '10', section: 'C' },
-					{ id: 7, name: 'Krishna Reddy', grade: '10', section: 'D' }
-				]}
+				options={$studentListStore}
 				placeholder="Search student..."
 				on:handleDispatchComboBoxData={handleStudentSelect}
 			/>
@@ -118,8 +118,11 @@
 	</div>
 </Header>
 
-{#key $page.url.pathname}
+<!-- {#key $page.url.pathname}
 	<main>
 		<slot></slot>
 	</main>
-{/key}
+{/key} -->
+<main>
+	<slot></slot>
+</main>
