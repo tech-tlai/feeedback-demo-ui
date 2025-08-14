@@ -4,14 +4,15 @@
 	import { formatDateDDMonthShortYear } from '$lib/utils';
 	import { fetchApi } from '$lib/apiUtils.js';
 
+	export let subjectData = [];
+	export let selectedLanguage = 'English';
 	let examDates = [];
-	export let subjectData = {};
 	let isLoading = false;
 	let error = null;
 	const STUDENT_ID = 1;
-	let selectedLanguage = 'English';
 	let tempLanguage = 'English'; // temporary variable to store value since fitler hasnt been abstracted into a component yet
 	let isMounted = false;
+	let formattedPercentileTrend = [];
 
 	// async function fetchPercentileTrend() {
 	// 	try {
@@ -50,13 +51,38 @@
 	// 	}
 	// }
 
-
 	function handleApplyFilter(e) {
 		selectedLanguage = tempLanguage;
 	}
 
-	$: if (isMounted && selectedLanguage) {
-		fetchPercentileTrend();
+	// $: if (isMounted && selectedLanguage) {
+	// 	fetchPercentileTrend();
+	// }
+
+	$: formatDataForCharts(subjectData);
+
+	function formatDataForCharts() {
+		if (!Object.keys(subjectData)?.length) return;
+
+		const sortedData = subjectData.sort((a, b) => new Date(a.date) - new Date(b.date));
+		formattedPercentileTrend = Array.isArray(sortedData)
+			? sortedData.reduce((acc, item) => {
+					if (!acc[item.subject]) acc[item.subject] = [];
+					acc[item.subject].push({
+						studentScorePercentage: item.studentScorePercentage,
+						percentile25: item.percentile25,
+						percentile50: item.percentile50,
+						percentile75: item.percentile75,
+						date: formatDateDDMonthShortYear(item.date),
+						examId: item.examId,
+						subjectId: item.subjectId
+					});
+					return acc;
+				}, {})
+			: {};
+
+		const uniqueDates = new Set(sortedData.map((item) => formatDateDDMonthShortYear(item.date)));
+		examDates = Array.from(uniqueDates);
 	}
 
 	onMount(async () => {
@@ -72,12 +98,12 @@
 	<PercentileTrendChart
 		title="Score and Percentile trend subject wise"
 		{examDates}
-		{subjectData}
+		subjectData={formattedPercentileTrend}
 		subjectFilter={selectedLanguage}
 	>
 		<FilterDropdown slot="filter" let:close>
 			<!-- Subject Dropdown -->
-			<div>
+			<!-- <div>
 				<label for="subject" class="block text-sm text-gray-500 mb-1">Select subject:</label>
 				<select
 					id="subject"
@@ -97,7 +123,7 @@
 					handleApplyFilter();
 					close();
 				}}>Apply</Button
-			>
+			> -->
 		</FilterDropdown>
 	</PercentileTrendChart>
 {/if}

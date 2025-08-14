@@ -65,7 +65,7 @@
 
 			return [
 				{
-					label: `${subject} - Your Score`,
+					label: ` Your Score`,
 					data: normalized.map((d) => (d ? d.studentScorePercentage : null)),
 					borderColor: subjectColors[subject] || '#000',
 					backgroundColor: subjectColors[subject] || '#000',
@@ -74,7 +74,7 @@
 					spanGaps: true
 				},
 				{
-					label: `${subject} - 75th Percentile`,
+					label: ` 75th Percentile`,
 					data: normalized.map((d) => (d ? d.percentile75 : null)),
 					borderColor: 'rgba(75, 192, 192, 1)',
 					backgroundColor: 'rgba(75, 192, 192, 0.2)',
@@ -85,7 +85,7 @@
 				},
 
 				{
-					label: `${subject} - 50th Percentile`,
+					label: ` 50th Percentile`,
 					data: normalized.map((d) => (d ? d.percentile50 : null)),
 					borderColor: 'rgba(54, 162, 235, 1)',
 					backgroundColor: 'rgba(54, 162, 235, 0.2)',
@@ -95,7 +95,7 @@
 					spanGaps: true
 				},
 				{
-					label: `${subject} - 25th Percentile`,
+					label: ` 25th Percentile`,
 					data: normalized.map((d) => (d ? d.percentile25 : null)),
 					borderColor: 'rgba(255, 99, 132, 1)',
 					backgroundColor: 'rgba(255, 99, 132, 0.2)',

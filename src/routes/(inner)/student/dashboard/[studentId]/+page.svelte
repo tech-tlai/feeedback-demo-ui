@@ -12,6 +12,7 @@
 	import { studentUploadedFiles } from '$lib/stores/studentUploadState';
 	import SubjectWiseSection from '$lib/components/student/SubjectWiseSection.svelte';
 	import AnimLoader from '$lib/components/AnimLoader.svelte';
+	import { goto } from '$app/navigation';
 
 	let dashboardLoading = true;
 	let dashboardError = null;
@@ -35,7 +36,7 @@
 	let profileData = {
 		name: 'Kavya Reddy',
 		role: 'STUDENT',
-		class_: '3',
+		class_: '-',
 		id: '321468',
 		school: "St. Mary's Higher Secondary School",
 		location: 'Trivandrum',
@@ -43,10 +44,10 @@
 	};
 
 	$: studentId = $page.params.studentId;
-	// $: selectedSubject = $page.url.searchParams.get('sub') || '';
+	$: selectedSubject = $page.url.searchParams.get('sub') || '';
 	$: allSubjects = $page.url.searchParams.get('subjects') || '';
 	$: studentName = $page.url.searchParams.get('name') || '';
-	$: studentClass = $page.url.searchParams.get('class') || profileData.class_;
+	$: studentClass = $page.url.searchParams.get('studentClass') || profileData.class_;
 	$: profilePic = $page.url.searchParams.get('img') || profileData.image;
 
 	// Generic function to POST form data to a given API route with custom params
@@ -122,6 +123,8 @@
 				// fetchAnalysisWithStudentIdAndSubject()
 			]);
 
+			console.log('respWithStudId',respWithStudId);
+
 			if (respWithStudId.status === 'fulfilled') {
 				analyisWtStudId = respWithStudId.value || {};
 				perfAnalysis = analyisWtStudId?.llm_performance_analysis || {};
@@ -162,6 +165,7 @@
 			const respWithStudIdAndSubj = res;
 			analyisWtSubAndStudId = respWithStudIdAndSubj || [];
 			percentileTrend = analyisWtSubAndStudId?.percentileTrends || [];
+			console.log('percentileTrend', percentileTrend);
 			strengthAnalysis = analyisWtSubAndStudId?.topic_analysis || {};
 		} catch (err) {
 			analyisWtSubAndStudIdError = err.message || 'Failed to load dashboard data';
@@ -171,21 +175,27 @@
 		}
 	}
 
-	function handleSubjectSelection(e){
+	function handleSubjectSelection(e) {
 		const { index, tab } = e.detail;
-		selectedSubject = tab.text;
+		// Update the 'sub' search param in the URL
+		const url = new URL(window.location.href);
+		url.searchParams.set('sub', tab.text);
+		goto(url.pathname + url.search, { replaceState: true, scroll: false });
 	}
-	
+
 	let isMounted = false;
 
 	onMount(() => {
 		isMounted = true;
-		selectedSubject = $page.url.searchParams.get('sub') || '';
-		fetchAllDashboardData();
+
+	
 	});
 
-	$: if (selectedSubject) {
+	$: if (selectedSubject && isMounted) {
 		fetchSubjectWiseData();
+	}
+	$: if (studentId && isMounted) {
+		fetchAllDashboardData();
 	}
 </script>
 
@@ -205,8 +215,15 @@
 				profileData={{ ...profileData, name: studentName, class_: studentClass, image: profilePic }}
 			/>
 			<StudentRow1 {progressReport} apiError={analyisWtStudIdError} />
+			<StudentRow3 {perfAnalysis} apiError={analyisWtStudIdError}/>
 			<StudentRow2 {progressTrend} progressTrendError={analyisWtStudIdError} />
-			<SubjectWiseSection {strengthAnalysis} {percentileTrend} {subWiseChartsLoading} chartsError={analyisWtSubAndStudIdError} on:tabSelected={handleSubjectSelection}/>
+			<SubjectWiseSection
+				{strengthAnalysis}
+				{percentileTrend}
+				{subWiseChartsLoading}
+				chartsError={analyisWtSubAndStudIdError}
+				on:tabSelected={handleSubjectSelection}
+			/>
 
 			<!-- <StudentRow3 apiError={analyisWtStudIdError} {perfAnalysis} /> -->
 			<!-- <StudentTopicWiseAnalysis apiError={analyisWtStudIdError} {strengthAnalysis} /> -->

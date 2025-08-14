@@ -5,7 +5,7 @@
 
 	let isLoading = false;
 	let error = null;
-	let perfData = {
+	export let perfData = {
 		achievement: [],
 		roomForImprovement: [],
 		suggestions: []

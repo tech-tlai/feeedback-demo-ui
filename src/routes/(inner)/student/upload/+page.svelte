@@ -126,6 +126,7 @@
 			getStudentDashboardUrl({
 				studentId: selectedEntity.studentId,
 				name: selectedEntity.name,
+				studentClass: selectedEntity.className,
 				subject: defaultSelectedSubj || '',
 				allSubjects: selectedEntity?.subjects
 			})

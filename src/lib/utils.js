@@ -3,11 +3,12 @@
  * @param {Object} params - { studentId, name, subject }
  * @returns {string} - The constructed URL
  */
-export function getStudentDashboardUrl({ studentId, name, subject, allSubjects }) {
+export function getStudentDashboardUrl({ studentId, name, subject, studentClass, allSubjects }) {
     const base = `/student/dashboard/${encodeURIComponent(studentId)}`;
     const searchParams = [];
     if (studentId) searchParams.push(`id=${encodeURIComponent(studentId)}`);
     if (name) searchParams.push(`name=${encodeURIComponent(name)}`);
+    if (studentClass) searchParams.push(`studentClass=${encodeURIComponent(studentClass)}`);
     if (subject) searchParams.push(`sub=${encodeURIComponent(subject)}`);
     if (Array.isArray(allSubjects) && allSubjects.length > 0) {
         const subjectsStr = allSubjects.map(s => encodeURIComponent(s)).join(',');
