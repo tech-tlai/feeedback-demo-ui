@@ -17,8 +17,7 @@
 			const teacherSubject = encodeURIComponent(
 				selectedEntity.subject || selectedEntity.subjects?.[0] || ''
 			);
-			// Optionally set selectedClassStore here if needed
-			// selectedClassStore.set(...)
+			
 			goto(
 				`/teacher/dashboard/${teacherId}?id=${teacherId}&&name=${teacherName}&&sub=${teacherSubject}`
 			);
@@ -53,6 +52,7 @@
 				dashboardUrl="/teacher/dashboard"
 				dataUploadPageUrl="/teacher/upload"
 				comboPlaceholder="Search teacher..."
+				showSelectionDropdowm={false}
 				on:entitySelected={handleEntitySelected}
 			/>
 			<!-- Student Dashboard Card -->
@@ -67,6 +67,7 @@
 				dashboardUrl="/student/dashboard"
 				dataUploadPageUrl="/student/upload"
 				comboPlaceholder="Search student..."
+				showSelectionDropdowm={false}
 				on:entitySelected={handleEntitySelected}
 			/>
 

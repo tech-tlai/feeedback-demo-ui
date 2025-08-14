@@ -2,7 +2,7 @@
 	import ProfileSection from '$lib/components/profileSection/ProfileSection.svelte';
 	import StudentRow1 from '$lib/components/student/StudentRow1.svelte';
 	import StudentRow2 from '$lib/components/student/StudentRow2.svelte';
-	import StudentRow3 from '$lib/components/student/StudentRow3.svelte';
+	import StudentTextualFeedback from '$lib/components/student/StudentTextualFeedback.svelte';
 	import StudentTopicWiseAnalysis from '$lib/components/student/StudentTopicWiseAnalysis.svelte';
 	import PerfHistorySection from '$lib/components/student/PerfHistorySection.svelte';
 	import GoalsSection from '$lib/components/student/GoalsSection.svelte';
@@ -30,7 +30,7 @@
 		<ProfileSection {profileData}/>
 		<StudentRow1 />
 		<StudentRow2 />
-		<StudentRow3 />
+		<StudentTextualFeedback />
 		<StudentTopicWiseAnalysis />
 		<PerfHistorySection />
 		<GoalsSection />

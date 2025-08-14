@@ -1,13 +1,13 @@
 <script>
-	import { PercentileTrendChart, FilterDropdown, Button } from '$lib';
+	import { PercentileTrendChart, FilterDropdown, Button, PercentileTrendSkeleton } from '$lib';
 	import { onMount } from 'svelte';
 	import { formatDateDDMonthShortYear } from '$lib/utils';
 	import { fetchApi } from '$lib/apiUtils.js';
 
 	export let subjectData = [];
 	export let selectedLanguage = 'English';
+	export let isLoading = false;
 	let examDates = [];
-	let isLoading = false;
 	let error = null;
 	const STUDENT_ID = 1;
 	let tempLanguage = 'English'; // temporary variable to store value since fitler hasnt been abstracted into a component yet
@@ -91,7 +91,8 @@
 </script>
 
 {#if isLoading}
-	<div class="p-4 text-center">Loading...</div>
+	<!-- <div class="p-4 text-center">Loading...</div> -->
+	 <PercentileTrendSkeleton/>
 {:else if error}
 	<div class="p-4 text-center text-red-500">{error}</div>
 {:else}

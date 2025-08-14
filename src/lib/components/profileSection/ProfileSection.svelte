@@ -181,7 +181,7 @@
 			default:
 				console.log('Unknown chat menu action:', action, chat);
 		}
-		console.log('pinnedChats', pinnedChats);
+		
 	}
 
 	onMount(async () => {

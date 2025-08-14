@@ -1,5 +1,5 @@
 <script>
-	import { TopicWiseAnalysis, SectionTitle } from '$lib';
+	import { TopicWiseAnalysis, SectionTitle, StrengthAnalysisSkeleton } from '$lib';
 	import { onMount } from 'svelte';
 	import ErrorComponent from '$lib/components/ErrorComponent.svelte';
 	import SkelClassSummary from '$lib/components/loadingSkeletons/SkelClassSummary.svelte';
@@ -9,8 +9,8 @@
 	export let apiError = false;
 	let strengths = [];
 	let weaknesses = [];
-	let isLoadingStrengths = false;
-	let isLoadingWeaknesses = false;
+	export let isLoadingStrengths = false;
+	export let isLoadingWeaknesses = false;
 	let errorStrengths = null;
 	let errorWeaknesses = null;
 
@@ -86,7 +86,7 @@
 
 <div class="grid grid-cols-2 gap-5">
 	{#if isLoadingStrengths}
-		<SkelClassSummary />
+		<StrengthAnalysisSkeleton />
 	{:else if errorStrengths}
 		<div class="min-h-40 h-full text-sm bg-white p-4 rounded-lg shadow-sm">
 			<div class=" text-red-500 mb-4 flex gap-4 items-center">
@@ -105,7 +105,7 @@
 	{/if}
 
 	{#if isLoadingWeaknesses}
-		<SkelClassSummary />
+		<StrengthAnalysisSkeleton />
 	{:else if errorWeaknesses}
 		<div class="min-h-40 h-full text-sm bg-white p-4 rounded-lg shadow-sm">
 			<div class=" text-red-500 mb-4 flex gap-4 items-center">

@@ -1,4 +1,5 @@
 <script>
+    import AvatarLetter from "$lib/components/profileSection/AvatarLetter.svelte";
     export let name = '';
     export let role = '';
     export let class_ = '';
@@ -16,9 +17,10 @@
     </div>
     
     <div class="relative px-4 pb-4 -mt-16 flex flex-col items-center">
-      <div class="w-32 h-32 rounded-full overflow-hidden border-4 border-white bg-white">
+      <!-- <div class="w-32 h-32 rounded-full overflow-hidden border-4 border-white bg-white">
         <img src={image || "/placeholder.svg"} alt={name} class="w-full h-full object-cover" />
-      </div>
+      </div> -->
+      <AvatarLetter letter={name[0]}/>
       
       <h2 class="mt-2 text-2xl font-bold text-center text-black">{name}</h2>
       <p class="text-gray-600 font-semibold">{role}</p>

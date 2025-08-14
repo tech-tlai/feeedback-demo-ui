@@ -8,7 +8,7 @@
 	import { teacherListStore } from '$lib/stores/teacherUploadStore.js';
 	import { selectedClassStore } from '$lib/stores/globalFilters.js';
 	import { studentListStore } from '$lib/stores/studentUploadState.js';
-	import {getStudentDashboardUrl} from "$lib/utils"
+	import { getStudentDashboardUrl } from '$lib/utils';
 
 	// Define your navItems and actionButtons for each route
 	const navConfig = {
@@ -35,34 +35,23 @@
 	let selectedTeacher = null;
 
 	function handleStudentSelect(event) {
-		console.log('e.detail from combobox', event.detail);
 		const itemDetails = event.detail.itemDetails;
 		selectedStudent = itemDetails;
-		console.log('selectedStudent', selectedStudent);
 
-		// Extract name and class from the selected item
-		// const name = selectedStudent.name;
-		// const class_ = selectedStudent.grade || itemDetails.class || itemDetails.class_; // fallback for different keys
-		// const id = selectedStudent.id;
-		// if (name) {
-		// 	// const params = new URLSearchParams();
-		// 	// params.set('name', name);
-		// 	// if (class_) params.set('class', class_);
-		// 	// goto(`/student/dashboard/${encodeURIComponent(id)}?${params.toString()}`);
-			
-		// }
-		goto(getStudentDashboardUrl({
-			studentId: selectedStudent.studentId,
-			name: selectedStudent.name,
-			subject: selectedStudent?.subjects[0] || '',
-			allSubjects: selectedStudent?.subjects
-		}));
+		goto(
+			getStudentDashboardUrl({
+				studentId: selectedStudent.studentId,
+				name: selectedStudent.name,
+				studentClass: selectedStudent.className,
+				subject: selectedStudent?.subjects[0] || '',
+				allSubjects: selectedStudent?.subjects
+			})
+		);
 	}
 
 	function handleTeacherSelect(event) {
 		const itemDetails = event.detail.itemDetails;
 		selectedTeacher = itemDetails;
-		console.log('selectedTeacher', selectedTeacher);
 		// Extract name and subject from the selected item
 
 		const name = selectedTeacher.name;
@@ -96,16 +85,23 @@
 <Header {...$headerConfig}>
 	<div slot="header-custom-actions">
 		{#if $page.url.pathname.startsWith('/student/dashboard')}
-			<SearchableComboBox
-				options={$studentListStore}
-				placeholder="Search student..."
-				on:handleDispatchComboBoxData={handleStudentSelect}
-			/>
+			<div class="flex w-[400px] gap-8 items-center">
+				<ul>
+					<li>
+						<a href="/student/upload" class="min-w-[200px]">Upload data</a>
+					</li>
+				</ul>
+				<SearchableComboBox
+					options={$studentListStore}
+					placeholder="Search student..."
+					on:handleDispatchComboBoxData={handleStudentSelect}
+				/>
+			</div>
 		{:else if $page.url.pathname.startsWith('/teacher/dashboard')}
 			<div class="flex w-[400px] gap-8 items-center">
 				<ul>
 					<li>
-						<a href="/teacher/upload" class="min-w-[200px]">Upload teachers</a>
+						<a href="/teacher/upload" class="min-w-[200px]">Upload data</a>
 					</li>
 				</ul>
 				<SearchableComboBox

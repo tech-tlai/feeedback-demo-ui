@@ -4,7 +4,7 @@
 	import { fetchApi } from '$lib/apiUtils.js';
 
 	let isLoading = false;
-	let error = null;
+	export let error = null;
 	export let perfData = {
 		achievement: [],
 		roomForImprovement: [],

@@ -14,6 +14,7 @@
 	export let gradient = 'from-blue-400 to-cyan-500';
 	export let dataUploadPageUrl = '';
 	export let entity = 'student';
+	export let showSelectionDropdowm = true;
 
 	const dispatch = createEventDispatcher();
 	// export let fileUploadHelperText='Upload file'
@@ -104,38 +105,40 @@
 	</div>
 	<div class="p-6">
 		<h3 class="text-2xl font-bold text-slate-800 mb-2 text-left">{title}</h3>
-		<p class="text-slate-600 mb-4 text-left">
+		<p class="text-slate-600 mb-8 text-left">
 			{description}
 		</p>
-		<div class=" text-left text-gray-dark my-1">
-			<span>Choose {entity} from dataset</span>
-		</div>
-		<div class="mb-4 flex items-center gap-2 justify-between">
-			<div class="flex-grow">
-				<SearchableComboBox
-					options={entityList}
-					label={comboLabel}
-					placeholder={comboPlaceholder}
-					selectedItemId={selectedEntityId}
-					selectedItemName={selectedEntityName}
-					on:handleDispatchComboBoxData={handleComboBoxChange}
-				/>
+		{#if showSelectionDropdowm}
+			<div class=" text-left text-gray-dark my-1">
+				<span>Choose {entity} from dataset</span>
 			</div>
+			<div class="mb-4 flex items-center gap-2 justify-between">
+				<div class="flex-grow">
+					<SearchableComboBox
+						options={entityList}
+						label={comboLabel}
+						placeholder={comboPlaceholder}
+						selectedItemId={selectedEntityId}
+						selectedItemName={selectedEntityName}
+						on:handleDispatchComboBoxData={handleComboBoxChange}
+					/>
+				</div>
 
-			<button
-				type="button"
-				class="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-dark disabled:cursor-not-allowed"
-				on:click={handleButtonClick}
-				disabled={!selectedEntityId}
-			>
-				{buttonText}
-			</button>
-		</div>
+				<button
+					type="button"
+					class="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-dark disabled:cursor-not-allowed"
+					on:click={handleButtonClick}
+					disabled={!selectedEntityId}
+				>
+					{buttonText}
+				</button>
+			</div>
+		{/if}
 		{#if dataUploadPageUrl}
-			<div class=" border-t border-gray-dark relative text-gray-dark my-8">
+			<!-- <div class=" border-t border-gray-dark relative text-gray-dark my-8">
 				<span class="bg-white inline-block p-2 absolute left-1/2 -top-1/2 -translate-y-1/2">OR</span
 				>
-			</div>
+			</div> -->
 			<div class="flex items-center justify-center">
 				<a href={dataUploadPageUrl}>
 					<button
@@ -143,7 +146,7 @@
 						class="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-dark disabled:cursor-not-allowed"
 						on:click={handleNavigation}
 					>
-						Upload new data set
+						Upload data set
 					</button>
 				</a>
 			</div>

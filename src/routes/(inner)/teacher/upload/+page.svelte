@@ -123,8 +123,6 @@
 		const { entity, selectedEntityId, selectedEntityName, selectedEntity } = e.detail;
 		console.log('entitySelected event:', e.detail);
 
-		
-
 		const className = selectedEntity?.class_subject[0]?.class
 			? selectedEntity?.class_subject[0]?.class
 			: '-';
@@ -156,6 +154,7 @@
 		{#if currentStep === 0}
 			<FileUploadComponent
 				title="Upload Teachers' List"
+				sampleFileUrl={'/upload-templates/performance_sample_class_7_8.xlsx'}
 				on:fileUploadSubmit={onTeacherFileUploadSubmit}
 			/>
 		{/if}

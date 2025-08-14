@@ -32,11 +32,16 @@
 
 	// Colors for subjects
 	const subjectColors = {
-		Mathematics: '#4CAF50',
+		Maths: '#9C27B0',
 		English: '#9C27B0',
-		Hindi: '#2196F3',
-		'General Science': '#FFEB3B',
-		'Social Science': '#F44336'
+		Hindi: '#9C27B0',
+		'Science': '#9C27B0',
+		'Social Science': '#9C27B0'
+		// Maths: '#4CAF50',
+		// English: '#9C27B0',
+		// Hindi: '#2196F3',
+		// 'Science': '#FFEB3B',
+		// 'Social Science': '#F44336'
 	};
 
 	function setContextInChatBox() {

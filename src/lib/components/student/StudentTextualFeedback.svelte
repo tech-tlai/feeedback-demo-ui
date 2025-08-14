@@ -6,7 +6,7 @@
 
 <div class="grid grid-cols-12 gap-5">
     <div class="col-span-9">
-        <StudentPerfAnalysis perfData={perfAnalysis} />
+        <StudentPerfAnalysis perfData={perfAnalysis} error={apiError} />
     </div>
     <div class="col-span-3">
         <Quote/>

@@ -41,26 +41,7 @@
 		active: i === currentStep
 	}));
 
-	// Helper to transform teachers to unique list with class_subject array
-	// function transformStudentList(teachers) {
-	// 	const studentMap = {};
-	// 	(teachers || []).forEach((t) => {
-	// 		if (!studentMap[t.studentId]) {
-	// 			studentMap[t.studentId] = {
-	// 				id: t.studentId,
-	// 				name: t.name,
-	// 				class_subject: []
-	// 			};
-	// 		}
-	// 		(t.subjects || []).forEach((subj) => {
-	// 			studentMap[t.studentId].class_subject.push({
-	// 				class: t.className,
-	// 				subject: subj
-	// 			});
-	// 		});
-	// 	});
-	// 	return Object.values(teacherMap);
-	// }
+	
 
 	async function onStudentFileUploadSubmit(e) {
 		const files = e.detail.files;
@@ -116,12 +97,11 @@
 		selectedStudentStore.set({
 			studentId: selectedEntity.studentId,
 			className: selectedEntity.className,
-			// division: selectedEntity.className[1],
+			studentClass:selectedEntity.className,
 			allSubjects: selectedEntity.subjects,
 			selectedSubject: defaultSelectedSubj,
 			fullClassName: selectedEntity.className
 		});
-		// console.log('selectedStudentStore', $selectedStudentStore);
 		goto(
 			getStudentDashboardUrl({
 				studentId: selectedEntity.studentId,
@@ -131,12 +111,10 @@
 				allSubjects: selectedEntity?.subjects
 			})
 		);
-		// goto(
-		// 	`/student/dashboard/${selectedEntity.studentId}?id=${encodeURIComponent(selectedEntity.studentId)}&&name=${encodeURIComponent(selectedEntity.name)}&&sub=${encodeURIComponent(defaultSelectedSubj || '')}`
-		// );
-		// You can perform any logic here, but do not navigate
-		// For example, you could set a store, show a message, etc.
+		
 	}
+
+
 </script>
 
 <div class="px-12">
@@ -145,6 +123,7 @@
 		{#if currentStep === 0}
 			<FileUploadComponent
 				title="Upload Students' List"
+				sampleFileUrl={'/upload-templates/performance_sample_class_7_8.xlsx'}
 				on:fileUploadSubmit={onStudentFileUploadSubmit}
 			/>
 		{/if}
@@ -167,3 +146,4 @@
 		{/if}
 	</div>
 </div>
+

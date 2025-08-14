@@ -1,7 +1,7 @@
 <script>
 	import { SectionTitle, Tabs } from '$lib';
 	import { AllSubjectsPercentileTrend } from '$lib';
-	
+
 	import StudentTopicWiseAnalysis from '$lib/components/student/StudentTopicWiseAnalysis.svelte';
 	import { studentUploadedFiles } from '$lib/stores/studentUploadState';
 	import { createEventDispatcher, onMount } from 'svelte';
@@ -40,7 +40,7 @@
 	});
 </script>
 
-<div class="flex w-full justify-center mt-8">
+<div class="flex w-full justify-center mt-8" id="sub-wise-section">
 	<SectionTitle title="Subject Wise Analysis" />
 </div>
 <div class="flex flex-col gap-8 items-center w-full mb-4">
@@ -51,15 +51,26 @@
 		selectedIndex={selectedClassSubjFilterIndex}
 	/>
 </div>
-{#if subWiseChartsLoading}
-	<div class="h-80 mx-auto my-0">Loading subject wise data</div>
-{:else if chartsError}
+{#if chartsError}
+	<!-- <div class="h-80 mx-auto my-0">Loading subject wise data</div> -->
 	<div>{chartsError}</div>
 {:else}
-	<div class="col-span-6">
-		<AllSubjectsPercentileTrend subjectData={percentileTrend} selectedLanguage={selectedSubject}/>
+	<div class="grid grid-cols-12 gap-5">
+		<!-- <StudentRow3 /> -->
+		<div class="col-span-12">
+			<StudentTopicWiseAnalysis
+				apiError={analyisWtSubAndStudIdError}
+				{strengthAnalysis}
+				isLoadingStrengths={subWiseChartsLoading}
+				isLoadingWeaknesses={subWiseChartsLoading}
+			/>
+		</div>
+		<div class="col-span-6">
+			<AllSubjectsPercentileTrend
+				subjectData={percentileTrend}
+				selectedLanguage={selectedSubject}
+				isLoading={subWiseChartsLoading}
+			/>
+		</div>
 	</div>
-
-	<!-- <StudentRow3 /> -->
-	<StudentTopicWiseAnalysis apiError={analyisWtSubAndStudIdError} {strengthAnalysis} />
 {/if}
