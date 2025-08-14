@@ -117,7 +117,7 @@
 
 	// $: console.log('selectedClassStore in dashboard page ===', $selectedClassStore);
 
-	$: if (isMounted) {
+	$: if (isMounted && teacherId) {
 		fetchAllDashboardData();
 	}
 

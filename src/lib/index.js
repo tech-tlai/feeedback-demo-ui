@@ -65,12 +65,15 @@ import SkelClassSummary from '$lib/components/loadingSkeletons/SkelClassSummary.
 import SkelChatHistory from '$lib/components/loadingSkeletons/SkelChatHistory.svelte';
 import SkelChartWidget from '$lib/components/loadingSkeletons/SkelChartWidget.svelte';
 import SkelDataTable from '$lib/components/loadingSkeletons/SkelDataTable.svelte';
-
+import PercentileTrendSkeleton from '$lib/components/loadingSkeletons/PercentileTrendSkeleton.svelte';
+import StrengthAnalysisSkeleton from '$lib/components/loadingSkeletons/StrengthAnalysisSkeleton.svelte';
 export {
+  PercentileTrendSkeleton,
   SkelClassSummary,
   SkelChatHistory,
   SkelChartWidget,
-  SkelDataTable 
+  SkelDataTable,
+  StrengthAnalysisSkeleton
 }
 // =========================================================================   
 

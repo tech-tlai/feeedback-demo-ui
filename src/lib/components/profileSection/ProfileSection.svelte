@@ -158,7 +158,6 @@
 			const maxOrder =
 				pinnedChats.length > 0 ? Math.max(...pinnedChats.map((c) => c.order || 1)) : 1;
 			const order = maxOrder + 1;
-			console.log('new order-student', order);
 			pinnedChats = [...pinnedChats, { ...chat, order }];
 			selectedTab = 1;
 		}
@@ -182,7 +181,7 @@
 			default:
 				console.log('Unknown chat menu action:', action, chat);
 		}
-		console.log('pinnedChats', pinnedChats);
+		
 	}
 
 	onMount(async () => {

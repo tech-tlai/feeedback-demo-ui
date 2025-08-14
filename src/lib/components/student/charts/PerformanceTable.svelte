@@ -4,7 +4,7 @@
 	import { fetchApi } from '$lib/apiUtils.js';
 	export let headers = [
 		{ key: 'name', label: 'Subject' },
-		{ key: 'examName', label: 'Exam' },
+		{ key: 'examId', label: 'Exam Id' },
 		{ key: 'classAvg', label: 'Class Avg.' },
 		{ key: 'marks', label: 'Marks' },
 		{ key: 'totalMarks', label: 'Total Marks' },
@@ -13,26 +13,26 @@
 		{ key: 'feedback', label: 'Feedback' }
 	];
 
-	let subjectsData = [];
-	let isLoading = true;
-	let error = null;
-	const STUDENT_ID = 1;
+	export let subjectsData = [];
+	export let error = null;
+	let isLoading = false;
 
-	onMount(async () => {
-		try {
-			const data = await fetchApi(`/apis/student/progress-report/${STUDENT_ID}`, {
-				action: 'fetch',
-				entity: 'progress report'
-			});
-			subjectsData = data.map((sub) => {
-				return { ...sub, date: formatDateDDMonthShortYear(sub.date) };
-			});
-		} catch (err) {
-			error = err.message;
-		} finally {
-			isLoading = false;
-		}
-	});
+
+	// onMount(async () => {
+	// 	try {
+	// 		const data = await fetchApi(`/apis/student/progress-report/${STUDENT_ID}`, {
+	// 			action: 'fetch',
+	// 			entity: 'progress report'
+	// 		});
+	// 		subjectsData = data.map((sub) => {
+	// 			return { ...sub, date: formatDateDDMonthShortYear(sub.date) };
+	// 		});
+	// 	} catch (err) {
+	// 		error = err.message;
+	// 	} finally {
+	// 		isLoading = false;
+	// 	}
+	// });
 
 	function getMarkStatusColor(mark, totalMark) {
 		const percentage = (mark / totalMark) * 100;
