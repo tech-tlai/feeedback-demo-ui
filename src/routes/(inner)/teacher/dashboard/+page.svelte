@@ -8,7 +8,12 @@
 	import { SectionWiseScore, PerformanceAnalysis, TopicWiseAnalysisSection } from '$lib';
 	import { onDestroy } from 'svelte';
 	import { chatContextStore, selectedClassStore } from '$lib/stores/globalFilters.js';
-	
+	import { page } from '$app/stores';
+
+	$: teacherId = $page.params.teacherId;
+	$: teacherName = $page.url.searchParams.get('name') || teacherId;
+	$: teacherSubject = $page.url.searchParams.get('subject') || '';
+
 	const profileData = {
 		name: 'Sandeep Sharma',
 		role: 'TEACHER',
@@ -21,7 +26,7 @@
 
 	onDestroy(() => {
 		chatContextStore.set(null);
-		selectedClassStore.set('')
+		selectedClassStore.set('');
 	});
 
 	// let selectedClass='';
@@ -34,16 +39,10 @@
 
 <div class="w-full space-y-8 bg-gray-50 p-4">
 	<div class="mx-auto flex max-w-[1400px] flex-col gap-5">
-		<TeacherProfileSection {profileData} />
+		<TeacherProfileSection profileData={{ ...profileData, name: teacherName, subject: teacherSubject }} />
 		<GlobalFilters />
 		<TeacherRow1 />
 		<TeacherRow2 />
-		<!-- <div class="grid grid-cols-12 gap-5">
-			<div class="col-span-6">
-				<SectionWiseScore />
-			</div>
-		</div> -->
-
 		<TopicWiseAnalysisSection />
 		<ScoreDistributionSection />
 	</div>

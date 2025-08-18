@@ -1,43 +1,31 @@
 <script>
-	import { ProgressTrendChart } from '$lib';
-	import { onMount } from 'svelte';
+	import { ProgressTrendChart, SkelChartWidget } from '$lib';
 	import { chatContextStore, selectedClassStore } from '$lib/stores/globalFilters.js';
 
+	export let perfTrend=[];
+	
 	let examDates = [];
 	let subjectData = {};
-	let isLoading = true;
-	let error = null;
-	let isMounted = false;
+	let isLoading = false;
+	export let error = null;
 	const title = 'Progress Trend';
 
-	async function fetchProgressTrend() {
-		isLoading = true;
-		error = null;
-		try {
-			const { className, division, subject } = $selectedClassStore;
-			const classSubject = `${className}${division}_${subject}`;			
-			const response = await fetch(`/apis/teacher/progress-trend/${classSubject}`);
-			if (!response.ok) throw new Error('Failed to fetch progress trend data');
-			const apiData = await response.json();
-			const sortedData = apiData.sort((a, b) => new Date(a.date) - new Date(b.date));
-			examDates = sortedData.map((item) => item.date);
-			subjectData = sortedData.reduce((acc, item) => {
-				if (!acc[item.subject]) {
-					acc[item.subject] = [];
-				}
-				acc[item.subject].push({
-					percentage: item.marksPercentage,
-					total: item.totalMarks,
-					obtained: item.marks,
-					date: item.date
-				});
-				return acc;
-			}, {});
-		} catch (err) {
-			error = err.message;
-		} finally {
-			isLoading = false;
-		}
+	$: if (perfTrend && perfTrend.length > 0) {
+		examDates = perfTrend.map((item) => item.date);
+		subjectData = perfTrend.reduce((acc, item) => {
+			if (!acc[item.subject]) {
+				acc[item.subject] = [];
+			}
+			acc[item.subject].push({
+				percentage: item.marksPercentage,
+				total: item.totalMarks,
+				obtained: item.marks,
+				date: item.date
+			});
+			return acc;
+		}, {});
+
+		
 	}
 
 	function setContextInChatBox(e) {
@@ -52,21 +40,45 @@
 		}
 	}
 
-	$: if (isMounted && $selectedClassStore) {
-		fetchProgressTrend();
-	}
+	// async function fetchProgressTrend() {
+	// 	isLoading = true;
+	// 	error = null;
+	// 	try {
+	// 		const { className, division, subject } = $selectedClassStore;
+	// 		const classSubject = `${className}${division}_${subject}`;
+	// 		const apiData = await fetchApi(`/apis/teacher/progress-trend/${classSubject}`, {
+	// 			action: 'fetch',
+	// 			entity: 'progress trend'
+	// 		});
+	//
+	// 		const sortedData = apiData.sort((a, b) => new Date(a.date) - new Date(b.date));
+	// 		examDates = sortedData.map((item) => item.date);
+	// 		subjectData = sortedData.reduce((acc, item) => {
+	// 			if (!acc[item.subject]) {
+	// 				acc[item.subject] = [];
+	// 			}
+	// 			acc[item.subject].push({
+	// 				percentage: item.marksPercentage,
+	// 				total: item.totalMarks,
+	// 				obtained: item.marks,
+	// 				date: item.date
+	// 			});
+	// 			return acc;
+	// 		}, {});
+	// 	} catch (err) {
+	// 		error = err.message;
+	// 	} finally {
+	// 		isLoading = false;
+	// 	}
+	// }
 
-	onMount(() => {
-		isMounted = true;
-	});
-
-	
 </script>
 
 {#if isLoading}
-	<div class="p-4 text-center">Loading...</div>
+	<!-- <div class="p-4 text-center bg-white rounded-lg h-full">Loading...</div> -->
+	<SkelChartWidget />
 {:else if error}
-	<div class="p-4 text-center text-red-500">{error}</div>
+	<div class="p-4 text-center text-red-500 bg-white rounded-lg h-full text-sm">{error}</div>
 {:else}
 	<ProgressTrendChart
 		{title}

@@ -1,3 +1,5 @@
+import { teacherChatDetails } from '$lib/data.js';
+
 // SvelteKit POST endpoint for /apis/teacher/chats
 const loreumIpsum = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
 export async function POST({ request }) {
@@ -9,11 +11,14 @@ export async function POST({ request }) {
                 headers: { 'Content-Type': 'application/json' }
             });
         }
-        // Mock response
-        const id = Math.floor(Math.random() * 10000) + 100;
-        const response = `This is a mock AI response for teacher: ${title} \n ${loreumIpsum}`;
+        // Find the next id based on teacherChatDetails
+        const ids = Object.keys(teacherChatDetails).map(Number);
+        const nextId = ids.length > 0 ? Math.max(...ids) + 1 : 1;
+        const details = `This is a mock AI response for: ${title} -- Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque euismod, nisi vel consectetur.`;
+        // Append to teacherChatDetails (in-memory, will not persist after restart)
+        teacherChatDetails[nextId] = { id: nextId, title, details };
         return new Response(
-            JSON.stringify({ id, title, response }),
+            JSON.stringify({ id: nextId, title, response: details }),
             {
                 status: 200,
                 headers: { 'Content-Type': 'application/json' }
@@ -25,4 +30,16 @@ export async function POST({ request }) {
             headers: { 'Content-Type': 'application/json' }
         });
     }
+}
+
+export async function GET() {
+    // Return all teacher chats in the required format
+    const chats = Object.values(teacherChatDetails).map(chat => ({
+        uuid: chat.id,
+        text: chat.title
+    }));
+    return new Response(JSON.stringify(chats), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
+    });
 }

@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { ProgressTrendChart } from '$lib';
 	import { formatDateDDMonthShortYear } from '$lib/utils';
+	import { fetchApi } from '$lib/apiUtils.js';
 
 	let examDates = [];
 	let subjectData = {};
@@ -11,11 +12,10 @@
 
 	onMount(async () => {
 		try {
-			const response = await fetch(`/apis/student/progress-trend/${STUDENT_ID}`);
-			if (!response.ok) {
-				throw new Error('Failed to fetch progress trend data');
-			}
-			const apiData = await response.json();
+			const apiData = await fetchApi(`/apis/student/progress-trend/${STUDENT_ID}`, {
+				action: 'fetch',
+				entity: 'progress trend'
+			});
 
 			// Sorting the data by date in chronological order
 			const sortedData = apiData.sort((a, b) => new Date(a.date) - new Date(b.date));

@@ -2,6 +2,7 @@
 	import { Card, ProgressIndicator } from '$lib';
 	import { selectedClassStore } from '$lib/stores/globalFilters.js';
 	import { onMount } from 'svelte';
+	import { fetchApi } from '$lib/apiUtils.js';
 
 	// Props
 	export let title = 'Learning Outcome scores';
@@ -10,36 +11,36 @@
 		{ label: 'Application', value: 0 },
 		{ label: 'Understanding', value: 0 }
 	];
-	let isLoading = true;
-	let error = '';
+	let isLoading = false;
+	export let error = '';
 
 	let isMounted = false;
 
-	async function fetchLearningOutcomes() {
-		try {
-			isLoading = true;
-			error = '';
-			const { className, division, subject } = $selectedClassStore;
-			const classSubject = `${className}${division}_${subject}`;
-			const response = await fetch(`/apis/teacher/learningOutcomes/${classSubject}`);
-			if (!response.ok) {
-				throw new Error('Failed to fetch top performers data');
-			}
-			outcomes = await response.json();
-		} catch (err) {
-			error = err.message;
-		} finally {
-			isLoading = false;
-		}
-	}
+	// async function fetchLearningOutcomes() {
+	// 	try {
+	// 		isLoading = true;
+	// 		error = '';
+	// 		const { className, division, subject } = $selectedClassStore;
+	// 		const classSubject = `${className}${division}_${subject}`;
+	// 		outcomes = await fetchApi(`/apis/teacher/learningOutcomes/${classSubject}`, {
+	// 			action: 'fetch',
+	// 			entity: 'learning outcomes'
+	// 		});
+	// 	} catch (err) {
+	// 		error = err.message;
+	// 	} finally {
+	// 		isLoading = false;
+	// 	}
+	// }
 
-	$: if (isMounted && $selectedClassStore) {
-		fetchLearningOutcomes();
-	}
+	// $: if (isMounted && $selectedClassStore) {
+	// 	fetchLearningOutcomes();
+	// }
 
-	onMount(() => {
-		isMounted = true;
-	});
+	// onMount(() => {
+	// 	isMounted = true;
+	// });
+
 </script>
 
 <Card>
@@ -52,7 +53,7 @@
 	{#if isLoading}
 		<div class="p-4 text-center">Loading...</div>
 	{:else if error}
-		<div class="p-4 text-center text-red-500">{error}</div>
+		<div class="p-4 text-center text-red-500 text-sm">{error}</div>
 	{:else}
 		<div class="flex flex-col h-full justify-between">
 			<div class="space-y-8 mb-4">

@@ -6,17 +6,10 @@
 	import ExamSchedule from '$lib/components/profileSection/ExamSchedule.svelte';
 	import Achievements from '$lib/components/profileSection/Achievements.svelte';
 	import { fetchApi } from '$lib/apiUtils.js';
+	import { onMount } from 'svelte';
 
 	// Sample data
-	export let profileData = {
-		name: 'Kavya Reddy',
-		role: 'STUDENT',
-		class_: '3',
-		id: '321468',
-		school: "St. Mary's Higher Secondary School",
-		location: 'Trivandrum',
-		image: '/kavya_reddy.png'
-	};
+	export let profileData = {};
 
 	const statsData = [
 		{
@@ -49,14 +42,7 @@
 		}
 	];
 
-	const chatHistory = [
-    { "uuid": 1, "text": "How did Class 5 perform overall in the recent Mathematics assessment?" },
-    { "uuid": 2, "text": "What are the common challenges Class 3 students face in multiplication?" },
-    { "uuid": 3, "text": "Which specific topics in Geometry need more attention for Class 5?" },
-    { "uuid": 4, "text": "Are there any patterns in the errors made by Class 3 in their basic arithmetic problems?" }
-]
-
-	const pinnedChats = 12;
+	let chatHistory = [];
 
 	const suggestedQueries = [
 		{ id: 1, title: 'Subject specific insights', query: 'How did I perform in Mathematics?' },
@@ -86,6 +72,10 @@
 	let loadingChatDetails = false;
 	let chatError = null;
 
+	let pinnedChats = [];
+
+	let selectedTab = 0;
+
 	function handleClick() {
 		if (chatInterface) {
 			chatInterface.focusChatBox(); // Call the focusChatBox method from ChatInterface
@@ -100,7 +90,10 @@
 		if (!chat || (!chat.id && !chat.uuid)) return;
 		loadingChatDetails = true;
 		try {
-		const data = await fetchApi(`/apis/student/chat/details/${chat.id || chat.uuid}`);
+			const data = await fetchApi(
+				`/apis/student/chat/details/${chat.id || chat.uuid}?title=${chat.text}`,
+				{ action: 'fetch', entity: 'chat details' }
+			);
 			chatDetails = { queryTitle: data.title, response: data.details };
 		} catch (err) {
 			chatError = err.message;
@@ -115,13 +108,29 @@
 		chatError = null;
 		loadingChatDetails = true;
 		try {
-			const data = await fetchApi(`/apis/student/chat/suggestions/${suggestion.id}`);
-			chatDetails = { queryTitle: data.query, response: data.response };
+			const data = await fetchApi('/apis/student/chat', {
+				method: 'POST',
+				body: { title: suggestion.query },
+				action: 'fetch',
+				entity: 'chat suggestion'
+			});
+			setChatDetailsAndAddToHistory(data);
 		} catch (err) {
 			chatError = err.message;
 		} finally {
 			loadingChatDetails = false;
 		}
+	}
+
+	function addNewChatToHistory(data) {
+		const newChat = { uuid: data.id, text: data.title };
+		chatHistory = [...chatHistory, newChat];
+		selectedChat = newChat;
+	}
+
+	function setChatDetailsAndAddToHistory(data) {
+		chatDetails = { queryTitle: data.title, response: data.response };
+		addNewChatToHistory(data);
 	}
 
 	async function handleChatInput(e) {
@@ -130,14 +139,63 @@
 		chatError = null;
 		loadingChatDetails = true;
 		try {
-			const data = await fetchApi('/apis/student/chat', { method: 'POST', body: { title: inputText } });
-			chatDetails = { queryTitle: data.title, response: data.response };
+			const data = await fetchApi('/apis/student/chat', {
+				method: 'POST',
+				body: { title: inputText },
+				action: 'fetch',
+				entity: 'chat input'
+			});
+			setChatDetailsAndAddToHistory(data);
 		} catch (err) {
 			chatError = err.message;
 		} finally {
 			loadingChatDetails = false;
 		}
 	}
+
+	function handlePinChat(chat) {
+		if (!pinnedChats.some((c) => (c.id || c.uuid) === (chat.id || chat.uuid))) {
+			const maxOrder =
+				pinnedChats.length > 0 ? Math.max(...pinnedChats.map((c) => c.order || 1)) : 1;
+			const order = maxOrder + 1;
+			console.log('new order-student', order);
+			pinnedChats = [...pinnedChats, { ...chat, order }];
+			selectedTab = 1;
+		}
+	}
+
+	function handleUnpinChat(chat) {
+		pinnedChats = pinnedChats.filter((c) => (c.id || c.uuid) !== (chat.id || chat.uuid));
+	}
+
+	function handleChatMenuAction(e) {
+		const { chat, action } = e.detail;
+
+		switch (action) {
+			case 'pin':
+				handlePinChat(chat);
+				break;
+			case 'unpin':
+				handleUnpinChat(chat);
+				break;
+			// Add more actions as needed
+			default:
+				console.log('Unknown chat menu action:', action, chat);
+		}
+		console.log('pinnedChats', pinnedChats);
+	}
+
+	onMount(async () => {
+		try {
+			const data = await fetchApi('/apis/student/chat', {
+				action: 'fetch',
+				entity: 'chat history'
+			});
+			chatHistory = []
+		} catch (err) {
+			console.error('Failed to fetch chat history:', err);
+		}
+	});
 </script>
 
 <main class="min-h-screen">
@@ -147,9 +205,11 @@
 			<Profile {...profileData} />
 			<ChatHistory
 				history={chatHistory}
-				pinnedCount={pinnedChats}
 				on:chatSelected={handleChatSelection}
 				selected={selectedChat}
+				on:chatMenuAction={handleChatMenuAction}
+				{pinnedChats}
+				bind:selectedTab
 			/>
 		</div>
 
@@ -177,9 +237,3 @@
 		</div>
 	</div>
 </main>
-
-<style lang="postcss">
-	:global(body) {
-		font-family: 'Roboto', sans-serif;
-	}
-</style>

@@ -1,11 +1,13 @@
 <script>
 	// Import your existing components
+	import { onMount } from 'svelte';
 	import ProfileCard from '$lib/components/profileSection/Profile.svelte';
 	import ChatHistory from '$lib/components/profileSection/ChatHistory.svelte';
 	import { OtherClassSummary } from '$lib';
 	import ChatInterface from '$lib/components/profileSection/ChatInterface.svelte';
 	import AllClassesSummary from '$lib/components/teacher/AllClassesSummary.svelte';
 	import { fetchApi } from '$lib/apiUtils.js';
+	import { getErrorMessage } from '$lib/utils';
 	export let profileData = {
 		name: 'Sabdeep Sharma',
 		role: 'TEACHER',
@@ -16,17 +18,19 @@
 		image: '/sandeep_pic.png'
 	};
 	// Sample class data for the horizontal scrollable area
-	export let classes = [];
+	export let allClassesSummary = [];
+	export let chartDataError = '';
+	
+	let chatHistory = [];
+	let pinnedChats = [];
+	let selectedTab = 0;
+	let chatInterface = null;
 
-	const chatHistory = [
-		{ uuid: 1, text: 'How did Class 10 perform in the end-term exam?' },
-		{ uuid: 2, text: 'What are the weak areas in Mathematics for Class 7?' },
-		{ uuid: 3, text: 'Which students from Class 5 showed the most improvement in English?' },
-		{ uuid: 4, text: 'What can be done to improve vocabulary for Class 3A?' }
-		// Add more as needed, incrementing the id
-	];
+	let loadingChatHistory = false;
+	let chatHistoryError = null;
+	let loadingChatDetails = false;
+	let chatDetailsError = null;
 
-	const pinnedChats = 12;
 	const suggestedQueries = [
 		{
 			id: 1,
@@ -36,30 +40,24 @@
 		{ id: 2, title: 'Analyze weak areas', query: 'Weaknesses of class 3 students in English.' }
 	];
 
-	// Helper function to determine score color
-	function getScoreColor(status) {
-		if (status === 'success') return 'bg-green-light text-green-dark';
-		if (status === 'warning') return 'bg-orange-light text-orange-dark';
-		return 'bg-gray-light text-gray-dark';
-	}
-
 	let selectedChat = null;
 	let chatDetails = null;
-	let loadingChatDetails = false;
-	let chatError = null;
 
 	async function handleChatSelection(e) {
 		const chat = e.detail;
 		selectedChat = chat;
 		chatDetails = null;
-		chatError = null;
+		chatDetailsError = null;
 		if (!chat || (!chat.id && !chat.uuid)) return;
 		loadingChatDetails = true;
 		try {
-			const data = await fetchApi(`/apis/teacher/chat/details/${chat.id || chat.uuid}`);
+			const data = await fetchApi(
+				`/apis/teacher/chat/details/${chat.id || chat.uuid}?title=${chat.text}`,
+				{ action: 'fetch', entity: 'chat details' }
+			);
 			chatDetails = { queryTitle: data.title, response: data.details };
 		} catch (err) {
-			chatError = err.message;
+			chatDetailsError = err.message;
 		} finally {
 			loadingChatDetails = false;
 		}
@@ -67,37 +65,105 @@
 
 	async function handleFetchFromSuggestion(e) {
 		const suggestion = e.detail;
-		console.log('suggestion', suggestion);
 		chatDetails = null;
-		chatError = null;
+		chatDetailsError = null;
 		loadingChatDetails = true;
 		try {
-			const data = await fetchApi(`/apis/teacher/chat/suggestions/${suggestion.id}`);
-			chatDetails = { queryTitle: data.query, response: data.response };
+			const data = await fetchApi(`/apis/teacher/chat`, {
+				method: 'POST',
+				body: { title: suggestion.query },
+				action: 'fetch',
+				entity: 'chat suggestion'
+			});
+			setChatDetailsAndAddToHistory(data);
 		} catch (err) {
-			chatError = err.message;
+			chatDetailsError = err.message;
 		} finally {
 			loadingChatDetails = false;
 		}
 	}
 
+	function addNewChatToHistory(data) {
+		const newChat = { uuid: data.id, text: data.title };
+		chatHistory = [...chatHistory, newChat];
+		selectedChat = newChat;
+	}
+
+	function setChatDetailsAndAddToHistory(data) {
+		chatDetails = { queryTitle: data.title, response: data.response };
+		addNewChatToHistory(data);
+	}
+
 	async function handleChatInput(e) {
 		const inputText = e.detail;
 		chatDetails = null;
-		chatError = null;
+		chatDetailsError = null;
 		loadingChatDetails = true;
 		try {
 			const data = await fetchApi('/apis/teacher/chat', {
 				method: 'POST',
-				body: { title: inputText }
+				body: { title: inputText },
+				action: 'fetch',
+				entity: 'chat input'
 			});
-			chatDetails = { queryTitle: data.title, response: data.response };
+			setChatDetailsAndAddToHistory(data);
 		} catch (err) {
-			chatError = err.message;
+			chatDetailsError = err.message;
 		} finally {
 			loadingChatDetails = false;
 		}
 	}
+
+	function handlePinChat(chat) {
+		if (!pinnedChats.some((c) => (c.id || c.uuid) === (chat.id || chat.uuid))) {
+			const maxOrder =
+				pinnedChats.length > 0 ? Math.max(...pinnedChats.map((c) => c.order || 1)) : 1;
+			const order = maxOrder + 1;
+			pinnedChats = [...pinnedChats, { ...chat, order }];
+			selectedTab = 1;
+		}
+	}
+
+	function handleUnpinChat(chat) {
+		pinnedChats = pinnedChats.filter((c) => (c.id || c.uuid) !== (chat.id || chat.uuid));
+	}
+
+	function handleChatMenuAction(e) {
+		const { chat, action } = e.detail;
+		switch (action) {
+			case 'pin':
+				handlePinChat(chat);
+				break;
+			case 'unpin':
+				handleUnpinChat(chat);
+				break;
+			// Add more actions as needed
+			default:
+				console.log('Unknown chat menu action:', action, chat);
+		}
+	}
+
+	async function fetchChatHistory() {
+		loadingChatHistory = true;
+		chatHistoryError = null;
+		try {
+			const data = await fetchApi('/apis/teacher/chat', {
+				action: 'fetch',
+				entity: 'chat history'
+			});
+
+			// chatHistory = data;
+			chatHistory = [];
+		} catch (err) {
+			chatHistoryError = err.message;
+		} finally {
+			loadingChatHistory = false;
+		}
+	}
+
+	onMount(() => {
+		fetchChatHistory();
+	});
 </script>
 
 <div class="w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-5">
@@ -107,9 +173,15 @@
 
 		<ChatHistory
 			history={chatHistory}
-			pinnedCount={pinnedChats}
 			on:chatSelected={handleChatSelection}
 			selected={selectedChat}
+			on:chatMenuAction={handleChatMenuAction}
+			{pinnedChats}
+			bind:selectedTab
+			loadingHistory={loadingChatHistory}
+			historyError={chatHistoryError}
+			loadingDetails={loadingChatDetails}
+			detailsError={chatDetailsError}
 		/>
 	</div>
 
@@ -117,12 +189,17 @@
 	<div class="lg:col-span-9 space-y-5 h-full">
 		<div class="flex flex-col gap-4 h-full">
 			<!-- Horizontal Scrollable Class Cards -->
-			<!--  -->
-			<AllClassesSummary />
+			<AllClassesSummary
+				classes={allClassesSummary}
+				error={chartDataError
+					? `Failed to load all classes performance summary. ${chartDataError}`
+					: ''}
+			/>
 			<div class=" flex-grow">
 				<ChatInterface
 					aiResponse={chatDetails}
 					{suggestedQueries}
+					bind:this={chatInterface}
 					on:fetchFromSuggestion={handleFetchFromSuggestion}
 					on:chatInput={handleChatInput}
 				/>

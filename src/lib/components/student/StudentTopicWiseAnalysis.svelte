@@ -3,7 +3,7 @@
 	import { onMount } from 'svelte';
 	import ErrorComponent from '$lib/components/ErrorComponent.svelte';
 	import SkelClassSummary from '$lib/components/loadingSkeletons/SkelClassSummary.svelte';
-	import { fetchStrengths, fetchWeaknesses } from '$lib/apiUtils.js';
+	import { fetchApi } from '$lib/apiUtils.js';
 
 	let strengths = [];
 	let weaknesses = [];
@@ -15,9 +15,12 @@
 	const STUDENT_ID=1;
 
 	async function loadStrengths() {
-
 		try {
-			strengths = await fetchStrengths(`/apis/student/topic-wise-analysis/strengths/${STUDENT_ID}`);
+			isLoadingStrengths = true;
+			strengths = await fetchApi(`/apis/student/topic-wise-analysis/strengths/${STUDENT_ID}`, {
+				action: 'fetch',
+				entity: 'topic-wise strengths'
+			});
 		} catch (err) {
 			errorStrengths = err.message;
 		} finally {
@@ -27,7 +30,11 @@
 
 	async function loadWeaknesses() {
 		try {
-			weaknesses = await fetchWeaknesses(`/apis/student/topic-wise-analysis/weaknesses/${STUDENT_ID}`);
+			isLoadingWeaknesses = true;
+			weaknesses = await fetchApi(`/apis/student/topic-wise-analysis/weaknesses/${STUDENT_ID}`, {
+				action: 'fetch',
+				entity: 'topic-wise weaknesses'
+			});
 		} catch (err) {
 			errorWeaknesses = err.message;
 		} finally {

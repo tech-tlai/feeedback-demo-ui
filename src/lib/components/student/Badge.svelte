@@ -11,12 +11,12 @@
     const badgeIcons = {
       scholar: {
         icon: `<div class="relative">
-                <img src="violet_medal.png" alt="Medal" class="w-8 h-8" />
+                <img src="/violet_medal.png" alt="Medal" class="w-8 h-8" />
               </div>`,
       },
       wizard: {
         icon: `<div class="relative">
-                 <img src="green_medal.png" alt="Medal" class="w-8 h-8" />
+                 <img src="/green_medal.png" alt="Medal" class="w-8 h-8" />
               </div>`,
       },
       achiever: {
@@ -29,7 +29,7 @@
       genius: {
         // For custom icon, pass the SVG directly as a prop
         icon: `<div class="relative">
-                <img src="red_medal.png" alt="Medal" class="w-8 h-8" />
+                <img src="/red_medal.png" alt="Medal" class="w-8 h-8" />
               </div>`
       },
       custom:{

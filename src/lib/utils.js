@@ -73,3 +73,99 @@ export function clickOutside(node, callback) {
 
   return `${day} ${month} '${yearShort}`;
 }
+
+
+/**
+ * Generates a user-friendly error message based on HTTP status.
+ * 
+ * @param {Response | { status: number }} response - The fetch response or error object.
+ * @param {'fetch' | 'create' | 'update' | 'delete'} action - The attempted action.
+ * @param {string} entity - The name of the entity or module (e.g., "chat history").
+ * @returns {string} A human-readable error message.
+ */
+export function getErrorMessage(response, action = 'fetch', entity = 'data') {
+	const status = response?.status;
+
+	switch (status) {
+		case 400:
+			return `Failed to ${action} ${entity}. Invalid request.`;
+		case 401:
+			return `Failed to ${action} ${entity}. You are unauthorized.`;
+		case 403:
+			return `Failed to ${action} ${entity}. Access is forbidden.`;
+		case 404:
+			return `Failed to ${action} ${entity}. Not found.`;
+		case 409:
+			return `Failed to ${action} ${entity}. Conflict occurred.`;
+		case 422:
+			return `Failed to ${action} ${entity}. Unprocessable data.`;
+		case 429:
+			return `Failed to ${action} ${entity}. Too many requests. Please try again later.`;
+		case 500:
+			return `Failed to ${action} ${entity}. Internal server error.`;
+		case 502:
+			return `Failed to ${action} ${entity}. Bad gateway.`;
+		case 503:
+			return `Failed to ${action} ${entity}. Service unavailable.`;
+		case 504:
+			return `Failed to ${action} ${entity}. Gateway timeout.`;
+		default:
+			return `Failed to ${action} ${entity}. Something went wrong.`;
+	}
+}
+
+
+export function transformSectionWiseData(sectionWiseData) {
+  const resultMap = new Map();
+
+  // Loop through each section
+  for (const section of sectionWiseData.sectionData) {
+    const className = section.section;
+
+    // Loop through each score in the section
+    for (const score of section.scores) {
+      const range = score.scoreRange;
+      const proportion = score.studentProportion;
+
+      // If the range is not yet in resultMap, initialize it
+      if (!resultMap.has(range)) {
+        resultMap.set(range, {
+          scoreRange: range,
+          scores: [],
+        });
+      }
+
+      // Push the score for this class
+      resultMap.get(range).scores.push({
+        studentProportion: proportion,
+        class: className,
+      });
+    }
+  }
+
+  // Convert Map to Array
+  return Array.from(resultMap.values());
+}
+
+
+export function toHistogramArray(transformedData) {
+  const classList = [];
+
+  // Collect unique class names (in order of appearance)
+  transformedData[0]?.scores?.forEach(score => {
+    classList.push(score.class);
+  });
+
+  // Initialize a 2D array with one row per class
+  const histogramData = classList.map(() => []);
+
+  // Loop through each score range
+  transformedData.forEach(entry => {
+    entry.scores.forEach((score, index) => {
+      histogramData[index].push(score.studentProportion);
+    });
+  });
+
+  return histogramData;
+}
+

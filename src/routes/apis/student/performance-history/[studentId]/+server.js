@@ -87,6 +87,7 @@ export async function GET({ url ,params}) {
         }
 
         const data = await response.json();
+      
         return json(data);
     } catch (error) {
         return json({ error: 'An error occurred while fetching performance history data' }, { status: 500 });

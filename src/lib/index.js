@@ -6,25 +6,39 @@
 
 //lib/components
 import Card from '$lib/components/Card.svelte';
+import ChatItem from '$lib/components/ChatItem.svelte';
+import CommonDashCard from '$lib/components/CommonDashCard.svelte';
+import ContextMenu from '$lib/components/ContextMenu.svelte';
 import Button from '$lib/components/Button.svelte';
 import Datatable from '$lib/components/Datatable.svelte';
+import FileUpload from '$lib/components/FileUpload.svelte';
+import FileUploadComponent from '$lib/components/FileUploadComponent.svelte';
 import FilterDropdown from '$lib/components/FilterDropdown.svelte';
 import LegacyDatatable from '$lib/components/LegacyDatatable.svelte';
 import LegacyTabs from '$lib/components/LegacyTabs.svelte';
+import MultiFileUpload from '$lib/components/MultiFileUpload.svelte';
 import ProgressIndicator from '$lib/components/ProgressIndicator.svelte';
 import SearchBar from '$lib/components/SearchBar.svelte';
+import SearchableComboBox from "$lib/components/SearchableComboBox.svelte"
 import SectionTitle from '$lib/components/SectionTitle.svelte';
 import StrengthWeaknessNotfn from '$lib/components/StrengthWeaknessNotfn.svelte';
 import Tabs from '$lib/components/Tabs.svelte';
 export {
     Card,
+    ChatItem,
+    CommonDashCard,
+    ContextMenu,
     Button,
     Datatable,
+    FileUpload,
+    FileUploadComponent,
     FilterDropdown,
     LegacyDatatable,
     LegacyTabs,
+    MultiFileUpload,
     ProgressIndicator,
     SearchBar,
+    SearchableComboBox,
     SectionTitle,
     StrengthWeaknessNotfn,
     Tabs
@@ -48,10 +62,14 @@ export {
 //lib/components/loadingSkeletons
 
 import SkelClassSummary from '$lib/components/loadingSkeletons/SkelClassSummary.svelte';
+import SkelChatHistory from '$lib/components/loadingSkeletons/SkelChatHistory.svelte';
+import SkelChartWidget from '$lib/components/loadingSkeletons/SkelChartWidget.svelte';
 import SkelDataTable from '$lib/components/loadingSkeletons/SkelDataTable.svelte';
 
 export {
   SkelClassSummary,
+  SkelChatHistory,
+  SkelChartWidget,
   SkelDataTable 
 }
 // =========================================================================   
@@ -60,7 +78,7 @@ export {
 import TeacherProfileSection from '$lib/components/teacher/TeacherProfileSection.svelte';
 import TopicWiseAnalysisSection from '$lib/components/teacher/TopicWiseAnalysisSection.svelte';
 
-export { TeacherProfileSection, TopicWiseAnalysisSection,}
+export { TeacherProfileSection, TopicWiseAnalysisSection}
 
 // ================================================================================
 

@@ -3,6 +3,7 @@
     import {Card, DrilldownChart} from "$lib";
     import { selectedClassStore, chatContextStore } from '$lib/stores/globalFilters.js';
 	import { FilterIcon } from '$lib/svgComponents';
+	import { fetchApi } from '$lib/apiUtils.js';
 
     const chartTitle = "Student distribution";
     let transformedData = null;
@@ -25,12 +26,10 @@
 			error=null;
 			const { className, division, subject } = $selectedClassStore;
 			const classSubject = `${className}${division}_${subject}`;
-
-            const response = await fetch(`/apis/teacher/student-distribution/${classSubject}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-            const data = await response.json();
+			const data = await fetchApi(`/apis/teacher/student-distribution/3A_English`, {
+				action: 'fetch',
+				entity: 'student distribution'
+			});
 
             transformedData = {
                 name: 'Student Distribution',

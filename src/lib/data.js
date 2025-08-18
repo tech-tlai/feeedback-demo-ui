@@ -129,3 +129,66 @@ export const aiResponse = [
     content: 'Let me know if you’d like a detailed topic-wise breakdown!'
   }
 ];
+
+
+export const studentChatDetails = {
+    1: { id: 1, title: 'How did I perform in previous 4 English tests?', details: 'You scored 85, 88, 90, and 87 in your last 4 English tests.' },
+    2: { id: 2, title: 'Analyse my weaknesses in Hindi grammar.', details: 'Common mistakes: verb conjugation, gender agreement.' },
+    3: { id: 3, title: 'Overall performance in Mathematics tests', details: 'Average score: 78%. Strength: Algebra. Weakness: Geometry.' },
+    4: { id: 4, title: 'What feedback do you have on my problem..', details: 'Try to show your work step by step for better feedback.' },
+    5: { id: 5, title: 'How did I perform in previous 4 English tests?', details: 'Repeated query. See above.' }
+};
+
+
+export const students = [
+  { id: 1, name: 'Kavya Reddy', grade: '10', section: 'A' },
+  { id: 2, name: 'Saanvi Das', grade: '10', section: 'A' },
+  { id: 3, name: 'Ishaan Gupta', grade: '10', section: 'B' },
+  { id: 4, name: 'Meera Menon', grade: '10', section: 'B' },
+  { id: 5, name: 'Aditya Pillai', grade: '10', section: 'C' },
+  { id: 6, name: 'Riya Sharma', grade: '10', section: 'C' },
+  { id: 7, name: 'Krishna Reddy', grade: '10', section: 'D' },
+  { id: 8, name: 'Ananya Iyer', grade: '10', section: 'D' },
+  { id: 9, name: 'Varun Chopra', grade: '10', section: 'E' },
+  { id: 10, name: 'Diya Bansal', grade: '10', section: 'E' },
+  { id: 11, name: 'Karan Verma', grade: '10', section: 'F' },
+  { id: 12, name: 'Aditi Jain', grade: '10', section: 'F' },
+  { id: 13, name: 'Mohmd Jaleel AbdulKhader', grade: '10', section: 'F' },
+  { id: 14, name: 'Rohan Singh', grade: '10', section: 'G' },
+  { id: 15, name: 'Neha Kulkarni', grade: '10', section: 'G' },
+  { id: 16, name: 'Aryan Mishra', grade: '10', section: 'G' },
+  { id: 17, name: 'Sneha Patil', grade: '10', section: 'G' },
+  { id: 18, name: 'Vikram Rao', grade: '10', section: 'G' },
+  { id: 19, name: 'Pooja Thakur', grade: '10', section: 'G' },
+  { id: 20, name: 'Rajesh Kumar', grade: '10', section: 'G' },
+  { id: 21, name: 'Priya Joshi', grade: '10', section: 'G' },
+  { id: 22, name: 'Aakash Yadav', grade: '10', section: 'G' },
+  { id: 23, name: 'Prakash Yadav', grade: '10', section: 'F' },
+  { id: 24, name: 'Savakash Yadav', grade: '10', section: 'F' },
+  { id: 25, name: 'Nikita Mehta', grade: '10', section: 'H' },
+  { id: 26, name: 'Harsh Vardhan', grade: '10', section: 'H' },
+  { id: 27, name: 'Siddharth Das', grade: '10', section: 'I' },
+  { id: 28, name: 'Kriti Ghosh', grade: '10', section: 'I' },
+  { id: 29, name: 'Tanya Roy', grade: '10', section: 'J' },
+  { id: 30, name: 'Arjun Banerjee', grade: '10', section: 'J' }
+];
+
+export const teachers = [
+  { id: 1, name: 'Mr. Sandeep Sharma',grade: '7', subject: 'English' },
+  { id: 2, name: 'Mr. Sandeep Kumar', subject: 'Mathematics' },
+  { id: 3, name: 'Ms. Jance Joseph', subject: 'Science' },
+  { id: 4, name: 'Mr. Rajeev Menon', subject: 'Social Science' },
+  { id: 5, name: 'Mrs. Priya Sharma', subject: 'Hindi' },
+  { id: 6, name: 'Mr. Arvind Rao', subject: 'Computer Science' },
+  { id: 7, name: 'Ms. Pooja Thakur', subject: 'Biology' },
+  { id: 8, name: 'Mr. Vikram Singh', subject: 'Physics' },
+  { id: 9, name: 'Mrs. Neha Kulkarni', subject: 'Chemistry' },
+  { id: 10, name: 'Ms. Ananya Iyer', subject: 'English' }
+];
+
+export const teacherChatDetails = {
+    1: { id: 1, title: 'How did Class 10 perform in the end-term exam?', details: 'Class 10 average: 82%. Top scorer: Aryan Mishra.' },
+    2: { id: 2, title: 'What are the weak areas in Mathematics for Class 7?', details: 'Weaknesses: Fractions, Geometry.' },
+    3: { id: 3, title: 'Which students from Class 5 showed the most improvement in English?', details: 'Most improved: Nikita Mehta, Harsh Vardhan.' },
+    4: { id: 4, title: 'What can be done to improve vocabulary for Class 3A?', details: 'Suggestions: Daily reading, vocabulary games.' }
+};

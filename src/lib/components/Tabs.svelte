@@ -7,7 +7,6 @@
 		{ id: 1, text: 'Class 3A English' } // id and text are mandatory fields, can add more metadata as required.
 	];
 
-	$: console.log('tabs', tabs);
 
 	// Index of the currently selected tab (default to first tab)
 	export let selectedIndex = 0;
@@ -17,23 +16,25 @@
 
 	// Function to handle tab selection
 	function selectTab(index, tab) {
-		selectedIndex = index;
-		dispatch('tabSelected', { index, tab });
+		if (selectedIndex !== index) {
+			selectedIndex = index;
+			dispatch('tabSelected', { index, tab });
+		}
 	}
 
-	onMount(() => {
-		dispatch('tabSelected', {
-			index: selectedIndex,
-			tab: tabs[selectedIndex]
-		});
-	});
+	// onMount(() => {
+	// 	dispatch('tabSelected', {
+	// 		index: selectedIndex,
+	// 		tab: tabs[selectedIndex]
+	// 	});
+	// });
 </script>
 
 <div class=" border-b border-gray-light">
 	<div class="flex">
 		{#each tabs as tab, index}
 			<button
-				class="px-4 py-3 text-base relative {selectedIndex === index
+				class="px-4 py-3 text-sm relative {selectedIndex === index
 					? 'text-black font-semibold'
 					: 'text-gray-dark font-medium'}"
 				on:click={() => selectTab(index, tab)}
