@@ -82,7 +82,7 @@
 	}
 
 	async function fetchAnalysisWithStudentId() {
-		return await postFormDataToApi('/apis/student/upload', { student_id: studentId });
+		return await postFormDataToApi('http://65.2.78.221:8000/v1/feedback/student', { student_id: studentId });
 	}
 
 	async function fetchAllDashboardData() {
@@ -128,7 +128,7 @@
 		}
 
 		try {
-			const res = await postFormDataToApi('/apis/student/upload', {
+			const res = await postFormDataToApi('http://65.2.78.221:8000/v1/feedback/student', {
 				student_id: studentId,
 				subject: selectedSubject
 			});

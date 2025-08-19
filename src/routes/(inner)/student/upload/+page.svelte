@@ -56,7 +56,8 @@
 		const formData = new FormData();
 		formData.append('excel_file', files[0]);
 		try {
-			const res = await fetch('/apis/student/upload', { method: 'POST', body: formData });
+			// const res = await fetch('/apis/student/upload', { method: 'POST', body: formData });
+			const res = await fetch('http://65.2.78.221:8000/v1/feedback/student', { method: 'POST', body: formData });
 			if (res.ok) {
 				const data = await res.json();
 				// const transformed = transformStudentList(data.teachers);
